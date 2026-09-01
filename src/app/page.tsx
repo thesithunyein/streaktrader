@@ -155,6 +155,31 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* Business Model */}
+      <section className="max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+          <span className="text-xs font-semibold text-accent uppercase tracking-widest">Built for Growth</span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-text mt-3">How StreakTrader sustains</h2>
+        </motion.div>
+        <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+          {[
+            { icon: Zap, title: "Free to Trade", desc: "Zero fees on all trades. StreakTrader is free for everyone — no hidden costs, no minimums." },
+            { icon: Trophy, title: "Premium Analytics", desc: "Advanced streak tracking, historical performance, and market intelligence for power users." },
+            { icon: TrendingUp, title: "Viral Growth", desc: "Shareable streak cards drive organic acquisition. Every share brings new traders to DreamDEX." },
+          ].map((item, i) => (
+            <motion.div key={item.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+              className="glass rounded-2xl p-6 text-center card-hover">
+              <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                <item.icon className="w-6 h-6 text-accent" />
+              </div>
+              <div className="text-base font-bold text-text mb-2">{item.title}</div>
+              <div className="text-sm text-text-dim leading-relaxed">{item.desc}</div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="max-w-6xl mx-auto px-4 py-16 sm:py-20 text-center">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>

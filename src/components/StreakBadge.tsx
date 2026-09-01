@@ -1,9 +1,13 @@
 "use client";
 
 import { useStreakStore } from "@/lib/store";
-import { Zap, Target, TrendingUp, Activity } from "lucide-react";
+import { Zap, Target, TrendingUp, Activity, Share2 } from "lucide-react";
 
-export default function StatsBar() {
+interface StatsBarProps {
+  onShare?: () => void;
+}
+
+export default function StatsBar({ onShare }: StatsBarProps) {
   const { streak, getMultiplier, getWinRate, totalPnL } = useStreakStore();
 
   const multiplier = getMultiplier();
@@ -53,7 +57,7 @@ export default function StatsBar() {
         </div>
       </div>
 
-      <div className="glass rounded-2xl p-4 flex flex-col items-center justify-center gap-2 card-hover">
+      <div className="glass rounded-2xl p-4 flex flex-col items-center justify-center gap-2 card-hover relative">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${totalPnL >= 0 ? "bg-up/10" : "bg-down/10"}`}>
           <TrendingUp className={`w-5 h-5 ${totalPnL >= 0 ? "text-up" : "text-down"}`} />
         </div>
@@ -63,6 +67,11 @@ export default function StatsBar() {
           </div>
           <div className="text-xs text-text-dim uppercase tracking-wider">P&L</div>
         </div>
+        {streak > 0 && onShare && (
+          <button onClick={onShare} className="absolute top-2 right-2 w-7 h-7 rounded-full bg-accent/10 flex items-center justify-center hover:bg-accent/20 transition-colors" title="Share streak">
+            <Share2 className="w-3.5 h-3.5 text-accent" />
+          </button>
+        )}
       </div>
     </div>
   );

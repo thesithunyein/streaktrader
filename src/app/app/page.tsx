@@ -9,6 +9,7 @@ import StatsBar from "@/components/StreakBadge";
 import MarketCard from "@/components/MarketCard";
 import TradePanel from "@/components/TradePanel";
 import SettlementView from "@/components/SettlementView";
+import StreakCard from "@/components/StreakCard";
 import Footer from "@/components/Footer";
 import { useMarkets } from "@/hooks/useMarkets";
 import { Activity, Loader2 } from "lucide-react";
@@ -57,6 +58,7 @@ export default function TradingApp() {
   const [selectedMarket, setSelectedMarket] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showStreakCard, setShowStreakCard] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -78,7 +80,7 @@ export default function TradingApp() {
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 pt-4 pb-8">
         {/* Stats */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-          <StatsBar />
+          <StatsBar onShare={() => setShowStreakCard(true)} />
         </motion.div>
 
         {/* Live Markets */}
@@ -150,6 +152,10 @@ export default function TradingApp() {
       </AnimatePresence>
 
       <SettlementView />
+
+      <AnimatePresence>
+        {showStreakCard && <StreakCard onClose={() => setShowStreakCard(false)} />}
+      </AnimatePresence>
 
       {/* Onboarding */}
       <AnimatePresence>
