@@ -70,66 +70,70 @@ export default function AnimatedBackground() {
           vec2 uv = gl_FragCoord.xy / u_resolution;
           float t = u_time * 0.4;
 
-          // Logo blue = #2563eb
-          // Clean white background, very subtle blue waves only in bottom half
-          vec3 base = vec3(0.98, 0.99, 1.0);  // #fafcff — nearly white
+          // Logo blue gradient background: #2563eb to #3b82f6
+          // Logo = white S on bright blue. Match that blue.
+          vec3 blueLight = vec3(0.42, 0.60, 0.95);  // #6b99f2 — lighter blue top
+          vec3 blueMain = vec3(0.30, 0.50, 0.93);   // #4d80ed — mid blue
+          vec3 blueDeep = vec3(0.22, 0.42, 0.90);   // #396be5 — deeper blue bottom
 
-          // Only show waves in the lower 60% — keep top clean for text
-          float yMask = smoothstep(0.35, 0.55, uv.y);  // fades in from 35%-55% down
+          // Base gradient from top to bottom
+          vec3 base = mix(blueLight, mix(blueMain, blueDeep, uv.y), uv.y * 0.7);
 
-          // Wave 1: top wave, very subtle
-          float wave1_y = 0.55
-            + sin(uv.x * 2.0 + t * 0.5) * 0.04
-            + sin(uv.x * 3.5 - t * 0.3) * 0.02
-            + snoise(vec2(uv.x * 1.2 + t * 0.15, 0.5)) * 0.03;
-          float wave1 = smoothstep(wave1_y + 0.03, wave1_y - 0.03, uv.y);
-          vec3 wave1Color = vec3(0.93, 0.96, 1.0);  // very faint blue tint
-          base = mix(base, wave1Color, wave1 * 0.3 * yMask);
+          // Wave layers — lighter/darker variations within the blue
+          // Wave 1: lighter wave on top
+          float wave1_y = 0.25
+            + sin(uv.x * 2.0 + t * 0.5) * 0.05
+            + sin(uv.x * 3.5 - t * 0.3) * 0.025
+            + snoise(vec2(uv.x * 1.2 + t * 0.15, 0.5)) * 0.04;
+          float wave1 = smoothstep(wave1_y + 0.04, wave1_y - 0.04, uv.y);
+          vec3 wave1Color = vec3(0.50, 0.68, 0.97);  // lighter blue wave
+          base = mix(base, wave1Color, wave1 * 0.3);
 
           // Wave 2
-          float wave2_y = 0.63
-            + sin(uv.x * 2.5 - t * 0.4) * 0.04
-            + sin(uv.x * 4.0 + t * 0.25) * 0.02
-            + snoise(vec2(uv.x * 1.5 - t * 0.12, 1.0)) * 0.03;
-          float wave2 = smoothstep(wave2_y + 0.025, wave2_y - 0.025, uv.y);
-          vec3 wave2Color = vec3(0.88, 0.93, 1.0);  // #e0edff
-          base = mix(base, wave2Color, wave2 * 0.35 * yMask);
+          float wave2_y = 0.40
+            + sin(uv.x * 2.5 - t * 0.4) * 0.05
+            + sin(uv.x * 4.0 + t * 0.25) * 0.025
+            + snoise(vec2(uv.x * 1.5 - t * 0.12, 1.0)) * 0.035;
+          float wave2 = smoothstep(wave2_y + 0.035, wave2_y - 0.035, uv.y);
+          vec3 wave2Color = vec3(0.38, 0.56, 0.94);  // slightly different blue
+          base = mix(base, wave2Color, wave2 * 0.25);
 
-          // Wave 3
-          float wave3_y = 0.72
-            + sin(uv.x * 1.8 + t * 0.35) * 0.05
-            + sin(uv.x * 5.0 - t * 0.2) * 0.02
-            + snoise(vec2(uv.x * 1.0 + t * 0.08, 2.0)) * 0.04;
-          float wave3 = smoothstep(wave3_y + 0.02, wave3_y - 0.02, uv.y);
-          vec3 wave3Color = vec3(0.80, 0.88, 0.99);  // soft blue
-          base = mix(base, wave3Color, wave3 * 0.4 * yMask);
+          // Wave 3: darker wave
+          float wave3_y = 0.55
+            + sin(uv.x * 1.8 + t * 0.35) * 0.06
+            + sin(uv.x * 5.0 - t * 0.2) * 0.025
+            + snoise(vec2(uv.x * 1.0 + t * 0.08, 2.0)) * 0.045;
+          float wave3 = smoothstep(wave3_y + 0.03, wave3_y - 0.03, uv.y);
+          vec3 wave3Color = vec3(0.25, 0.44, 0.88);  // deeper blue
+          base = mix(base, wave3Color, wave3 * 0.3);
 
-          // Wave 4: slightly deeper
-          float wave4_y = 0.80
+          // Wave 4
+          float wave4_y = 0.70
             + sin(uv.x * 2.2 - t * 0.3) * 0.04
             + sin(uv.x * 3.0 + t * 0.18) * 0.02
-            + snoise(vec2(uv.x * 0.8 + t * 0.06, 3.0)) * 0.03;
-          float wave4 = smoothstep(wave4_y + 0.015, wave4_y - 0.015, uv.y);
-          vec3 wave4Color = vec3(0.70, 0.82, 0.98);  // #b3d1fa
-          base = mix(base, wave4Color, wave4 * 0.4 * yMask);
+            + snoise(vec2(uv.x * 0.8 + t * 0.06, 3.0)) * 0.035;
+          float wave4 = smoothstep(wave4_y + 0.025, wave4_y - 0.025, uv.y);
+          vec3 wave4Color = vec3(0.35, 0.54, 0.93);  // mid-blue
+          base = mix(base, wave4Color, wave4 * 0.25);
 
-          // Wave 5: bottom — hint of logo blue
-          float wave5_y = 0.88
-            + sin(uv.x * 2.6 + t * 0.4) * 0.03
+          // Wave 5: bottom — light streak
+          float wave5_y = 0.85
+            + sin(uv.x * 2.6 + t * 0.4) * 0.035
             + sin(uv.x * 4.0 - t * 0.25) * 0.015
-            + snoise(vec2(uv.x * 1.4 - t * 0.1, 4.0)) * 0.025;
-          float wave5 = smoothstep(wave5_y + 0.01, wave5_y - 0.01, uv.y);
-          vec3 wave5Color = vec3(0.55, 0.72, 0.96);  // #8cb8f4
-          base = mix(base, wave5Color, wave5 * 0.35 * yMask);
+            + snoise(vec2(uv.x * 1.4 - t * 0.1, 4.0)) * 0.03;
+          float wave5 = smoothstep(wave5_y + 0.02, wave5_y - 0.02, uv.y);
+          vec3 wave5Color = vec3(0.48, 0.66, 0.97);  // lighter blue streak
+          base = mix(base, wave5Color, wave5 * 0.2);
 
-          // Very subtle white crest lines
-          float crest1 = smoothstep(0.006, 0.0, abs(uv.y - wave1_y)) * 0.06;
-          float crest2 = smoothstep(0.005, 0.0, abs(uv.y - wave2_y)) * 0.04;
-          base += vec3(crest1 + crest2) * yMask;
+          // Subtle white crest highlights along waves — like light reflections
+          float crest1 = smoothstep(0.005, 0.0, abs(uv.y - wave1_y)) * 0.08;
+          float crest2 = smoothstep(0.004, 0.0, abs(uv.y - wave3_y)) * 0.06;
+          base += vec3(crest1 + crest2);
 
-          // Soft top-left to bottom-right light gradient
-          float lightGrad = (uv.x * 0.3 + uv.y * 0.7);
-          base = mix(base, base + vec3(0.01, 0.015, 0.03), lightGrad);
+          // Top-right soft glow — like light source
+          float glow = 1.0 - length((uv - vec2(0.75, 0.1)) * vec2(1.5, 2.0));
+          glow = max(0.0, glow);
+          base += vec3(0.05, 0.07, 0.12) * glow;
 
           gl_FragColor = vec4(base, 1.0);
         }
