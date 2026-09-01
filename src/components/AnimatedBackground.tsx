@@ -2,221 +2,155 @@
 
 import { useEffect, useRef } from "react";
 
+// Stripe-style WebGL mesh gradient — GPU-accelerated, buttery smooth
 export default function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
 
-    let animationId: number;
-    let W = 0;
-    let H = 0;
-    let mouseX = 0.5;
-    let mouseY = 0.5;
+    // WebGL setup
+    const gl = canvas.getContext("webgl", { antialias: true, alpha: true });
+    if (!gl) return;
+
+    let animId: number;
+    let time = 0;
+    let width = 0;
+    let height = 0;
 
     const resize = () => {
-      W = canvas.width = window.innerWidth;
-      H = canvas.height = Math.max(window.innerHeight, 900);
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = Math.max(window.innerHeight, 900);
+      gl.viewport(0, 0, width, height);
     };
     resize();
     window.addEventListener("resize", resize);
 
-    const handleMouse = (e: MouseEvent) => {
-      mouseX = e.clientX / W;
-      mouseY = e.clientY / H;
-    };
-    window.addEventListener("mousemove", handleMouse);
-
-    // Particles
-    const particles: { x: number; y: number; vx: number; vy: number; r: number; a: number; hue: number }[] = [];
-    for (let i = 0; i < 80; i++) {
-      particles.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.25,
-        r: Math.random() * 2.5 + 0.8,
-        a: Math.random() * 0.4 + 0.1,
-        hue: 210 + Math.random() * 30,
-      });
-    }
-
-    let t = 0;
-
-    const hex2rgb = (hex: string) => {
-      const r = parseInt(hex.slice(1, 3), 16);
-      const g = parseInt(hex.slice(3, 5), 16);
-      const b = parseInt(hex.slice(5, 7), 16);
-      return { r, g, b };
-    };
-
-    const draw = () => {
-      // ── Base gradient ──
-      const base = ctx.createLinearGradient(0, 0, W, H);
-      base.addColorStop(0, "#f0f5ff");
-      base.addColorStop(0.35, "#e8f0fe");
-      base.addColorStop(0.65, "#f5f8ff");
-      base.addColorStop(1, "#eaf0ff");
-      ctx.fillStyle = base;
-      ctx.fillRect(0, 0, W, H);
-
-      // ── Subtle grid ──
-      ctx.strokeStyle = "rgba(37, 99, 235, 0.04)";
-      ctx.lineWidth = 0.5;
-      const gridSize = 60;
-      for (let x = 0; x < W; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, H);
-        ctx.stroke();
+    // Vertex shader
+    const vertSrc = `
+      attribute vec2 position;
+      void main() {
+        gl_Position = vec4(position, 0.0, 1.0);
       }
-      for (let y = 0; y < H; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
-        ctx.stroke();
+    `;
+
+    // Fragment shader — Stripe-style mesh gradient with noise
+    const fragSrc = `
+      precision highp float;
+      uniform float u_time;
+      uniform vec2 u_resolution;
+
+      // Simplex noise helpers
+      vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+      float snoise(vec2 v) {
+        const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                           -0.577350269189626, 0.024390243902439);
+        vec2 i  = floor(v + dot(v, C.yy));
+        vec2 x0 = v - i + dot(i, C.xx);
+        vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+        vec4 x12 = x0.xyxy + C.xxzz;
+        x12.xy -= i1;
+        i = mod289(i);
+        vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+        vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+        m = m*m; m = m*m;
+        vec3 x = 2.0 * fract(p * C.www) - 1.0;
+        vec3 h = abs(x) - 0.5;
+        vec3 ox = floor(x + 0.5);
+        vec3 a0 = x - ox;
+        m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+        vec3 g;
+        g.x = a0.x * x0.x + h.x * x0.y;
+        g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+        return 130.0 * dot(m, g);
       }
 
-      // ── Mesh gradient blobs ──
-      const blobs = [
-        { cx: W * 0.15, cy: H * 0.2, r: 350, color: "#2563eb", opacity: 0.07 },
-        { cx: W * 0.85, cy: H * 0.15, r: 300, color: "#60a5fa", opacity: 0.06 },
-        { cx: W * 0.5, cy: H * 0.6, r: 400, color: "#3b82f6", opacity: 0.05 },
-        { cx: W * 0.2, cy: H * 0.8, r: 280, color: "#818cf8", opacity: 0.04 },
-        { cx: W * 0.75, cy: H * 0.75, r: 320, color: "#1d4ed8", opacity: 0.05 },
-      ];
+      void main() {
+        vec2 uv = gl_FragCoord.xy / u_resolution;
+        float t = u_time * 0.15;
 
-      for (const blob of blobs) {
-        const bx = blob.cx + Math.sin(t * 0.004 + blob.cx * 0.001) * 60 + (mouseX - 0.5) * 40;
-        const by = blob.cy + Math.cos(t * 0.003 + blob.cy * 0.001) * 50 + (mouseY - 0.5) * 30;
-        const br = blob.r + Math.sin(t * 0.006 + blob.cx) * 40;
+        // Multiple noise layers for mesh gradient
+        float n1 = snoise(vec2(uv.x * 1.5 + t * 0.3, uv.y * 1.2 + t * 0.2));
+        float n2 = snoise(vec2(uv.x * 2.0 - t * 0.2, uv.y * 1.8 + t * 0.15));
+        float n3 = snoise(vec2(uv.x * 1.0 + t * 0.1, uv.y * 2.5 - t * 0.1));
+        float n4 = snoise(vec2(uv.x * 3.0 + t * 0.25, uv.y * 0.8 + t * 0.3));
 
-        const { r, g, b } = hex2rgb(blob.color);
-        const grad = ctx.createRadialGradient(bx, by, 0, bx, by, br);
-        grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${blob.opacity + Math.sin(t * 0.005) * 0.015})`);
-        grad.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, ${blob.opacity * 0.5})`);
-        grad.addColorStop(1, "transparent");
-        ctx.fillStyle = grad;
-        ctx.fillRect(bx - br, by - br, br * 2, br * 2);
+        // Blue palette colors
+        vec3 c1 = vec3(0.94, 0.97, 1.0);    // #f0f7ff — light blue-white
+        vec3 c2 = vec3(0.85, 0.92, 1.0);    // #d9ebff — soft blue
+        vec3 c3 = vec3(0.65, 0.82, 1.0);    // #a6d1ff — medium blue
+        vec3 c4 = vec3(0.37, 0.55, 0.95);   // #5e8cf2 — vivid blue
+        vec3 c5 = vec3(0.25, 0.45, 0.90);   // #4073e5 — deep blue
+
+        // Mix colors based on noise
+        float blend1 = smoothstep(-0.3, 0.8, n1);
+        float blend2 = smoothstep(-0.5, 0.6, n2);
+        float blend3 = smoothstep(-0.4, 0.5, n3);
+        float blend4 = smoothstep(-0.6, 0.4, n4);
+
+        vec3 color = mix(c1, c2, blend1 * 0.6);
+        color = mix(color, c3, blend2 * 0.35);
+        color = mix(color, c4, blend3 * 0.15);
+        color = mix(color, c5, blend4 * 0.08);
+
+        // Subtle diagonal light streak (Stripe signature)
+        float streak = smoothstep(0.3, 0.5, snoise(vec2(uv.x * 0.5 + uv.y * 2.0 + t * 0.4, uv.y * 0.3)));
+        color = mix(color, vec3(0.98, 0.99, 1.0), streak * 0.12);
+
+        // Top-left to bottom-right light flow
+        float flow = smoothstep(0.0, 1.0, uv.x + uv.y + snoise(vec2(uv.x * 2.0 + t, uv.y * 2.0)) * 0.2);
+        color = mix(color, vec3(0.92, 0.96, 1.0), flow * 0.08);
+
+        gl_FragColor = vec4(color, 1.0);
       }
+    `;
 
-      // ── Aurora / wave bands ──
-      const waveData = [
-        { y: H * 0.55, amp: 50, freq: 0.002, spd: 0.01, color: "#2563eb", opacity: 0.06 },
-        { y: H * 0.65, amp: 35, freq: 0.003, spd: 0.015, color: "#60a5fa", opacity: 0.04 },
-        { y: H * 0.72, amp: 60, freq: 0.0015, spd: 0.008, color: "#3b82f6", opacity: 0.03 },
-        { y: H * 0.8, amp: 25, freq: 0.004, spd: 0.02, color: "#818cf8", opacity: 0.025 },
-      ];
-
-      for (const w of waveData) {
-        ctx.beginPath();
-        ctx.moveTo(0, H);
-        for (let x = 0; x <= W; x += 3) {
-          const y =
-            w.y +
-            Math.sin(x * w.freq + t * w.spd) * w.amp +
-            Math.sin(x * w.freq * 1.7 + t * w.spd * 0.7) * w.amp * 0.4 +
-            Math.cos(x * w.freq * 0.5 + t * w.spd * 1.5) * w.amp * 0.3;
-          ctx.lineTo(x, y);
-        }
-        ctx.lineTo(W, H);
-        ctx.closePath();
-        const { r, g, b } = hex2rgb(w.color);
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${w.opacity})`;
-        ctx.fill();
-      }
-
-      // ── Grid dots (intersection glow) ──
-      for (let x = gridSize; x < W; x += gridSize) {
-        for (let y = gridSize; y < H; y += gridSize) {
-          const distToMouse = Math.sqrt((x / W - mouseX) ** 2 + (y / H - mouseY) ** 2);
-          const glow = Math.max(0, 1 - distToMouse * 3) * 0.3;
-          const pulse = Math.sin(t * 0.02 + x * 0.01 + y * 0.01) * 0.05;
-          const alpha = 0.06 + glow + pulse;
-
-          ctx.beginPath();
-          ctx.arc(x, y, 1.5 + glow * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(37, 99, 235, ${alpha})`;
-          ctx.fill();
-        }
-      }
-
-      // ── Particles ──
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < -10) p.x = W + 10;
-        if (p.x > W + 10) p.x = -10;
-        if (p.y < -10) p.y = H + 10;
-        if (p.y > H + 10) p.y = -10;
-
-        const pulse = Math.sin(t * 0.015 + p.x * 0.005) * 0.12;
-        const alpha = p.a + pulse;
-
-        // Glow halo
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
-        grad.addColorStop(0, `hsla(${p.hue}, 70%, 55%, ${alpha * 0.3})`);
-        grad.addColorStop(1, "transparent");
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Core dot
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${p.hue}, 70%, 55%, ${alpha + 0.1})`;
-        ctx.fill();
-      }
-
-      // ── Connecting lines ──
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 120) {
-            const alpha = (1 - dist / 120) * 0.06;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(37, 99, 235, ${alpha})`;
-            ctx.lineWidth = 0.4;
-            ctx.stroke();
-          }
-        }
-      }
-
-      // ── Top-center hero glow (mouse-reactive) ──
-      const heroGlowX = W * 0.5 + (mouseX - 0.5) * 30;
-      const heroGlowY = H * 0.25 + (mouseY - 0.5) * 20;
-      const heroGrad = ctx.createRadialGradient(heroGlowX, heroGlowY, 0, heroGlowX, heroGlowY, 250);
-      heroGrad.addColorStop(0, "rgba(37, 99, 235, 0.08)");
-      heroGrad.addColorStop(0.5, "rgba(37, 99, 235, 0.03)");
-      heroGrad.addColorStop(1, "transparent");
-      ctx.fillStyle = heroGrad;
-      ctx.fillRect(0, 0, W, H);
-
-      // ── Vignette ──
-      const vig = ctx.createRadialGradient(W / 2, H / 2, W * 0.3, W / 2, H / 2, W * 0.8);
-      vig.addColorStop(0, "transparent");
-      vig.addColorStop(1, "rgba(240, 245, 255, 0.4)");
-      ctx.fillStyle = vig;
-      ctx.fillRect(0, 0, W, H);
-
-      t++;
-      animationId = requestAnimationFrame(draw);
+    const compileShader = (type: number, src: string) => {
+      const shader = gl.createShader(type)!;
+      gl.shaderSource(shader, src);
+      gl.compileShader(shader);
+      return shader;
     };
 
-    draw();
+    const vert = compileShader(gl.VERTEX_SHADER, vertSrc);
+    const frag = compileShader(gl.FRAGMENT_SHADER, fragSrc);
+    const program = gl.createProgram()!;
+    gl.attachShader(program, vert);
+    gl.attachShader(program, frag);
+    gl.linkProgram(program);
+    gl.useProgram(program);
+
+    // Full-screen quad
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    const posLoc = gl.getAttribLocation(program, "position");
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const uTime = gl.getUniformLocation(program, "u_time");
+    const uRes = gl.getUniformLocation(program, "u_resolution");
+
+    const render = () => {
+      time += 0.016;
+      gl.uniform1f(uTime, time);
+      gl.uniform2f(uRes, width, height);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      animId = requestAnimationFrame(render);
+    };
+    render();
 
     return () => {
-      cancelAnimationFrame(animationId);
+      cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMouse);
+      gl.deleteProgram(program);
+      gl.deleteShader(vert);
+      gl.deleteShader(frag);
+      gl.deleteBuffer(buf);
     };
   }, []);
 
