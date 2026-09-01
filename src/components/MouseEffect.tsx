@@ -141,7 +141,7 @@ export function CursorGlow() {
 
   return (
     <>
-      {/* Main glow — big, visible */}
+      {/* Outer glow — soft radial */}
       <div
         className="pointer-events-none fixed z-[100]"
         style={{
@@ -149,21 +149,35 @@ export function CursorGlow() {
           top: pos.y - 200,
           width: 400,
           height: 400,
-          background: "radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0.04) 40%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(37, 99, 235, 0.06) 0%, transparent 60%)",
           borderRadius: "50%",
           opacity: visible ? 1 : 0,
           transition: "opacity 0.4s ease",
         }}
       />
-      {/* Inner bright core */}
+      {/* Main circle ring */}
       <div
         className="pointer-events-none fixed z-[100]"
         style={{
-          left: pos.x - 60,
-          top: pos.y - 60,
-          width: 120,
-          height: 120,
-          background: "radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, transparent 70%)",
+          left: pos.x - 40,
+          top: pos.y - 40,
+          width: 80,
+          height: 80,
+          border: "1.5px solid rgba(37, 99, 235, 0.25)",
+          borderRadius: "50%",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.3s ease, left 0.15s ease-out, top 0.15s ease-out",
+        }}
+      />
+      {/* Inner dot */}
+      <div
+        className="pointer-events-none fixed z-[100]"
+        style={{
+          left: pos.x - 4,
+          top: pos.y - 4,
+          width: 8,
+          height: 8,
+          background: "rgba(37, 99, 235, 0.5)",
           borderRadius: "50%",
           opacity: visible ? 1 : 0,
           transition: "opacity 0.3s ease",
