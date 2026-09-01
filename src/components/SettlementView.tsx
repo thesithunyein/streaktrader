@@ -4,29 +4,55 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStreakStore } from "@/lib/store";
 import { useTrade } from "@/components/TradeProvider";
-import { Zap, CheckCircle, XCircle, Lock, ArrowRight, Loader2 } from "lucide-react";
+import { Zap, CheckCircle, XCircle, Lock, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import confetti from "canvas-confetti";
 
-// Live price chart during settlement — the tension moment
-function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: number }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [price, setPrice] = useState(entryPrice);
-  const [history, setHistory] = useState<number[]>([entryPrice]);
-  const animRef = useRef<number>(0);
+// Real BTC price from Binance public API
+function useRealPrice() {
+  const [price, setPrice] = useState<number>(0);
+  const [history, setHistory] = useState<number[]>([]);
 
   useEffect(() => {
-    // Simulate live BTC price movement
-    let current = entryPrice;
-    const tick = () => {
-      const change = (Math.random() - 0.48) * current * 0.001; // slight upward bias
-      current += change;
-      setPrice(current);
-      setHistory((h) => [...h.slice(-60), current]);
-      animRef.current = requestAnimationFrame(() => setTimeout(tick, 500));
+    let alive = true;
+    const fetchPrice = async () => {
+      try {
+        const res = await fetch(
+          "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
+        );
+        const data = await res.json();
+        const p = parseFloat(data.price);
+        if (alive && p > 0) {
+          setPrice(p);
+          setHistory((h) => [...h.slice(-59), p]);
+        }
+      } catch {
+        // If Binance fails, try CoinGecko
+        try {
+          const res = await fetch(
+            "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
+          );
+          const data = await res.json();
+          const p = data.bitcoin?.usd;
+          if (alive && p) {
+            setPrice(p);
+            setHistory((h) => [...h.slice(-59), p]);
+          }
+        } catch {}
+      }
     };
-    animRef.current = requestAnimationFrame(() => setTimeout(tick, 500));
-    return () => cancelAnimationFrame(animRef.current);
-  }, [entryPrice]);
+
+    fetchPrice();
+    const interval = setInterval(fetchPrice, 2000);
+    return () => { alive = false; clearInterval(interval); };
+  }, []);
+
+  return { price, history };
+}
+
+// Live price chart during settlement — THE tension moment
+function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: number }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { price, history } = useRealPrice();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -34,21 +60,21 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const w = canvas.width = canvas.offsetWidth * 2;
-    const h = canvas.height = canvas.offsetHeight * 2;
+    const w = (canvas.width = canvas.offsetWidth * 2);
+    const h = (canvas.height = canvas.offsetHeight * 2);
     ctx.scale(2, 2);
     const cw = w / 2;
     const ch = h / 2;
 
     ctx.clearRect(0, 0, cw, ch);
 
-    const min = Math.min(...history) - 10;
-    const max = Math.max(...history) + 10;
+    const min = Math.min(...history) - 20;
+    const max = Math.max(...history) + 20;
     const range = max - min || 1;
 
     // Entry price line
     const entryY = ch - ((entryPrice - min) / range) * ch;
-    ctx.strokeStyle = "rgba(100, 116, 139, 0.3)";
+    ctx.strokeStyle = "rgba(100, 116, 139, 0.4)";
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
     ctx.moveTo(0, entryY);
@@ -56,12 +82,19 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Price line
+    // "Entry" label
+    ctx.fillStyle = "rgba(100, 116, 139, 0.6)";
+    ctx.font = "9px sans-serif";
+    ctx.fillText("Entry", 4, entryY - 4);
+
     const isWinning =
       (side === "UP" && price >= entryPrice) ||
       (side === "DOWN" && price <= entryPrice);
     const color = isWinning ? "#16a34a" : "#dc2626";
 
+    // Price line with glow
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 6;
     ctx.beginPath();
     history.forEach((p, i) => {
       const x = (i / (history.length - 1)) * cw;
@@ -70,8 +103,9 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
       else ctx.lineTo(x, y);
     });
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.5;
     ctx.stroke();
+    ctx.shadowBlur = 0;
 
     // Gradient fill under line
     const lastX = cw;
@@ -80,32 +114,46 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
     ctx.lineTo(0, ch);
     ctx.closePath();
     const grad = ctx.createLinearGradient(0, 0, 0, ch);
-    grad.addColorStop(0, isWinning ? "rgba(22, 163, 74, 0.15)" : "rgba(220, 38, 38, 0.15)");
+    grad.addColorStop(0, isWinning ? "rgba(22, 163, 74, 0.2)" : "rgba(220, 38, 38, 0.2)");
     grad.addColorStop(1, "transparent");
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // Current price dot
+    // Current price dot with pulse
     ctx.beginPath();
-    ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+    ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.fill();
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 8, 0, Math.PI * 2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.3;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
   }, [history, price, entryPrice, side]);
 
   const isWinning =
     (side === "UP" && price >= entryPrice) ||
     (side === "DOWN" && price <= entryPrice);
+  const change = price > 0 ? ((price - entryPrice) / entryPrice) * 100 : 0;
 
   return (
     <div className="relative">
-      <canvas ref={canvasRef} className="w-full h-32 sm:h-40" style={{ imageRendering: "auto" }} />
+      <canvas ref={canvasRef} className="w-full h-36 sm:h-44" style={{ imageRendering: "auto" }} />
       <div className="flex justify-between items-center mt-2 px-1">
         <div className="text-[10px] text-text-muted">Entry: ${entryPrice.toLocaleString()}</div>
         <div className={`text-sm font-mono font-bold ${isWinning ? "text-up" : "text-down"}`}>
-          ${price.toFixed(2)}
+          ${price > 0 ? price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "..."}
         </div>
         <div className={`text-[10px] font-semibold ${isWinning ? "text-up" : "text-down"}`}>
-          {isWinning ? "▲ WINNING" : "▼ LOSING"}
+          {price > 0 ? (
+            <>
+              {change >= 0 ? "▲" : "▼"} {Math.abs(change).toFixed(2)}% · {isWinning ? "WINNING" : "LOSING"}
+            </>
+          ) : (
+            "Loading price..."
+          )}
         </div>
       </div>
     </div>
@@ -118,10 +166,15 @@ export default function SettlementView() {
   const [countdown, setCountdown] = useState(30);
   const [isResolving, setIsResolving] = useState(false);
   const [settled, setSettled] = useState(false);
-  const [entryPrice] = useState(() => 67000 + Math.random() * 2000);
+  const [entryPrice] = useState(() => {
+    // Use a reasonable BTC price as entry point
+    return 67000 + Math.random() * 2000;
+  });
+  const resolvedRef = useRef(false);
 
   useEffect(() => {
     if (!showSettlement || showResult || !currentTrade) return;
+    resolvedRef.current = false;
 
     const timer = setInterval(() => {
       setCountdown((c) => {
@@ -130,42 +183,59 @@ export default function SettlementView() {
       });
     }, 1000);
 
-    // Try to detect real settlement
+    // Poll real on-chain positions for settlement detection
     const pollSettlement = setInterval(async () => {
-      if (!exchange || settled) return;
+      if (!exchange || settled || resolvedRef.current) return;
       try {
         const positions = await exchange.fetchPositions();
         const marketPos = positions.find((p: any) => p.symbol === currentTrade.symbol && p.size > 0);
         if (!marketPos || marketPos.size === 0) {
+          // Position settled — try to redeem
+          resolvedRef.current = true;
           setSettled(true);
+          setIsResolving(true);
           clearInterval(pollSettlement);
           clearInterval(timer);
-          try { await redeem(currentTrade.symbol, 0); } catch {}
-          resolveTrade("WIN");
-          confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, colors: ["#2563eb", "#60a5fa", "#16a34a", "#f59e0b"] });
+
+          // Determine win/loss from on-chain data
+          // If position is gone, it was settled. We check if we got tokens back.
+          try {
+            await redeem(currentTrade.symbol, 0);
+            // If redeem succeeds, it's a WIN
+            resolveTrade("WIN");
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, colors: ["#2563eb", "#60a5fa", "#16a34a", "#f59e0b"] });
+          } catch {
+            // If redeem fails or no tokens, it's a LOSE
+            resolveTrade("LOSE");
+          }
         }
-      } catch {}
+      } catch {
+        // SDK not connected or error — will fall through to countdown fallback
+      }
     }, 3000);
 
     return () => { clearInterval(timer); clearInterval(pollSettlement); };
   }, [showSettlement, showResult, currentTrade, exchange, settled, resolveTrade, redeem]);
 
-  // Fallback when countdown hits 0
+  // Fallback: when countdown hits 0 and no exchange connected, show "waiting for settlement"
+  // This is NOT random — it tells the user to wait for real settlement
   useEffect(() => {
-    if (countdown <= 0 && !showResult && showSettlement && !settled) {
-      setSettled(true);
-      setIsResolving(true);
-      resolveTrade(Math.random() < 0.65 ? "WIN" : "LOSE");
-      if (Math.random() < 0.65) {
-        confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, colors: ["#2563eb", "#60a5fa", "#16a34a", "#f59e0b"] });
+    if (countdown <= 0 && !showResult && showSettlement && !settled && !resolvedRef.current) {
+      // If exchange is connected, keep polling (don't resolve randomly)
+      if (exchange) {
+        setIsResolving(true);
+        return;
       }
+      // If no exchange connected, show a message that wallet is needed
+      setIsResolving(true);
     }
-  }, [countdown, showResult, showSettlement, settled, resolveTrade]);
+  }, [countdown, showResult, showSettlement, settled, exchange]);
 
   const handleDismiss = useCallback(() => {
     setCountdown(30);
     setIsResolving(false);
     setSettled(false);
+    resolvedRef.current = false;
     dismissResult();
   }, [dismissResult]);
 
@@ -184,9 +254,19 @@ export default function SettlementView() {
             <motion.div animate={{ scale: countdown <= 5 && countdown > 0 ? [1, 1.05, 1] : 1 }}
               transition={{ repeat: countdown <= 5 && countdown > 0 ? Infinity : 0, duration: 0.8 }}
               className={`text-5xl sm:text-6xl font-mono font-bold mb-2 ${countdown <= 5 && countdown > 0 ? "text-down" : "text-text"}`}>
-              {countdown <= 0 ? <Loader2 className="w-10 h-10 mx-auto animate-spin text-accent" /> : `0:${countdown.toString().padStart(2, "0")}`}
+              {countdown <= 0 ? (
+                <Loader2 className="w-10 h-10 mx-auto animate-spin text-accent" />
+              ) : (
+                `0:${countdown.toString().padStart(2, "0")}`
+              )}
             </motion.div>
-            <div className="text-sm text-text-dim mb-4">{countdown <= 0 ? "Checking settlement..." : "Until settlement"}</div>
+            <div className="text-sm text-text-dim mb-4">
+              {countdown <= 0
+                ? isResolving
+                  ? "Settling on-chain..."
+                  : "Waiting for settlement..."
+                : "Until settlement"}
+            </div>
 
             {/* Live price chart — THE tension moment */}
             <div className="mb-4 rounded-xl bg-slate-50 border border-border p-3">
@@ -212,6 +292,14 @@ export default function SettlementView() {
               <motion.div className="h-full bg-accent rounded-full" initial={{ width: "0%" }}
                 animate={{ width: `${countdown > 0 ? 100 - (countdown / 30) * 100 : 100}%` }} transition={{ duration: 1, ease: "linear" }} />
             </div>
+
+            {/* No wallet message */}
+            {!exchange && countdown <= 0 && (
+              <div className="mt-4 p-3 rounded-xl bg-accent/5 border border-accent/15 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-accent shrink-0" />
+                <span className="text-xs text-text-dim">Connect wallet for real on-chain settlement</span>
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}

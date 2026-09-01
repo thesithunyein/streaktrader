@@ -7,7 +7,7 @@ import { useTrade } from "@/components/TradeProvider";
 import { ArrowUp, ArrowDown, X, Zap, AlertTriangle, Loader2 } from "lucide-react";
 
 interface TradePanelProps {
-  market: { symbol: string; underlying: string; window: string; upProbability: number; poolAddress?: string };
+  market: { symbol: string; downSymbol: string; underlying: string; window: string; upProbability: number; poolAddress?: string };
   onClose: () => void;
 }
 
@@ -32,13 +32,12 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
     setTradeError(null);
 
     try {
-      // Place a real IOC market order via SDK
-      // Side: BUY YES for UP, BUY NO for DOWN
-      const orderSide = side === "UP" ? "buy" : "buy";
+      // UP = buy YES token, DOWN = buy NO token
+      const orderSymbol = side === "UP" ? market.symbol : market.downSymbol;
 
       await placeOrder(
-        market.symbol,
-        orderSide,
+        orderSymbol,
+        "buy",
         stake,
         undefined, // market order, no limit price
         "IOC" // immediate or cancel

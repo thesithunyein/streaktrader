@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { getReadExchange } from "@/lib/sdkRead";
 
 export interface LiveMarket {
-  symbol: string;
+  symbol: string;       // YES/UP token symbol
+  downSymbol: string;   // NO/DOWN token symbol
   underlying: string;
   window: string;
   expiry: number;
@@ -37,6 +38,8 @@ export function useMarkets() {
 
           const upSymbol =
             m.outcomes?.[0]?.symbol || m.symbol || `${m.underlying}-UP`;
+          const downSymbol =
+            m.outcomes?.[1]?.symbol || `${m.underlying}-DOWN`;
           if (!upSymbol) continue;
 
           const book = await exchange.fetchOrderBook(upSymbol, 5);
@@ -62,6 +65,7 @@ export function useMarkets() {
 
           liveMarkets.push({
             symbol: upSymbol,
+            downSymbol,
             underlying,
             window: windowMatch,
             expiry: Number(m.expiry) * 1000,
