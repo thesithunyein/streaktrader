@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
@@ -17,7 +16,6 @@ import {
   BarChart3,
   Clock,
   ChevronRight,
-  Star,
 } from "lucide-react";
 
 const FEATURES = [
@@ -97,25 +95,33 @@ export default function Home() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-accent/[0.03] to-transparent">
-        <div className="max-w-6xl mx-auto px-4 pt-16 pb-20 sm:pt-24 sm:pb-28 text-center relative">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className="w-24 h-24 rounded-3xl overflow-hidden relative mx-auto mb-8 shadow-2xl shadow-accent/20"
-          >
-            <Image src="/logo.png" alt="StreakTrader" fill className="object-cover" />
-          </motion.div>
+      <section className="relative overflow-hidden min-h-[80vh] flex items-center">
+        {/* Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          poster="/logo.png"
+        >
+          <source
+            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260601_110537_3a579fa0-7bbc-4d94-9d25-0e816c7840f5.mp4"
+            type="video/mp4"
+          />
+        </video>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/40" />
 
+        <div className="max-w-6xl mx-auto px-4 py-20 sm:py-28 text-center relative z-10 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6"
+            transition={{ delay: 0.1 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm mb-6"
           >
             <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            <span className="text-sm font-medium text-accent">
+            <span className="text-sm font-medium text-white">
               Live on Shannon Testnet
             </span>
           </motion.div>
@@ -123,19 +129,19 @@ export default function Home() {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-4xl sm:text-5xl lg:text-7xl font-bold text-text mb-6 leading-tight"
+            transition={{ delay: 0.2 }}
+            className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight"
           >
             Build your streak.
             <br />
-            <span className="text-gradient">Ride the wave.</span>
+            <span className="text-accent-light">Ride the wave.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-lg sm:text-xl text-text-dim max-w-2xl mx-auto mb-10 leading-relaxed"
+            transition={{ delay: 0.3 }}
+            className="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             The prediction market app where every correct call extends your streak
             and multiplies your earnings. Trade Bitcoin and Ethereum event
@@ -159,7 +165,7 @@ export default function Home() {
               href="https://github.com/thesithunyein/streaktrader"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl text-base font-bold text-text-dim border border-border hover:border-accent/30 hover:text-text transition-all flex items-center gap-2"
+              className="px-8 py-4 rounded-2xl text-base font-bold text-white border border-white/20 hover:border-white/40 hover:bg-white/10 transition-all flex items-center gap-2"
             >
               View Source
               <ChevronRight className="w-4 h-4" />
@@ -170,15 +176,15 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.6 }}
             className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-16 max-w-3xl mx-auto"
           >
             {STATS.map((stat) => (
-              <div key={stat.label} className="glass rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold font-mono text-gradient">
+              <div key={stat.label} className="rounded-xl p-4 text-center bg-white/10 backdrop-blur-sm border border-white/10">
+                <div className="text-2xl font-bold font-mono text-white">
                   {stat.value}
                 </div>
-                <div className="text-xs text-text-dim mt-1">{stat.label}</div>
+                <div className="text-xs text-white/60 mt-1">{stat.label}</div>
               </div>
             ))}
           </motion.div>
