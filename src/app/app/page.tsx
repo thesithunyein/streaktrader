@@ -67,6 +67,11 @@ export default function TradingApp() {
       setShowOnboarding(true);
       localStorage.setItem("streaktrader-visited", "true");
     }
+
+    // Listen for share-streak events from SettlementView
+    const handleShareStreak = () => setShowStreakCard(true);
+    window.addEventListener("share-streak", handleShareStreak);
+    return () => window.removeEventListener("share-streak", handleShareStreak);
   }, []);
 
   if (!mounted) return null;

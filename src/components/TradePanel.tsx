@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStreakStore } from "@/lib/store";
 import { useTrade } from "@/components/TradeProvider";
-import { ArrowUp, ArrowDown, X, Zap, AlertTriangle, Loader2 } from "lucide-react";
+import { ArrowUp, ArrowDown, X, Zap, AlertTriangle, Loader2, Shield, ShieldCheck } from "lucide-react";
 
 interface TradePanelProps {
   market: { symbol: string; downSymbol: string; underlying: string; window: string; upProbability: number; poolAddress?: string };
@@ -16,7 +16,7 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
   const [stake, setStake] = useState(10);
   const [placing, setPlacing] = useState(false);
   const [tradeError, setTradeError] = useState<string | null>(null);
-  const { placeTrade, streak, getMultiplier } = useStreakStore();
+  const { placeTrade, streak, getMultiplier, shields, activeShield, activateShield, deactivateShield } = useStreakStore();
   const { address, placeOrder } = useTrade();
   const multiplier = getMultiplier();
   const potentialPayout = stake * multiplier;
@@ -59,6 +59,14 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
     }
   };
 
+  const toggleShield = () => {
+    if (activeShield) {
+      deactivateShield();
+    } else if (shields > 0) {
+      activateShield();
+    }
+  };
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose} />
@@ -95,6 +103,7 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
           </motion.button>
         </div>
 
+        {/* Streak + Shield */}
         <AnimatePresence>
           {streak > 0 && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
@@ -108,6 +117,41 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Shield Toggle */}
+        {shields > 0 && streak > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-5">
+            <button
+              onClick={toggleShield}
+              className={`w-full p-3 rounded-xl flex items-center gap-3 transition-all ${
+                activeShield
+                  ? "bg-accent/10 border-2 border-accent/30"
+                  : "bg-slate-50 border border-border hover:border-accent/20"
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${activeShield ? "bg-accent/20" : "bg-slate-100"}`}>
+                {activeShield ? (
+                  <ShieldCheck className="w-5 h-5 text-accent" />
+                ) : (
+                  <Shield className="w-5 h-5 text-text-dim" />
+                )}
+              </div>
+              <div className="flex-1 text-left">
+                <div className={`text-sm font-semibold ${activeShield ? "text-accent" : "text-text"}`}>
+                  {activeShield ? "Shield Active" : "Activate Shield"}
+                </div>
+                <div className="text-xs text-text-dim">
+                  {activeShield
+                    ? "This trade is protected from streak loss"
+                    : `${shields} shield${shields > 1 ? "s" : ""} remaining — protects your streak`}
+                </div>
+              </div>
+              <div className={`text-xs font-bold px-2 py-1 rounded-lg ${activeShield ? "bg-accent/20 text-accent" : "bg-slate-100 text-text-dim"}`}>
+                {shields}x
+              </div>
+            </button>
+          </motion.div>
+        )}
 
         <div className="mb-5">
           <label className="text-xs font-semibold text-text-dim uppercase tracking-wider mb-2 block">Stake (tUSDC)</label>
@@ -133,12 +177,20 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-text-dim">If you LOSE</span>
-            <span className="text-sm font-bold text-down">-{stake.toFixed(1)} tUSDC</span>
+            <span className={`text-sm font-bold ${activeShield ? "text-accent line-through" : "text-down"}`}>
+              {activeShield ? "Protected by Shield" : `-${stake.toFixed(1)} tUSDC`}
+            </span>
           </div>
-          {streak > 0 && (
+          {streak > 0 && !activeShield && (
             <div className="mt-2 pt-2 border-t border-border flex items-center gap-1.5">
               <AlertTriangle className="w-3 h-3 text-down" />
               <span className="text-xs text-down">Losing resets your {streak}x streak</span>
+            </div>
+          )}
+          {activeShield && (
+            <div className="mt-2 pt-2 border-t border-border flex items-center gap-1.5">
+              <ShieldCheck className="w-3 h-3 text-accent" />
+              <span className="text-xs text-accent">Shield will protect your streak if you lose</span>
             </div>
           )}
         </div>

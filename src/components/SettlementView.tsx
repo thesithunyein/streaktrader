@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStreakStore } from "@/lib/store";
 import { useTrade } from "@/components/TradeProvider";
-import { Zap, CheckCircle, XCircle, Lock, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import { Zap, CheckCircle, XCircle, Lock, ArrowRight, Loader2, AlertCircle, Shield, ShieldCheck } from "lucide-react";
 import confetti from "canvas-confetti";
 
 // Real BTC price from Binance public API
@@ -26,7 +26,6 @@ function useRealPrice() {
           setHistory((h) => [...h.slice(-59), p]);
         }
       } catch {
-        // If Binance fails, try CoinGecko
         try {
           const res = await fetch(
             "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
@@ -82,7 +81,6 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // "Entry" label
     ctx.fillStyle = "rgba(100, 116, 139, 0.6)";
     ctx.font = "9px sans-serif";
     ctx.fillText("Entry", 4, entryY - 4);
@@ -92,7 +90,6 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
       (side === "DOWN" && price <= entryPrice);
     const color = isWinning ? "#16a34a" : "#dc2626";
 
-    // Price line with glow
     ctx.shadowColor = color;
     ctx.shadowBlur = 6;
     ctx.beginPath();
@@ -107,7 +104,6 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
     ctx.stroke();
     ctx.shadowBlur = 0;
 
-    // Gradient fill under line
     const lastX = cw;
     const lastY = ch - ((history[history.length - 1] - min) / range) * ch;
     ctx.lineTo(lastX, ch);
@@ -119,7 +115,6 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // Current price dot with pulse
     ctx.beginPath();
     ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
     ctx.fillStyle = color;
@@ -161,15 +156,12 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
 }
 
 export default function SettlementView() {
-  const { currentTrade, showSettlement, showResult, streak, bestStreak, resolveTrade, dismissResult, trades } = useStreakStore();
+  const { currentTrade, showSettlement, showResult, streak, bestStreak, resolveTrade, dismissResult, trades, activeShield, shields } = useStreakStore();
   const { exchange, address, redeem } = useTrade();
   const [countdown, setCountdown] = useState(30);
   const [isResolving, setIsResolving] = useState(false);
   const [settled, setSettled] = useState(false);
-  const [entryPrice] = useState(() => {
-    // Use a reasonable BTC price as entry point
-    return 67000 + Math.random() * 2000;
-  });
+  const [entryPrice] = useState(() => 67000 + Math.random() * 2000);
   const resolvedRef = useRef(false);
 
   useEffect(() => {
@@ -183,50 +175,38 @@ export default function SettlementView() {
       });
     }, 1000);
 
-    // Poll real on-chain positions for settlement detection
     const pollSettlement = setInterval(async () => {
       if (!exchange || settled || resolvedRef.current) return;
       try {
         const positions = await exchange.fetchPositions();
         const marketPos = positions.find((p: any) => p.symbol === currentTrade.symbol && p.size > 0);
         if (!marketPos || marketPos.size === 0) {
-          // Position settled — try to redeem
           resolvedRef.current = true;
           setSettled(true);
           setIsResolving(true);
           clearInterval(pollSettlement);
           clearInterval(timer);
 
-          // Determine win/loss from on-chain data
-          // If position is gone, it was settled. We check if we got tokens back.
           try {
             await redeem(currentTrade.symbol, 0);
-            // If redeem succeeds, it's a WIN
             resolveTrade("WIN");
             confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, colors: ["#2563eb", "#60a5fa", "#16a34a", "#f59e0b"] });
           } catch {
-            // If redeem fails or no tokens, it's a LOSE
             resolveTrade("LOSE");
           }
         }
-      } catch {
-        // SDK not connected or error — will fall through to countdown fallback
-      }
+      } catch {}
     }, 3000);
 
     return () => { clearInterval(timer); clearInterval(pollSettlement); };
   }, [showSettlement, showResult, currentTrade, exchange, settled, resolveTrade, redeem]);
 
-  // Fallback: when countdown hits 0 and no exchange connected, show "waiting for settlement"
-  // This is NOT random — it tells the user to wait for real settlement
   useEffect(() => {
     if (countdown <= 0 && !showResult && showSettlement && !settled && !resolvedRef.current) {
-      // If exchange is connected, keep polling (don't resolve randomly)
       if (exchange) {
         setIsResolving(true);
         return;
       }
-      // If no exchange connected, show a message that wallet is needed
       setIsResolving(true);
     }
   }, [countdown, showResult, showSettlement, settled, exchange]);
@@ -239,6 +219,13 @@ export default function SettlementView() {
     dismissResult();
   }, [dismissResult]);
 
+  const handleShare = useCallback(() => {
+    // Trigger share modal in parent
+    const event = new CustomEvent("share-streak");
+    window.dispatchEvent(event);
+    handleDismiss();
+  }, [handleDismiss]);
+
   return (
     <AnimatePresence>
       {/* Settlement countdown with live price chart */}
@@ -249,6 +236,15 @@ export default function SettlementView() {
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", damping: 25 }}
             className="relative bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full mx-4 text-center border border-border shadow-2xl">
+
+            {/* Shield active indicator */}
+            {currentTrade.shieldUsed && (
+              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-center gap-2 mb-4 p-2 rounded-xl bg-accent/5 border border-accent/15">
+                <ShieldCheck className="w-4 h-4 text-accent" />
+                <span className="text-xs font-semibold text-accent">Shield Active — Streak Protected</span>
+              </motion.div>
+            )}
 
             {/* Timer */}
             <motion.div animate={{ scale: countdown <= 5 && countdown > 0 ? [1, 1.05, 1] : 1 }}
@@ -268,7 +264,7 @@ export default function SettlementView() {
                 : "Until settlement"}
             </div>
 
-            {/* Live price chart — THE tension moment */}
+            {/* Live price chart */}
             <div className="mb-4 rounded-xl bg-slate-50 border border-border p-3">
               <PriceChart side={currentTrade.side} entryPrice={entryPrice} />
             </div>
@@ -293,7 +289,6 @@ export default function SettlementView() {
                 animate={{ width: `${countdown > 0 ? 100 - (countdown / 30) * 100 : 100}%` }} transition={{ duration: 1, ease: "linear" }} />
             </div>
 
-            {/* No wallet message */}
             {!exchange && countdown <= 0 && (
               <div className="mt-4 p-3 rounded-xl bg-accent/5 border border-accent/15 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-accent shrink-0" />
@@ -317,9 +312,13 @@ export default function SettlementView() {
               <CheckCircle className="w-10 h-10 text-up" />
             </motion.div>
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-              <div className="text-2xl font-bold text-up mb-1">You Won!</div>
+              <div className="text-2xl font-bold text-up mb-1">
+                {currentTrade?.shieldUsed ? "Shield Protected!" : "You Won!"}
+              </div>
               <div className="text-sm text-text-dim mb-6">
-                +{((currentTrade?.stake || 0) * (currentTrade?.multiplier || 1)).toFixed(1)} tUSDC earned
+                {currentTrade?.shieldUsed
+                  ? "Your streak is safe — Shield absorbed the loss"
+                  : `+${((currentTrade?.stake || 0) * (currentTrade?.multiplier || 1)).toFixed(1)} tUSDC earned`}
               </div>
             </motion.div>
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
@@ -338,9 +337,9 @@ export default function SettlementView() {
                 className="btn-primary py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2">
                 Next Trade <ArrowRight className="w-4 h-4" />
               </motion.button>
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleDismiss}
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleShare}
                 className="py-3 rounded-xl text-sm font-bold text-accent bg-accent/5 border border-accent/15 flex items-center justify-center gap-2 hover:bg-accent/10 transition-colors">
-                <Lock className="w-4 h-4" /> Lock Streak
+                <Lock className="w-4 h-4" /> Share Win
               </motion.button>
             </motion.div>
           </motion.div>
