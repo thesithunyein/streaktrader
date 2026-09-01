@@ -6,14 +6,20 @@ import { Clock, ArrowUp, ArrowDown } from "lucide-react";
 
 interface MarketCardProps {
   symbol: string;
+  downSymbol: string;
+  marketSymbol: string;
   underlying: string;
   window: string;
   expiry: number;
   upProbability: number;
-  onTrade: (side: "UP" | "DOWN") => void;
+  marketId: string;
+  poolAddress: string;
+  status: number;
+  onTrade: (market: any) => void;
 }
 
-export default function MarketCard({ symbol, underlying, window, expiry, upProbability, onTrade }: MarketCardProps) {
+export default function MarketCard(props: MarketCardProps) {
+  const { symbol, downSymbol, marketSymbol, underlying, window, expiry, upProbability, onTrade } = props;
   const [timeLeft, setTimeLeft] = useState("");
   const [progress, setProgress] = useState(100);
 
@@ -70,11 +76,11 @@ export default function MarketCard({ symbol, underlying, window, expiry, upProba
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => onTrade("UP")}
+        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => onTrade(props)}
           className="btn-up py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2">
           <ArrowUp className="w-4 h-4" /> TRADE UP
         </motion.button>
-        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => onTrade("DOWN")}
+        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => onTrade(props)}
           className="btn-down py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2">
           <ArrowDown className="w-4 h-4" /> TRADE DOWN
         </motion.button>

@@ -18,6 +18,7 @@ interface TradeContextType {
   balance: number;
   exchangeLoading: boolean;
   exchangeError: string | null;
+  marketsLoaded: boolean;
 
   // Actions
   refreshBalance: () => Promise<void>;
@@ -60,6 +61,7 @@ export default function TradeProvider({ children }: { children: ReactNode }) {
         exchange: exchange.exchange,
         exchangeLoading: exchange.loading,
         exchangeError: exchange.error,
+        marketsLoaded: exchange.marketsLoaded,
         refreshBalance: exchange.refreshBalance,
         placeOrder: exchange.placeOrder,
         redeem: exchange.redeem,
