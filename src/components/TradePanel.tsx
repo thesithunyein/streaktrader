@@ -4,14 +4,15 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStreakStore } from "@/lib/store";
 import { useTrade } from "@/components/TradeProvider";
-import { ArrowUp, ArrowDown, X, Zap, AlertTriangle, Loader2, Shield, ShieldCheck } from "lucide-react";
+import { ArrowUp, ArrowDown, X, Zap, AlertTriangle, Loader2, Shield, ShieldCheck, Swords } from "lucide-react";
 
 interface TradePanelProps {
   market: { symbol: string; downSymbol: string; underlying: string; window: string; upProbability: number; poolAddress?: string };
   onClose: () => void;
+  onChallenge?: () => void;
 }
 
-export default function TradePanel({ market, onClose }: TradePanelProps) {
+export default function TradePanel({ market, onClose, onChallenge }: TradePanelProps) {
   const [side, setSide] = useState<"UP" | "DOWN">("UP");
   const [stake, setStake] = useState(10);
   const [placing, setPlacing] = useState(false);
@@ -216,6 +217,15 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
             `Place Trade — ${stake} tUSDC ${side}`
           )}
         </motion.button>
+
+        {/* Challenge Friend button */}
+        {onChallenge && (
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+            onClick={onChallenge}
+            className="w-full mt-3 py-3 rounded-xl text-sm font-bold text-accent bg-accent/5 border border-accent/15 flex items-center justify-center gap-2 hover:bg-accent/10 transition-colors">
+            <Swords className="w-4 h-4" /> Challenge a Friend
+          </motion.button>
+        )}
       </motion.div>
     </motion.div>
   );

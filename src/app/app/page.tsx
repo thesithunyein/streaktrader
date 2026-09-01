@@ -10,6 +10,8 @@ import MarketCard from "@/components/MarketCard";
 import TradePanel from "@/components/TradePanel";
 import SettlementView from "@/components/SettlementView";
 import StreakCard from "@/components/StreakCard";
+import ChallengeModal from "@/components/ChallengeModal";
+import ChallengeBanner from "@/components/ChallengeBanner";
 import Footer from "@/components/Footer";
 import { useMarkets } from "@/hooks/useMarkets";
 import { Activity, Loader2 } from "lucide-react";
@@ -59,6 +61,7 @@ export default function TradingApp() {
   const [mounted, setMounted] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showStreakCard, setShowStreakCard] = useState(false);
+  const [showChallenge, setShowChallenge] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -87,6 +90,9 @@ export default function TradingApp() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <StatsBar onShare={() => setShowStreakCard(true)} />
         </motion.div>
+
+        {/* Challenge Banner */}
+        <ChallengeBanner />
 
         {/* Live Markets */}
         <div className="mb-8">
@@ -152,7 +158,13 @@ export default function TradingApp() {
 
       <AnimatePresence>
         {selectedMarket && (
-          <TradePanel market={selectedMarket} onClose={() => setSelectedMarket(null)} />
+          <TradePanel market={selectedMarket} onClose={() => setSelectedMarket(null)} onChallenge={() => setShowChallenge(true)} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showChallenge && selectedMarket && (
+          <ChallengeModal market={selectedMarket} onClose={() => setShowChallenge(false)} />
         )}
       </AnimatePresence>
 
