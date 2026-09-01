@@ -14,13 +14,13 @@ export default function Footer() {
             <span className="text-sm text-text-dim">StreakTrader</span>
           </div>
           <div className="text-xs text-text-muted text-center">
-            Built on{" "}
+            Powered by{" "}
             <span className="text-accent font-semibold">DreamDEX</span>{" "}
-            Event Contracts · Powered by{" "}
+            Event Contracts on{" "}
             <span className="text-accent font-semibold">Somnia</span>
           </div>
           <div className="text-xs text-text-muted">
-            Shannon Testnet · Chain 50312
+            Shannon Testnet
           </div>
         </div>
       </div>

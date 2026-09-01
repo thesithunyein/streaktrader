@@ -11,7 +11,7 @@ import TradePanel from "@/components/TradePanel";
 import SettlementView from "@/components/SettlementView";
 import Footer from "@/components/Footer";
 import { useMarkets } from "@/hooks/useMarkets";
-import { Zap, Shield, TrendingUp, Activity, Loader2, ArrowLeft } from "lucide-react";
+import { Activity, Loader2, ArrowLeft } from "lucide-react";
 
 
 
@@ -69,14 +69,7 @@ export default function TradingApp() {
       <Navbar />
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6">
-        {/* Back to home */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-text-dim hover:text-text transition-colors mb-6"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Back to home
-        </Link>
+
 
         {/* Stats */}
         <motion.div
@@ -123,12 +116,13 @@ export default function TradingApp() {
           )}
 
           {/* Empty state */}
-          {!loading && markets.length === 0 && (
-            <div className="glass rounded-2xl p-12 text-center">
+          {!loading && markets.length === 0 && !error && (
+            <div className="glass rounded-2xl p-8 sm:p-12 text-center">
               <Activity className="w-10 h-10 text-text-muted mx-auto mb-3" />
-              <p className="text-sm text-text-dim mb-1">No live markets</p>
-              <p className="text-xs text-text-muted">
-                Check back soon — new windows open every 15 minutes.
+              <p className="text-sm font-semibold text-text mb-1">No markets open right now</p>
+              <p className="text-xs text-text-muted max-w-xs mx-auto">
+                BTC and ETH event contracts open on a rolling schedule.
+                New trading windows launch every 15 minutes — check back shortly.
               </p>
             </div>
           )}
@@ -142,91 +136,8 @@ export default function TradingApp() {
         </div>
 
         {/* How It Works */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="glass rounded-3xl p-6 sm:p-8 mb-8"
-        >
-          <h2 className="text-lg font-bold text-text mb-6 text-center">
-            How it works
-          </h2>
-          <div className="grid sm:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Zap,
-                title: "Pick Your Side",
-                desc: "Choose UP or DOWN for any live BTC or ETH event contract",
-              },
-              {
-                icon: Activity,
-                title: "Build Your Streak",
-                desc: "Win consecutive trades to grow your multiplier",
-              },
-              {
-                icon: TrendingUp,
-                title: "Multiply Earnings",
-                desc: "Higher streaks = higher payouts on every trade",
-              },
-            ].map((step, i) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className="flex flex-col items-center text-center gap-3"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center">
-                  <step.icon className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-text mb-1">
-                    {step.title}
-                  </div>
-                  <div className="text-xs text-text-dim">{step.desc}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
 
-        {/* Features */}
-        <div className="grid sm:grid-cols-2 gap-4 mb-8">
-          {[
-            {
-              icon: Shield,
-              title: "Zero Fees",
-              desc: "No entry, settlement, or winnings fees on DreamDEX. Your stake is your maximum risk.",
-            },
-            {
-              icon: Zap,
-              title: "Lock Your Streak",
-              desc: "On a hot streak? Lock it in to cash out your multiplier earnings without risking the next trade.",
-            },
-          ].map((feat, i) => (
-            <motion.div
-              key={feat.title}
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="glass rounded-2xl p-5 card-hover"
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
-                  <feat.icon className="w-5 h-5 text-accent" />
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-text mb-1">
-                    {feat.title}
-                  </div>
-                  <div className="text-xs text-text-dim">{feat.desc}</div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+
       </main>
 
       <Footer />
@@ -272,22 +183,28 @@ export default function TradingApp() {
                 Welcome to StreakTrader
               </h3>
               <p className="text-sm text-text-dim mb-6 leading-relaxed">
-                Trade prediction markets on DreamDEX. Pick UP or DOWN, build your
-                streak, and multiply your earnings.
+                Predict whether BTC or ETH goes up or down. Win consecutive
+                trades to build your streak multiplier and maximize earnings.
               </p>
               <div className="space-y-3 text-left mb-6">
-                {[
-                  { icon: Zap, text: "One-click UP/DOWN trading" },
-                  { icon: Activity, text: "Streak multiplier grows your payout" },
-                  { icon: Shield, text: "Zero fees, capped risk" },
-                ].map((item) => (
-                  <div key={item.text} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-                      <item.icon className="w-4 h-4 text-accent" />
-                    </div>
-                    <span className="text-sm text-text">{item.text}</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                    <span className="text-accent text-sm">1</span>
                   </div>
-                ))}
+                  <span className="text-sm text-text">Pick a live market and choose UP or DOWN</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                    <span className="text-accent text-sm">2</span>
+                  </div>
+                  <span className="text-sm text-text">Win trades to grow your streak multiplier</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                    <span className="text-accent text-sm">3</span>
+                  </div>
+                  <span className="text-sm text-text">Higher streaks = higher payouts on every trade</span>
+                </div>
               </div>
               <motion.button
                 whileHover={{ scale: 1.02 }}
