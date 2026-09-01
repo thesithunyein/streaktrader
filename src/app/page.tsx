@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import { MouseParallax, InteractiveText, CursorGlow } from "@/components/MouseEffect";
 import {
   Zap,
   Shield,
@@ -93,13 +94,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
+      <CursorGlow />
       <Navbar />
 
       {/* Hero */}
       <section className="relative overflow-hidden min-h-[80vh] flex items-center">
         <AnimatedBackground />
 
-        <div className="max-w-5xl mx-auto px-4 pt-28 pb-24 sm:pt-36 sm:pb-32 text-center relative z-10 w-full">
+        <MouseParallax className="max-w-5xl mx-auto px-4 pt-28 pb-24 sm:pt-36 sm:pb-32 text-center relative z-10 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -118,9 +120,10 @@ export default function Home() {
             transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
             className="text-5xl sm:text-6xl lg:text-[5.5rem] font-extrabold text-text mb-7 leading-[1.08] tracking-tight"
           >
-            Build your streak.
-            <br />
-            <span className="text-gradient">Ride the wave.</span>
+            <InteractiveText text="Build your streak." className="block" />
+            <span className="block text-gradient mt-1">
+              <InteractiveText text="Ride the wave." />
+            </span>
           </motion.h1>
 
           <motion.p
@@ -174,7 +177,7 @@ export default function Home() {
               </div>
             ))}
           </motion.div>
-        </div>
+        </MouseParallax>
       </section>
 
       {/* How It Works */}
