@@ -22,7 +22,7 @@ export default function SettlementView() {
           setTimeout(() => {
             resolveTrade(result);
             if (result === "WIN") {
-              confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, colors: ["#6366f1", "#818cf8", "#16a34a", "#f59e0b"] });
+              confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, colors: ["#2563eb", "#60a5fa", "#16a34a", "#f59e0b"] });
             }
           }, 500);
           return 0;
