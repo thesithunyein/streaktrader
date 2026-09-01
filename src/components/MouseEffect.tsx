@@ -13,8 +13,8 @@ export function MouseParallax({ children, className = "" }: { children: ReactNod
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
     setOffset({
-      x: (e.clientX - cx) / rect.width * 8,
-      y: (e.clientY - cy) / rect.height * 5,
+      x: (e.clientX - cx) / rect.width * 12,
+      y: (e.clientY - cy) / rect.height * 8,
     });
   };
 
@@ -30,7 +30,7 @@ export function MouseParallax({ children, className = "" }: { children: ReactNod
       <div
         style={{
           transform: `translate(${offset.x}px, ${offset.y}px)`,
-          transition: "transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+          transition: "transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
         }}
       >
         {children}
@@ -39,15 +39,13 @@ export function MouseParallax({ children, className = "" }: { children: ReactNod
   );
 }
 
-// Interactive heading — letters respond to mouse proximity
+// Interactive heading — each letter reacts to mouse with visible scale + glow
 export function InteractiveText({
   text,
   className = "",
-  gradient = false,
 }: {
   text: string;
   className?: string;
-  gradient?: boolean;
 }) {
   const containerRef = useRef<HTMLSpanElement>(null);
 
@@ -64,19 +62,21 @@ export function InteractiveText({
       const lx = lRect.left - rect.left + lRect.width / 2;
       const ly = lRect.top - rect.top + lRect.height / 2;
       const dist = Math.sqrt((mx - lx) ** 2 + (my - ly) ** 2);
-      const maxDist = 80;
+      const maxDist = 100;
 
       if (dist < maxDist) {
         const strength = 1 - dist / maxDist;
-        const scale = 1 + strength * 0.15;
-        const translateY = -strength * 3;
+        const scale = 1 + strength * 0.3;
+        const translateY = -strength * 6;
         el.style.transform = `scale(${scale}) translateY(${translateY}px)`;
-        el.style.filter = `brightness(${1 + strength * 0.15})`;
-        el.style.textShadow = `0 0 ${strength * 20}px rgba(37, 99, 235, ${strength * 0.3})`;
+        el.style.filter = `brightness(${1 + strength * 0.3})`;
+        el.style.textShadow = `0 0 ${strength * 30}px rgba(37, 99, 235, ${strength * 0.6}), 0 ${strength * 4}px ${strength * 12}px rgba(37, 99, 235, ${strength * 0.3})`;
+        el.style.color = strength > 0.5 ? "#2563eb" : "";
       } else {
         el.style.transform = "scale(1) translateY(0)";
         el.style.filter = "none";
         el.style.textShadow = "none";
+        el.style.color = "";
       }
     });
   };
@@ -88,6 +88,7 @@ export function InteractiveText({
       h.style.transform = "scale(1) translateY(0)";
       h.style.filter = "none";
       h.style.textShadow = "none";
+      h.style.color = "";
     });
   };
 
@@ -97,14 +98,14 @@ export function InteractiveText({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={`inline-block cursor-default ${className}`}
-      style={{ lineHeight: 1.1 }}
+      style={{ lineHeight: 1.15 }}
     >
       {text.split("").map((char, i) => (
         <span
           key={i}
           className="letter inline-block"
           style={{
-            transition: "transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.25s ease, text-shadow 0.25s ease",
+            transition: "transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.2s ease, text-shadow 0.2s ease, color 0.2s ease",
             transformOrigin: "center bottom",
           }}
         >
@@ -115,9 +116,9 @@ export function InteractiveText({
   );
 }
 
-// Glow cursor follower
+// Big visible cursor glow that follows mouse
 export function CursorGlow() {
-  const [pos, setPos] = useState({ x: -200, y: -200 });
+  const [pos, setPos] = useState({ x: -300, y: -300 });
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -139,18 +140,35 @@ export function CursorGlow() {
   }, [visible]);
 
   return (
-    <div
-      className="pointer-events-none fixed z-[100]"
-      style={{
-        left: pos.x - 150,
-        top: pos.y - 150,
-        width: 300,
-        height: 300,
-        background: "radial-gradient(circle, rgba(37, 99, 235, 0.06) 0%, transparent 70%)",
-        borderRadius: "50%",
-        opacity: visible ? 1 : 0,
-        transition: "opacity 0.3s ease",
-      }}
-    />
+    <>
+      {/* Main glow — big, visible */}
+      <div
+        className="pointer-events-none fixed z-[100]"
+        style={{
+          left: pos.x - 200,
+          top: pos.y - 200,
+          width: 400,
+          height: 400,
+          background: "radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0.04) 40%, transparent 70%)",
+          borderRadius: "50%",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.4s ease",
+        }}
+      />
+      {/* Inner bright core */}
+      <div
+        className="pointer-events-none fixed z-[100]"
+        style={{
+          left: pos.x - 60,
+          top: pos.y - 60,
+          width: 120,
+          height: 120,
+          background: "radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, transparent 70%)",
+          borderRadius: "50%",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.3s ease",
+        }}
+      />
+    </>
   );
 }
