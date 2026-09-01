@@ -12,13 +12,8 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 glass-strong border-b border-border">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl overflow-hidden relative shadow-lg group-hover:shadow-accent/30 transition-shadow">
-            <Image
-              src="/logo.png"
-              alt="StreakTrader"
-              fill
-              className="object-cover"
-            />
+          <div className="w-9 h-9 rounded-xl overflow-hidden relative shadow-md group-hover:shadow-lg transition-shadow">
+            <Image src="/logo.png" alt="StreakTrader" fill className="object-cover" />
           </div>
           <span className="text-lg font-bold text-text hidden sm:block">
             Streak<span className="text-gradient">Trader</span>

@@ -97,10 +97,7 @@ export default function Home() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        {/* Ambient glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/8 rounded-full blur-[150px] pointer-events-none" />
-
+      <section className="relative overflow-hidden bg-gradient-to-b from-accent/[0.03] to-transparent">
         <div className="max-w-6xl mx-auto px-4 pt-16 pb-20 sm:pt-24 sm:pb-28 text-center relative">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -277,7 +274,6 @@ export default function Home() {
           viewport={{ once: true }}
           className="glass rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden"
         >
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
           <div className="relative">
             <span className="text-xs font-semibold text-accent uppercase tracking-widest">
               Powered by
