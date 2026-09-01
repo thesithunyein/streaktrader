@@ -99,24 +99,24 @@ export default function Home() {
       <section className="relative overflow-hidden min-h-[80vh] flex items-center">
         <AnimatedBackground />
 
-        <div className="max-w-6xl mx-auto px-4 py-20 sm:py-28 text-center relative z-10 w-full">
+        <div className="max-w-5xl mx-auto px-4 pt-28 pb-24 sm:pt-36 sm:pb-32 text-center relative z-10 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent/[0.08] border border-accent/15 mb-8"
           >
             <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            <span className="text-sm font-medium text-accent">
+            <span className="text-sm font-semibold text-accent tracking-wide">
               Live on Shannon Testnet
             </span>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-4xl sm:text-5xl lg:text-7xl font-bold text-text mb-6 leading-tight"
+            transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+            className="text-5xl sm:text-6xl lg:text-[5.5rem] font-extrabold text-text mb-7 leading-[1.08] tracking-tight"
           >
             Build your streak.
             <br />
@@ -126,7 +126,7 @@ export default function Home() {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.35 }}
             className="text-lg sm:text-xl text-text-dim max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             The prediction market app where every correct call extends your streak
@@ -142,7 +142,7 @@ export default function Home() {
           >
             <Link
               href="/app"
-              className="btn-primary px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-2 shadow-lg shadow-accent/20"
+              className="btn-primary px-9 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-2.5 shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 transition-all"
             >
               Start Trading
               <ArrowRight className="w-5 h-5" />
@@ -151,7 +151,7 @@ export default function Home() {
               href="https://github.com/thesithunyein/streaktrader"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl text-base font-bold text-text-dim border border-border hover:border-accent/30 hover:text-text transition-all flex items-center gap-2"
+              className="px-9 py-4 rounded-2xl text-base font-bold text-text-dim border border-border hover:border-accent/30 hover:text-text hover:bg-white/60 transition-all flex items-center gap-2 backdrop-blur-sm"
             >
               View Source
               <ChevronRight className="w-4 h-4" />
