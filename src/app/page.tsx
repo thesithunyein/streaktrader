@@ -104,10 +104,10 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/15 border border-white/20 backdrop-blur-sm mb-8"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent/[0.08] border border-accent/15 mb-8"
           >
-            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-            <span className="text-sm font-semibold text-white/90 tracking-wide">
+            <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+            <span className="text-sm font-semibold text-accent tracking-wide">
               Live on Shannon Testnet
             </span>
           </motion.div>
@@ -116,18 +116,18 @@ export default function Home() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
-            className="text-5xl sm:text-6xl lg:text-[5.5rem] font-extrabold text-white mb-7 leading-[1.08] tracking-tight"
+            className="text-5xl sm:text-6xl lg:text-[5.5rem] font-extrabold text-text mb-7 leading-[1.08] tracking-tight"
           >
             Build your streak.
             <br />
-            <span className="text-white/80">Ride the wave.</span>
+            <span className="text-gradient">Ride the wave.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 }}
-            className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed"
+            className="text-lg sm:text-xl text-text-dim max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             The prediction market app where every correct call extends your streak
             and multiplies your earnings. Trade Bitcoin and Ethereum event
@@ -142,7 +142,7 @@ export default function Home() {
           >
             <Link
               href="/app"
-              className="px-9 py-4 rounded-2xl text-base font-bold text-blue-600 bg-white flex items-center gap-2.5 shadow-lg hover:shadow-xl hover:bg-white/90 transition-all"
+              className="btn-primary px-9 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-2.5 shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 transition-all"
             >
               Start Trading
               <ArrowRight className="w-5 h-5" />
@@ -151,7 +151,7 @@ export default function Home() {
               href="https://github.com/thesithunyein/streaktrader"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-9 py-4 rounded-2xl text-base font-bold text-white/80 border border-white/25 hover:border-white/40 hover:bg-white/10 transition-all flex items-center gap-2"
+              className="px-9 py-4 rounded-2xl text-base font-bold text-text-dim border border-border hover:border-accent/30 hover:text-text hover:bg-white/60 transition-all flex items-center gap-2 backdrop-blur-sm"
             >
               View Source
               <ChevronRight className="w-4 h-4" />
@@ -166,11 +166,11 @@ export default function Home() {
             className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-16 max-w-3xl mx-auto"
           >
             {STATS.map((stat) => (
-              <div key={stat.label} className="rounded-xl p-4 text-center bg-white/10 backdrop-blur-sm border border-white/10">
-                <div className="text-2xl font-bold font-mono text-white">
+              <div key={stat.label} className="glass rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold font-mono text-gradient">
                   {stat.value}
                 </div>
-                <div className="text-xs text-white/50 mt-1">{stat.label}</div>
+                <div className="text-xs text-text-dim mt-1">{stat.label}</div>
               </div>
             ))}
           </motion.div>
