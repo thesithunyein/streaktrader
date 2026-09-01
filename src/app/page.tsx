@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import StatsBar from "@/components/StreakBadge";
 import MarketCard from "@/components/MarketCard";
 import TradePanel from "@/components/TradePanel";
 import SettlementView from "@/components/SettlementView";
 import Footer from "@/components/Footer";
-import { Flame, Zap, Shield, TrendingUp } from "lucide-react";
+import { Zap, Shield, TrendingUp, Activity } from "lucide-react";
 
 interface MarketData {
   symbol: string;
@@ -55,7 +56,6 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
-    // Simulate live probability updates
     const interval = setInterval(() => {
       setMarkets((prev) =>
         prev.map((m) => ({
@@ -77,17 +77,28 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fire-1/10 border border-fire-1/20 mb-4">
-            <Flame className="w-3.5 h-3.5 text-fire-1" />
-            <span className="text-xs font-semibold text-fire-1 uppercase tracking-wider">
+        {/* Hero */}
+        <div className="text-center mb-10">
+          {/* Logo */}
+          <div className="w-20 h-20 rounded-2xl overflow-hidden relative mx-auto mb-5 shadow-lg shadow-accent/20">
+            <Image
+              src="/logo.png"
+              alt="StreakTrader"
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 mb-4">
+            <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+            <span className="text-xs font-semibold text-accent uppercase tracking-wider">
               Live on Shannon Testnet
             </span>
           </div>
+
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text mb-3">
             Build your streak.{" "}
-            <span className="text-gradient-fire">Ride the wave.</span>
+            <span className="text-gradient">Ride the wave.</span>
           </h1>
           <p className="text-base sm:text-lg text-text-dim max-w-xl mx-auto">
             Trade Bitcoin and Ethereum event contracts. Every win builds your
@@ -101,9 +112,9 @@ export default function Home() {
         </div>
 
         {/* Live Markets */}
-        <div className="mb-6">
+        <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-2 h-2 rounded-full bg-up animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
             <h2 className="text-lg font-bold text-text">Live Markets</h2>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -137,8 +148,8 @@ export default function Home() {
               </div>
             </div>
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-fire-1/10 flex items-center justify-center">
-                <Flame className="w-6 h-6 text-fire-1" />
+              <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center">
+                <Activity className="w-6 h-6 text-accent" />
               </div>
               <div>
                 <div className="text-sm font-bold text-text mb-1">
@@ -185,8 +196,8 @@ export default function Home() {
           </div>
           <div className="glass rounded-2xl p-5 card-hover">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-fire-1/10 flex items-center justify-center shrink-0">
-                <Flame className="w-5 h-5 text-fire-1" />
+              <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+                <Zap className="w-5 h-5 text-accent" />
               </div>
               <div>
                 <div className="text-sm font-bold text-text mb-1">
@@ -204,7 +215,6 @@ export default function Home() {
 
       <Footer />
 
-      {/* Trade Panel Modal */}
       {selectedMarket && (
         <TradePanel
           market={selectedMarket}
@@ -212,7 +222,6 @@ export default function Home() {
         />
       )}
 
-      {/* Settlement View */}
       <SettlementView />
     </div>
   );

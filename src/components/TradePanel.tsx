@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { useStreakStore } from "@/lib/store";
-import {
-  ArrowUp,
-  ArrowDown,
-  X,
-  Flame,
-  AlertTriangle,
-} from "lucide-react";
+import { ArrowUp, ArrowDown, X, Zap, AlertTriangle } from "lucide-react";
 
 interface TradePanelProps {
   market: {
@@ -40,15 +34,12 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Panel */}
       <div className="relative w-full sm:w-[420px] max-h-[90vh] overflow-y-auto glass-strong rounded-t-3xl sm:rounded-3xl p-6 animate-slide-up">
-        {/* Close */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
@@ -56,7 +47,6 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
           <X className="w-4 h-4 text-text-dim" />
         </button>
 
-        {/* Market Info */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-sm text-text-dim">{market.underlying}</span>
@@ -66,7 +56,6 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
           <div className="text-lg font-bold text-text">{market.symbol}</div>
         </div>
 
-        {/* Side Selection */}
         <div className="grid grid-cols-2 gap-3 mb-5">
           <button
             onClick={() => setSide("UP")}
@@ -98,25 +87,23 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
           </button>
         </div>
 
-        {/* Streak Multiplier */}
         {streak > 0 && (
-          <div className="mb-5 p-3 rounded-xl bg-fire-1/10 border border-fire-1/20 flex items-center gap-3">
-            <Flame className="w-5 h-5 text-fire-1 animate-fire" />
+          <div className="mb-5 p-3 rounded-xl bg-accent/10 border border-accent/20 flex items-center gap-3">
+            <Zap className="w-5 h-5 text-accent" />
             <div className="flex-1">
-              <div className="text-sm font-semibold text-fire-1">
+              <div className="text-sm font-semibold text-accent">
                 {streak}x streak active
               </div>
               <div className="text-xs text-text-dim">
                 Multiplier applied to payout
               </div>
             </div>
-            <div className="text-lg font-bold font-mono text-fire-1">
+            <div className="text-lg font-bold font-mono text-accent">
               {multiplier}x
             </div>
           </div>
         )}
 
-        {/* Stake Input */}
         <div className="mb-5">
           <label className="text-xs font-semibold text-text-dim uppercase tracking-wider mb-2 block">
             Stake (tUSDC)
@@ -134,7 +121,6 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
               tUSDC
             </span>
           </div>
-          {/* Presets */}
           <div className="flex gap-2 mt-2">
             {presets.map((p) => (
               <button
@@ -152,7 +138,6 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
           </div>
         </div>
 
-        {/* Payout Preview */}
         <div className="mb-5 p-4 rounded-xl bg-bg border border-border">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-text-dim">If you WIN</span>
@@ -168,21 +153,18 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
           </div>
           {streak > 0 && (
             <div className="mt-2 pt-2 border-t border-border flex items-center gap-1.5">
-              <AlertTriangle className="w-3 h-3 text-fire-1" />
-              <span className="text-xs text-fire-1">
+              <AlertTriangle className="w-3 h-3 text-down" />
+              <span className="text-xs text-down">
                 Losing resets your {streak}x streak
               </span>
             </div>
           )}
         </div>
 
-        {/* Place Trade Button */}
         <button
           onClick={handleTrade}
           className={`w-full py-4 rounded-2xl text-base font-bold text-white transition-all duration-200 ${
-            side === "UP"
-              ? "btn-up"
-              : "btn-down"
+            side === "UP" ? "btn-up" : "btn-down"
           }`}
         >
           Place Trade — {stake} tUSDC {side}

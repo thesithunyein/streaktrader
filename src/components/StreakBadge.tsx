@@ -1,39 +1,30 @@
 "use client";
 
 import { useStreakStore } from "@/lib/store";
-import { Flame, TrendingUp, Target, Zap } from "lucide-react";
+import { Zap, Target, TrendingUp, Activity } from "lucide-react";
 
 export default function StatsBar() {
-  const { streak, getMultiplier, getWinRate, totalPnL, totalTrades } =
-    useStreakStore();
+  const { streak, getMultiplier, getWinRate, totalPnL } = useStreakStore();
 
   const multiplier = getMultiplier();
   const winRate = getWinRate();
-
-  const getFireSize = () => {
-    if (streak >= 5) return "w-16 h-16";
-    if (streak >= 3) return "w-14 h-14";
-    if (streak >= 1) return "w-12 h-12";
-    return "w-10 h-10";
-  };
-
-  const getFireColor = () => {
-    if (streak >= 5) return "from-fire-3 to-fire-1";
-    if (streak >= 3) return "from-fire-2 to-fire-1";
-    if (streak >= 1) return "from-fire-1 to-fire-2";
-    return "from-text-muted to-text-dim";
-  };
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {/* Streak */}
       <div className="glass rounded-2xl p-4 flex flex-col items-center justify-center gap-2 card-hover">
         <div
-          className={`${getFireSize()} rounded-full bg-gradient-to-br ${getFireColor()} flex items-center justify-center transition-all duration-500 ${
-            streak > 0 ? "animate-fire-pulse" : ""
+          className={`w-12 h-12 rounded-full bg-gradient-to-br flex items-center justify-center transition-all duration-500 ${
+            streak >= 5
+              ? "from-accent to-accent-light w-16 h-16 glow-streak"
+              : streak >= 3
+              ? "from-accent to-accent-light w-14 h-14"
+              : streak >= 1
+              ? "from-accent to-accent-light"
+              : "from-text-muted/30 to-text-dim/30"
           }`}
         >
-          <Flame
+          <Activity
             className={`text-white ${
               streak >= 5 ? "w-8 h-8" : streak >= 3 ? "w-7 h-7" : "w-6 h-6"
             } ${streak > 0 ? "animate-fire" : ""}`}

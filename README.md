@@ -1,8 +1,22 @@
+<div align="center">
+
+<img src="public/logo.png" alt="StreakTrader Logo" width="120" />
+
 # StreakTrader 🔥
 
 **Build your streak. Ride the wave.**
 
-The prediction market trading app where every win builds your streak and multiplies your earnings. Built on DreamDEX Event Contracts on the Somnia Network.
+The prediction market trading app where every win builds your streak and multiplies your earnings.
+
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=flat-square&logo=vercel)](https://streaktrader.sithunyein.com)
+[![Built on Somnia](https://img.shields.io/badge/Built%20on-Somnia-blue?style=flat-square)](https://somnia.network)
+[![DreamDEX](https://img.shields.io/badge/Powered%20by-DreamDEX-purple?style=flat-square)](https://dreamdex.io)
+
+**[Live App](https://streaktrader.sithunyein.com)** · **[GitHub](https://github.com/thesithunyein/streaktrader)**
+
+</div>
+
+---
 
 ## What is StreakTrader?
 
@@ -21,32 +35,30 @@ StreakTrader is a consumer-facing prediction market app that makes trading Bitco
 
 ## Tech Stack
 
-- **Framework:** Next.js 15 (App Router)
-- **Styling:** Tailwind CSS v4
-- **State:** Zustand
-- **Animation:** Framer Motion + Canvas Confetti
-- **Blockchain:** @somnia-chain/markets-sdk v0.28+
-- **Charts:** Lightweight Charts (TradingView)
-- **Network:** Somnia Shannon Testnet (Chain 50312)
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 15 (App Router) |
+| Styling | Tailwind CSS v4 |
+| State | Zustand |
+| Animation | Canvas Confetti |
+| Blockchain | @somnia-chain/markets-sdk v0.28+ |
+| Network | Somnia Shannon Testnet (Chain 50312) |
 
 ## Getting Started
 
 ```bash
-# Install dependencies
+# Clone
+git clone https://github.com/thesithunyein/streaktrader.git
+cd streaktrader
+
+# Install
 npm install
 
-# Run development server
+# Run
 npm run dev
-
-# Build for production
-npm run build
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
-
-## Environment
-
-This app connects to Somnia Shannon Testnet. No private key is needed for browsing — only for placing trades.
 
 ## How It Works
 
@@ -55,13 +67,13 @@ This app connects to Somnia Shannon Testnet. No private key is needed for browsi
 3. **Choose UP or DOWN** — will the price close above or below the opening price?
 4. **Set your stake** — 1 to 50 tUSDC
 5. **Wait for settlement** — watch the countdown with live price tracking
-6. **Win → streak grows, multiplier increases** | **Lose → streak resets to 0**
+6. **Win → streak grows, multiplier increases** · **Lose → streak resets to 0**
 
-## Built for
+## Built For
 
-- Somnia × DreamDEX Event Contracts Hackathon
-- Powered by DreamDEX Event Contracts
-- Built on Somnia Shannon Testnet
+- [Somnia × DreamDEX Event Contracts Hackathon](https://dorahacks.io/hackathon/event-contracts)
+- Powered by [DreamDEX Event Contracts](https://docs.dreamdex.io/developers/event-contracts)
+- Built on [Somnia Shannon Testnet](https://testnet.somnia.network)
 
 ## License
 

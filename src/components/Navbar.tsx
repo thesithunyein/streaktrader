@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useStreakStore } from "@/lib/store";
-import { Flame, Trophy, BarChart3, Wallet } from "lucide-react";
+import { Trophy, BarChart3, Wallet } from "lucide-react";
 
 export default function Navbar() {
   const { streak, totalPnL } = useStreakStore();
@@ -11,16 +12,21 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 glass-strong border-b border-border">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-fire-1 to-fire-3 flex items-center justify-center shadow-lg group-hover:shadow-fire-1/30 transition-shadow">
-            <Flame className="w-5 h-5 text-white" />
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-xl overflow-hidden relative shadow-lg group-hover:shadow-accent/30 transition-shadow">
+            <Image
+              src="/logo.png"
+              alt="StreakTrader"
+              fill
+              className="object-cover"
+            />
           </div>
           <span className="text-lg font-bold text-text hidden sm:block">
             Streak<span className="text-gradient">Trader</span>
           </span>
         </Link>
 
-        {/* Center: Streak */}
+        {/* Center: Nav Links */}
         <div className="flex items-center gap-6">
           <Link
             href="/"
@@ -42,9 +48,9 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           {/* Streak Badge */}
           {streak > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-fire-1/10 border border-fire-1/20 animate-streak-glow">
-              <Flame className="w-3.5 h-3.5 text-fire-1 animate-fire" />
-              <span className="text-sm font-bold font-mono text-fire-1">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 animate-streak-glow">
+              <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+              <span className="text-sm font-bold font-mono text-accent">
                 {streak}x
               </span>
             </div>
