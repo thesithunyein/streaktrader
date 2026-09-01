@@ -48,7 +48,7 @@ export default function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden min-h-[85vh] flex items-center">
         <AnimatedBackground />
-        <MouseParallax className="max-w-5xl mx-auto px-4 pt-28 pb-24 sm:pt-36 sm:pb-32 text-center relative z-10 w-full">
+        <MouseParallax className="max-w-5xl mx-auto px-4 pt-20 pb-16 sm:pt-24 sm:pb-24 text-center relative z-10 w-full">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent/[0.08] border border-accent/15 mb-8">
             <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
