@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AnimatedBackground from "@/components/AnimatedBackground";
 import {
   Zap,
   Shield,
@@ -96,32 +97,17 @@ export default function Home() {
 
       {/* Hero */}
       <section className="relative overflow-hidden min-h-[80vh] flex items-center">
-        {/* Video Background */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          poster="/logo.png"
-        >
-          <source
-            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260423_084718_72a17915-4964-4059-afcd-22d59399b72e.mp4"
-            type="video/mp4"
-          />
-        </video>
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/40" />
+        <AnimatedBackground />
 
         <div className="max-w-6xl mx-auto px-4 py-20 sm:py-28 text-center relative z-10 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm mb-6"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6"
           >
             <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            <span className="text-sm font-medium text-white">
+            <span className="text-sm font-medium text-accent">
               Live on Shannon Testnet
             </span>
           </motion.div>
@@ -130,18 +116,18 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight"
+            className="text-4xl sm:text-5xl lg:text-7xl font-bold text-text mb-6 leading-tight"
           >
             Build your streak.
             <br />
-            <span className="text-accent-light">Ride the wave.</span>
+            <span className="text-gradient">Ride the wave.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed"
+            className="text-lg sm:text-xl text-text-dim max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             The prediction market app where every correct call extends your streak
             and multiplies your earnings. Trade Bitcoin and Ethereum event
@@ -165,7 +151,7 @@ export default function Home() {
               href="https://github.com/thesithunyein/streaktrader"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl text-base font-bold text-white border border-white/20 hover:border-white/40 hover:bg-white/10 transition-all flex items-center gap-2"
+              className="px-8 py-4 rounded-2xl text-base font-bold text-text-dim border border-border hover:border-accent/30 hover:text-text transition-all flex items-center gap-2"
             >
               View Source
               <ChevronRight className="w-4 h-4" />
@@ -180,11 +166,11 @@ export default function Home() {
             className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-16 max-w-3xl mx-auto"
           >
             {STATS.map((stat) => (
-              <div key={stat.label} className="rounded-xl p-4 text-center bg-white/10 backdrop-blur-sm border border-white/10">
-                <div className="text-2xl font-bold font-mono text-white">
+              <div key={stat.label} className="glass rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold font-mono text-gradient">
                   {stat.value}
                 </div>
-                <div className="text-xs text-white/60 mt-1">{stat.label}</div>
+                <div className="text-xs text-text-dim mt-1">{stat.label}</div>
               </div>
             ))}
           </motion.div>
