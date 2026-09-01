@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useStreakStore } from "@/lib/store";
 import { ArrowUp, ArrowDown, X, Zap, AlertTriangle } from "lucide-react";
 
@@ -33,13 +34,24 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+    >
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      <div className="relative w-full sm:w-[420px] max-h-[90vh] overflow-y-auto glass-strong rounded-t-3xl sm:rounded-3xl p-6 animate-slide-up">
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 100, opacity: 0 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="relative w-full sm:w-[420px] max-h-[90vh] overflow-y-auto glass-strong rounded-t-3xl sm:rounded-3xl p-6"
+      >
         <button
           onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
@@ -57,7 +69,8 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-5">
-          <button
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => setSide("UP")}
             className={`py-4 rounded-2xl font-bold text-sm flex flex-col items-center gap-2 transition-all duration-200 ${
               side === "UP"
@@ -70,8 +83,9 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
             <span className="text-xs opacity-70">
               {market.upProbability.toFixed(0)}%
             </span>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => setSide("DOWN")}
             className={`py-4 rounded-2xl font-bold text-sm flex flex-col items-center gap-2 transition-all duration-200 ${
               side === "DOWN"
@@ -84,25 +98,32 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
             <span className="text-xs opacity-70">
               {(100 - market.upProbability).toFixed(0)}%
             </span>
-          </button>
+          </motion.button>
         </div>
 
-        {streak > 0 && (
-          <div className="mb-5 p-3 rounded-xl bg-accent/10 border border-accent/20 flex items-center gap-3">
-            <Zap className="w-5 h-5 text-accent" />
-            <div className="flex-1">
-              <div className="text-sm font-semibold text-accent">
-                {streak}x streak active
+        <AnimatePresence>
+          {streak > 0 && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-5 p-3 rounded-xl bg-accent/10 border border-accent/20 flex items-center gap-3 overflow-hidden"
+            >
+              <Zap className="w-5 h-5 text-accent" />
+              <div className="flex-1">
+                <div className="text-sm font-semibold text-accent">
+                  {streak}x streak active
+                </div>
+                <div className="text-xs text-text-dim">
+                  Multiplier applied to payout
+                </div>
               </div>
-              <div className="text-xs text-text-dim">
-                Multiplier applied to payout
+              <div className="text-lg font-bold font-mono text-accent">
+                {multiplier}x
               </div>
-            </div>
-            <div className="text-lg font-bold font-mono text-accent">
-              {multiplier}x
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="mb-5">
           <label className="text-xs font-semibold text-text-dim uppercase tracking-wider mb-2 block">
@@ -123,8 +144,9 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
           </div>
           <div className="flex gap-2 mt-2">
             {presets.map((p) => (
-              <button
+              <motion.button
                 key={p}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setStake(p)}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                   stake === p
@@ -133,7 +155,7 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
                 }`}
               >
                 {p}
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>
@@ -161,15 +183,17 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
           )}
         </div>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={handleTrade}
           className={`w-full py-4 rounded-2xl text-base font-bold text-white transition-all duration-200 ${
             side === "UP" ? "btn-up" : "btn-down"
           }`}
         >
           Place Trade — {stake} tUSDC {side}
-        </button>
-      </div>
-    </div>
+        </motion.button>
+      </motion.div>
+    </motion.div>
   );
 }

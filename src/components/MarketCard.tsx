@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Clock, ArrowUp, ArrowDown } from "lucide-react";
 
 interface MarketCardProps {
@@ -35,7 +36,6 @@ export default function MarketCard({
       const minutes = Math.floor(diff / 60000);
       const seconds = Math.floor((diff % 60000) / 1000);
       setTimeLeft(`${minutes}:${seconds.toString().padStart(2, "0")}`);
-      // Assume 15 min window for progress
       const totalMs = 15 * 60 * 1000;
       setProgress(Math.min(100, (diff / totalMs) * 100));
     };
@@ -47,8 +47,10 @@ export default function MarketCard({
   const downProbability = 100 - upProbability;
 
   return (
-    <div className="glass rounded-2xl p-5 card-hover group">
-      {/* Header */}
+    <motion.div
+      whileHover={{ y: -2, transition: { duration: 0.2 } }}
+      className="glass rounded-2xl p-5 card-hover group"
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center">
@@ -73,7 +75,6 @@ export default function MarketCard({
         </div>
       </div>
 
-      {/* Probability Bar */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5">
@@ -90,42 +91,47 @@ export default function MarketCard({
           </div>
         </div>
         <div className="h-2.5 rounded-full bg-bg overflow-hidden flex">
-          <div
-            className="h-full bg-gradient-to-r from-up to-up/70 rounded-l-full transition-all duration-1000"
-            style={{ width: `${upProbability}%` }}
+          <motion.div
+            className="h-full bg-gradient-to-r from-up to-up/70 rounded-l-full"
+            animate={{ width: `${upProbability}%` }}
+            transition={{ duration: 0.5 }}
           />
-          <div
-            className="h-full bg-gradient-to-r from-down/70 to-down rounded-r-full transition-all duration-1000"
-            style={{ width: `${downProbability}%` }}
+          <motion.div
+            className="h-full bg-gradient-to-r from-down/70 to-down rounded-r-full"
+            animate={{ width: `${downProbability}%` }}
+            transition={{ duration: 0.5 }}
           />
         </div>
       </div>
 
-      {/* Trade Buttons */}
       <div className="grid grid-cols-2 gap-3">
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => onTrade("UP")}
           className="btn-up py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2"
         >
           <ArrowUp className="w-4 h-4" />
           TRADE UP
-        </button>
-        <button
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => onTrade("DOWN")}
           className="btn-down py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2"
         >
           <ArrowDown className="w-4 h-4" />
           TRADE DOWN
-        </button>
+        </motion.button>
       </div>
 
-      {/* Progress bar */}
       <div className="mt-3 h-1 rounded-full bg-bg overflow-hidden">
-        <div
-          className="h-full bg-accent/30 rounded-full transition-all duration-1000"
-          style={{ width: `${progress}%` }}
+        <motion.div
+          className="h-full bg-accent/30 rounded-full"
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 1 }}
         />
       </div>
-    </div>
+    </motion.div>
   );
 }
