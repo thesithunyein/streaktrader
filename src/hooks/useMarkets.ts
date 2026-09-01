@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getExchange } from "@/lib/sdk";
+import { getReadExchange } from "@/lib/sdkRead";
 
 export interface LiveMarket {
   symbol: string;
@@ -21,7 +21,7 @@ export function useMarkets() {
 
   const fetchMarkets = useCallback(async () => {
     try {
-      const exchange = getExchange();
+      const exchange = getReadExchange();
       const binaryMarkets = await exchange.client.listLiveBinaryMarkets({
         limit: 20,
       });
@@ -30,21 +30,19 @@ export function useMarkets() {
 
       for (const m of binaryMarkets as any[]) {
         try {
-          // Check on-chain status
           const onchain = await exchange.client.getMarketOnchain(
             m.marketId as `0x${string}`
           );
-          if (onchain.status !== 1) continue; // Only Trading
+          if (onchain.status !== 1) continue;
 
-          const upSymbol = m.outcomes?.[0]?.symbol || m.symbol || `${m.underlying}-UP`;
+          const upSymbol =
+            m.outcomes?.[0]?.symbol || m.symbol || `${m.underlying}-UP`;
           if (!upSymbol) continue;
 
-          // Get order book for probability
           const book = await exchange.fetchOrderBook(upSymbol, 5);
           const bestBid = book.bids[0]?.[0];
           const bestAsk = book.asks[0]?.[0];
 
-          // Mid price = probability
           let upProb = 50;
           if (bestBid && bestAsk) {
             upProb = Math.round(((bestBid + bestAsk) / 2) * 100);
@@ -54,7 +52,6 @@ export function useMarkets() {
             upProb = Math.round(bestBid * 100);
           }
 
-          // Determine underlying and window from symbol
           const parts = upSymbol.split("-");
           const underlying = parts[0] === "BTC" ? "Bitcoin" : "Ethereum";
           const windowMatch = upSymbol.includes("15M")
@@ -74,7 +71,6 @@ export function useMarkets() {
             status: onchain.status,
           });
         } catch {
-          // Skip markets that fail
           continue;
         }
       }
@@ -90,8 +86,7 @@ export function useMarkets() {
 
   useEffect(() => {
     fetchMarkets();
-    // Poll every 5 seconds
-    const interval = setInterval(fetchMarkets, 5000);
+    const interval = setInterval(fetchMarkets, 10000);
     return () => clearInterval(interval);
   }, [fetchMarkets]);
 

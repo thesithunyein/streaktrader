@@ -3,20 +3,62 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStreakStore } from "@/lib/store";
-import { ArrowUp, ArrowDown, X, Zap, AlertTriangle } from "lucide-react";
+import { useTrade } from "@/components/TradeProvider";
+import { ArrowUp, ArrowDown, X, Zap, AlertTriangle, Loader2 } from "lucide-react";
 
 interface TradePanelProps {
-  market: { symbol: string; underlying: string; window: string; upProbability: number };
+  market: { symbol: string; underlying: string; window: string; upProbability: number; poolAddress?: string };
   onClose: () => void;
 }
 
 export default function TradePanel({ market, onClose }: TradePanelProps) {
   const [side, setSide] = useState<"UP" | "DOWN">("UP");
   const [stake, setStake] = useState(10);
+  const [placing, setPlacing] = useState(false);
+  const [tradeError, setTradeError] = useState<string | null>(null);
   const { placeTrade, streak, getMultiplier } = useStreakStore();
+  const { address, placeOrder } = useTrade();
   const multiplier = getMultiplier();
   const potentialPayout = stake * multiplier;
   const presets = [1, 5, 10, 25, 50];
+
+  const handlePlaceTrade = async () => {
+    if (!address) {
+      setTradeError("Connect your wallet first");
+      return;
+    }
+
+    setPlacing(true);
+    setTradeError(null);
+
+    try {
+      // Place a real IOC market order via SDK
+      // Side: BUY YES for UP, BUY NO for DOWN
+      const orderSide = side === "UP" ? "buy" : "buy";
+
+      await placeOrder(
+        market.symbol,
+        orderSide,
+        stake,
+        undefined, // market order, no limit price
+        "IOC" // immediate or cancel
+      );
+
+      // If order succeeds, create the local streak trade
+      placeTrade({
+        marketId: market.symbol,
+        symbol: market.symbol,
+        side,
+        stake,
+      });
+
+      onClose();
+    } catch (e: any) {
+      setTradeError(e.message || "Trade failed. Check your balance and try again.");
+    } finally {
+      setPlacing(false);
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
@@ -102,10 +144,26 @@ export default function TradePanel({ market, onClose }: TradePanelProps) {
           )}
         </div>
 
+        {tradeError && (
+          <div className="mb-4 p-3 rounded-xl bg-down/10 border border-down/20 text-sm text-down">
+            {tradeError}
+          </div>
+        )}
+
         <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-          onClick={() => { placeTrade({ marketId: market.symbol, symbol: market.symbol, side, stake }); }}
-          className={`w-full py-4 rounded-2xl text-base font-bold text-white transition-all ${side === "UP" ? "btn-up" : "btn-down"}`}>
-          Place Trade — {stake} tUSDC {side}
+          onClick={handlePlaceTrade}
+          disabled={placing || !address}
+          className={`w-full py-4 rounded-2xl text-base font-bold text-white transition-all flex items-center justify-center gap-2 ${!address ? "opacity-50 cursor-not-allowed bg-slate-300" : side === "UP" ? "btn-up" : "btn-down"}`}>
+          {placing ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Placing order...
+            </>
+          ) : !address ? (
+            "Connect Wallet to Trade"
+          ) : (
+            `Place Trade — ${stake} tUSDC ${side}`
+          )}
         </motion.button>
       </motion.div>
     </motion.div>

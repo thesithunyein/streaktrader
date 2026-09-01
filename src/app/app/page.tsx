@@ -13,49 +13,7 @@ import Footer from "@/components/Footer";
 import { useMarkets } from "@/hooks/useMarkets";
 import { Zap, Shield, TrendingUp, Activity, Loader2, ArrowLeft } from "lucide-react";
 
-// Fallback mock data
-const MOCK_MARKETS = [
-  {
-    symbol: "BTC-0-01SEP26-15M#YES",
-    underlying: "Bitcoin",
-    window: "15 min",
-    expiry: Date.now() + 15 * 60 * 1000,
-    upProbability: 67,
-    marketId: "mock-1",
-    poolAddress: "0x0",
-    status: 1,
-  },
-  {
-    symbol: "BTC-0-01SEP26-1H#YES",
-    underlying: "Bitcoin",
-    window: "1 hour",
-    expiry: Date.now() + 45 * 60 * 1000,
-    upProbability: 54,
-    marketId: "mock-2",
-    poolAddress: "0x0",
-    status: 1,
-  },
-  {
-    symbol: "ETH-0-01SEP26-15M#YES",
-    underlying: "Ethereum",
-    window: "15 min",
-    expiry: Date.now() + 8 * 60 * 1000,
-    upProbability: 72,
-    marketId: "mock-3",
-    poolAddress: "0x0",
-    status: 1,
-  },
-  {
-    symbol: "ETH-0-01SEP26-1H#YES",
-    underlying: "Ethereum",
-    window: "1 hour",
-    expiry: Date.now() + 52 * 60 * 1000,
-    upProbability: 48,
-    marketId: "mock-4",
-    poolAddress: "0x0",
-    status: 1,
-  },
-];
+
 
 // Loading skeleton
 function MarketSkeleton() {
@@ -104,7 +62,7 @@ export default function TradingApp() {
 
   if (!mounted) return null;
 
-  const markets = liveMarkets.length > 0 ? liveMarkets : MOCK_MARKETS;
+  const markets = liveMarkets;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -178,7 +136,7 @@ export default function TradingApp() {
           {/* Error state */}
           {error && (
             <div className="mt-3 p-3 rounded-xl bg-down/10 border border-down/20 text-sm text-down">
-              {error} — showing demo data
+              {error}
             </div>
           )}
         </div>

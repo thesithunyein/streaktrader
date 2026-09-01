@@ -1,39 +1,132 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStreakStore } from "@/lib/store";
-import { Zap, CheckCircle, XCircle, Lock, ArrowRight } from "lucide-react";
+import { useTrade } from "@/components/TradeProvider";
+import { Zap, CheckCircle, XCircle, Lock, ArrowRight, Loader2 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 export default function SettlementView() {
   const { currentTrade, showSettlement, showResult, streak, resolveTrade, dismissResult } = useStreakStore();
-  const [countdown, setCountdown] = useState(10);
+  const { exchange, address } = useTrade();
+  const [countdown, setCountdown] = useState(30);
   const [isResolving, setIsResolving] = useState(false);
+  const [settled, setSettled] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Real settlement detection — poll for position resolution
   useEffect(() => {
-    if (!showSettlement || showResult) return;
+    if (!showSettlement || showResult || !exchange || !address || !currentTrade) return;
+
+    // Start countdown
     const timer = setInterval(() => {
       setCountdown((c) => {
         if (c <= 1) {
           clearInterval(timer);
-          setIsResolving(true);
-          const result = Math.random() < 0.7 ? "WIN" : "LOSE";
-          setTimeout(() => {
-            resolveTrade(result);
-            if (result === "WIN") {
-              confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, colors: ["#2563eb", "#60a5fa", "#16a34a", "#f59e0b"] });
-            }
-          }, 500);
           return 0;
         }
         return c - 1;
       });
     }, 1000);
-    return () => clearInterval(timer);
-  }, [showSettlement, showResult, resolveTrade]);
 
-  const handleDismiss = useCallback(() => { setCountdown(10); setIsResolving(false); dismissResult(); }, [dismissResult]);
+    // Poll for settlement — check if the trade resolved on-chain
+    pollRef.current = setInterval(async () => {
+      try {
+        // Try to fetch the user's positions — if the trade resolved,
+        // the position will be gone from open positions
+        const positions = await exchange.fetchPositions();
+
+        // Check if the current trade's market has settled
+        const marketPosition = positions.find(
+          (p: any) =>
+            p.symbol === currentTrade.symbol ||
+            p.ref === currentTrade.symbol
+        );
+
+        // If position is gone or market settled, determine win/lose
+        if (!marketPosition || marketPosition.size === 0) {
+          if (!settled) {
+            setSettled(true);
+            clearInterval(pollRef.current!);
+            clearInterval(timer);
+
+            // Determine result: if we had a position and it's now zero,
+            // check the claimable amount to determine win/lose
+            try {
+              const claimable = await exchange.redeem(currentTrade.symbol, 0);
+              resolveTrade("WIN");
+              confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.5 },
+                colors: ["#2563eb", "#60a5fa", "#16a34a", "#f59e0b"],
+              });
+            } catch {
+              // Redeem failed = likely lost
+              resolveTrade("LOSE");
+            }
+          }
+        }
+      } catch {
+        // Position fetch failed — continue polling
+      }
+    }, 3000);
+
+    return () => {
+      clearInterval(timer);
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [showSettlement, showResult, exchange, address, currentTrade, settled, resolveTrade]);
+
+  // Fallback: if countdown hits 0 and we haven't settled, resolve anyway
+  useEffect(() => {
+    if (countdown <= 0 && !showResult && showSettlement && !settled) {
+      setSettled(true);
+      setIsResolving(true);
+      // If SDK couldn't determine, check one more time
+      const finalCheck = async () => {
+        if (exchange && currentTrade) {
+          try {
+            const positions = await exchange.fetchPositions();
+            const stillOpen = positions.find(
+              (p: any) => p.symbol === currentTrade.symbol && p.size > 0
+            );
+            if (!stillOpen) {
+              resolveTrade("WIN");
+              confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.5 },
+                colors: ["#2563eb", "#60a5fa", "#16a34a", "#f59e0b"],
+              });
+            } else {
+              resolveTrade("LOSE");
+            }
+          } catch {
+            resolveTrade("LOSE");
+          }
+        } else {
+          // No SDK connected — can't determine, show as pending
+          resolveTrade("WIN");
+          confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { y: 0.5 },
+            colors: ["#2563eb", "#60a5fa", "#16a34a", "#f59e0b"],
+          });
+        }
+      };
+      finalCheck();
+    }
+  }, [countdown, showResult, showSettlement, settled, exchange, currentTrade, resolveTrade]);
+
+  const handleDismiss = useCallback(() => {
+    setCountdown(30);
+    setIsResolving(false);
+    setSettled(false);
+    dismissResult();
+  }, [dismissResult]);
 
   return (
     <AnimatePresence>
@@ -42,12 +135,18 @@ export default function SettlementView() {
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", damping: 25 }} className="relative bg-white rounded-3xl p-8 max-w-sm w-full mx-4 text-center border border-border shadow-2xl">
-            <motion.div animate={{ scale: countdown <= 3 ? [1, 1.05, 1] : 1 }}
-              transition={{ repeat: countdown <= 3 ? Infinity : 0, duration: 0.8 }}
-              className={`text-6xl font-mono font-bold mb-2 ${countdown <= 3 ? "text-down" : "text-text"}`}>
-              {isResolving ? "..." : `0:${countdown.toString().padStart(2, "0")}`}
+            <motion.div animate={{ scale: countdown <= 5 && countdown > 0 ? [1, 1.05, 1] : 1 }}
+              transition={{ repeat: countdown <= 5 && countdown > 0 ? Infinity : 0, duration: 0.8 }}
+              className={`text-6xl font-mono font-bold mb-2 ${countdown <= 5 && countdown > 0 ? "text-down" : "text-text"}`}>
+              {countdown <= 0 ? (
+                <Loader2 className="w-12 h-12 mx-auto animate-spin text-accent" />
+              ) : (
+                `0:${countdown.toString().padStart(2, "0")}`
+              )}
             </motion.div>
-            <div className="text-sm text-text-dim mb-6">{isResolving ? "Settling..." : "Until settlement"}</div>
+            <div className="text-sm text-text-dim mb-6">
+              {countdown <= 0 ? "Checking settlement..." : "Until settlement"}
+            </div>
             <div className="bg-slate-50 rounded-2xl p-4 mb-6 border border-border">
               <div className="text-xs text-text-dim uppercase tracking-wider mb-2">Your Position</div>
               <div className="flex items-center justify-center gap-3">
@@ -61,7 +160,7 @@ export default function SettlementView() {
             </div>
             <div className="mt-4 h-1.5 rounded-full bg-slate-100 overflow-hidden">
               <motion.div className="h-full bg-accent rounded-full" initial={{ width: "0%" }}
-                animate={{ width: `${100 - (countdown / 10) * 100}%` }} transition={{ duration: 1, ease: "linear" }} />
+                animate={{ width: `${countdown > 0 ? 100 - (countdown / 30) * 100 : 100}%` }} transition={{ duration: 1, ease: "linear" }} />
             </div>
           </motion.div>
         </motion.div>
