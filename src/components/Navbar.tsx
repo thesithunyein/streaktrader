@@ -27,7 +27,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-6">
           <Link
-            href="/"
+            href="/app"
             className="flex items-center gap-2 text-sm text-text-dim hover:text-text transition-colors"
           >
             <BarChart3 className="w-4 h-4" />
