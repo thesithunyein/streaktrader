@@ -1,0 +1,149 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\sithu\\freebuff\\streaktrader\\contracts\\ChallengeArena.sol": {
+      "lastModificationDate": 1788296555691,
+      "contentHash": "00048d8fe728ecb686db14320777e4fa",
+      "sourceName": "contracts/ChallengeArena.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "ChallengeArena"
+      ]
+    },
+    "C:\\Users\\sithu\\freebuff\\streaktrader\\contracts\\ScoreOracle.sol": {
+      "lastModificationDate": 1788296841047,
+      "contentHash": "7690f7d452124e0674aa0f2887a81341",
+      "sourceName": "contracts/ScoreOracle.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "ScoreOracle"
+      ]
+    },
+    "C:\\Users\\sithu\\freebuff\\streaktrader\\contracts\\ShieldManager.sol": {
+      "lastModificationDate": 1788296831645,
+      "contentHash": "55808cb26692ff7de190d639698297c4",
+      "sourceName": "contracts/ShieldManager.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "ShieldManager"
+      ]
+    },
+    "C:\\Users\\sithu\\freebuff\\streaktrader\\contracts\\StreakRegistry.sol": {
+      "lastModificationDate": 1788296521938,
+      "contentHash": "5c377eb2ec1a07e1c2082a2f4c8a600e",
+      "sourceName": "contracts/StreakRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "StreakRegistry"
+      ]
+    }
+  }
+}
