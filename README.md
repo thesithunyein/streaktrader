@@ -1,10 +1,36 @@
-# StreakTrader
+<p align="center">
+  <img src="public/logo.png" alt="StreakTrader Logo" width="150" />
+</p>
 
-**Predict. Win. Streak. Multiply.**
+<h1 align="center">StreakTrader</h1>
 
 <p align="center">
-  <img src="public/logo.png" alt="StreakTrader Logo" width="120" />
+  <strong>Predict. Win. Streak. Multiply.</strong>
 </p>
+
+<p align="center">
+  <a href="https://streaktrader.sithunyein.com">
+    <img src="https://img.shields.io/badge/Live%20Demo-streaktrader.sithunyein.com-blue?style=for-the-badge" alt="Live Demo" />
+  </a>
+  <a href="https://github.com/thesithunyein/streaktrader/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
+  </a>
+  <a href="https://shannon-explorer.somnia.network/address/0x423b8701da3a251a3a3fc2d241b71e8d05744c91">
+    <img src="https://img.shields.io/badge/Network-Shannon%20Testnet-purple?style=for-the-badge" alt="Network" />
+  </a>
+  <a href="https://github.com/thesithunyein/streaktrader/blob/main/SECURITY.md">
+    <img src="https://img.shields.io/badge/Security-Policy-red?style=for-the-badge" alt="Security" />
+  </a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Smart%20Contracts-4%20Deployed-orange?style=flat-square" alt="Contracts" />
+  <img src="https://img.shields.io/badge/Tests-21%20Passing-brightgreen?style=flat-square" alt="Tests" />
+  <img src="https://img.shields.io/badge/SDK-DreamDEX-success?style=flat-square" alt="SDK" />
+  <img src="https://img.shields.io/badge/AI-Copilot%20Integrated-yellow?style=flat-square" alt="AI" />
+</p>
+
+---
 
 StreakTrader is a gamified prediction market platform built on [DreamDEX Event Contracts](https://docs.dreamdex.io/developers/event-contracts) and the [Somnia](https://somnia.network) blockchain. Users predict whether BTC or ETH will go UP or DOWN within 15-minute windows, building winning streaks that multiply their payouts.
 
@@ -22,6 +48,7 @@ Unlike traditional prediction market interfaces, StreakTrader wraps event contra
 | **Head-to-Head Challenges** | Challenge a friend on the same market | ChallengeArena |
 | **Shareable Streak Cards** | One-tap export beautiful streak images for Twitter | Client-side |
 | **Live Price Chart** | Real-time BTC price during settlement countdown | Binance API |
+| **AI Copilot** | Suggests UP/DOWN with confidence scores and risk analysis | API |
 
 ---
 
@@ -97,9 +124,12 @@ flowchart LR
 | **ChallengeArena** | [`0xcc1ef2948269d702c719e6ba1a55d25b3c05b262`](https://shannon-explorer.somnia.network/address/0xcc1ef2948269d702c719e6ba1a55d25b3c05b262) | Head-to-head challenges with on-chain stakes |
 | **ScoreOracle** | [`0x13bb32402bcffdb486c675f943be7b07bba54d60`](https://shannon-explorer.somnia.network/address/0x13bb32402bcffdb486c675f943be7b07bba54d60) | Computes prediction score (0-100) on-chain |
 
-**Network:** Somnia Shannon Testnet (Chain ID: 50312)  
-**RPC:** `https://api.infra.testnet.somnia.network`  
-**Explorer:** [shannon-explorer.somnia.network](https://shannon-explorer.somnia.network)
+| Network | Details |
+|---------|---------|
+| **Chain** | Somnia Shannon Testnet (Chain ID: 50312) |
+| **RPC** | `https://api.infra.testnet.somnia.network` |
+| **Explorer** | [shannon-explorer.somnia.network](https://shannon-explorer.somnia.network) |
+| **SDK** | [@somnia-chain/markets-sdk](https://www.npmjs.com/package/@somnia-chain/markets-sdk) |
 
 ---
 
@@ -183,6 +213,9 @@ streaktrader/
     StreakRegistry.test.ts      # 8 tests
     ShieldManager.test.ts       # 6 tests
     ScoreOracle.test.ts         # 7 tests
+  docs/
+    SDK_FEEDBACK_REPORT.md      # DreamDEX SDK feedback
+    PRESENTATION.md             # Hackathon presentation
   hardhat.config.ts
   package.json
 ```
@@ -208,15 +241,6 @@ npm run build
 # Run tests
 npx hardhat test
 ```
-
----
-
-## Documentation
-
-| Document | Purpose |
-|----------|---------|
-| [SDK Feedback Report](docs/SDK_FEEDBACK_REPORT.md) | DreamDEX SDK experience and suggestions |
-| [Presentation Deck](docs/PRESENTATION.md) | Hackathon presentation slides |
 
 ---
 
@@ -246,17 +270,34 @@ npx hardhat test
 
 ---
 
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [SDK Feedback Report](docs/SDK_FEEDBACK_REPORT.md) | DreamDEX SDK experience and suggestions |
+| [Presentation Deck](docs/PRESENTATION.md) | Hackathon presentation slides |
+| [Security Policy](SECURITY.md) | Vulnerability reporting guidelines |
+| [Code of Conduct](CODE_OF_CONDUCT.md) | Community standards |
+| [Contributing Guide](CONTRIBUTING.md) | How to contribute |
+| [License](LICENSE) | MIT License |
+
+---
+
 ## Hackathon Submission
 
 **Somnia x DreamDEX Event Contracts Hackathon**
 
-- **Project:** StreakTrader
-- **Category:** Consumer-facing prediction market with gamification
-- **Innovation:** On-chain streak tracking, prediction scores, streak shields, shareable cards
-- **Network:** Somnia Shannon Testnet (Chain 50312)
+| Field | Value |
+|-------|-------|
+| **Project** | StreakTrader |
+| **Category** | Consumer-facing prediction market with gamification |
+| **Innovation** | On-chain streak tracking, prediction scores, streak shields, shareable cards |
+| **Network** | Somnia Shannon Testnet (Chain 50312) |
+| **Author** | Sithu Nyein |
+| **Contact** | sithunyein.mailto@gmail.com |
 
 ---
 
 ## License
 
-MIT
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
