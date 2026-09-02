@@ -143,7 +143,7 @@ export function CursorGlow() {
     <>
       {/* Outer glow — soft radial */}
       <div
-        className="pointer-events-none fixed z-[100]"
+        className="pointer-events-none fixed z-[5]"
         style={{
           left: pos.x - 200,
           top: pos.y - 200,
@@ -157,7 +157,7 @@ export function CursorGlow() {
       />
       {/* Main circle ring */}
       <div
-        className="pointer-events-none fixed z-[100]"
+        className="pointer-events-none fixed z-[5]"
         style={{
           left: pos.x - 40,
           top: pos.y - 40,
@@ -171,7 +171,7 @@ export function CursorGlow() {
       />
       {/* Inner dot */}
       <div
-        className="pointer-events-none fixed z-[100]"
+        className="pointer-events-none fixed z-[5]"
         style={{
           left: pos.x - 4,
           top: pos.y - 4,

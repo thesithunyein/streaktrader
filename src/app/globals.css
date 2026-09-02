@@ -39,6 +39,8 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  html {
     overflow-x: hidden;
   }
   /* Stripe-style selection */
