@@ -54,63 +54,92 @@ Unlike traditional prediction market interfaces, StreakTrader wraps event contra
 
 ## Architecture
 
-```
+```mermaid
 flowchart TB
-    User[Trader] --> Frontend[StreakTrader App]
-    Frontend --> Landing[Landing Page]
-    Frontend --> Trading[Trading Page]
-    Frontend --> Leaderboard[Leaderboard]
-    Frontend --> History[Trade History]
-
+    User([Trader]) --> Frontend[StreakTrader App]
+    
+    subgraph Pages[Frontend Pages]
+        Landing[Landing Page]
+        Trading[Trading Page]
+        Leaderboard[Leaderboard]
+        History[Trade History]
+    end
+    
+    Frontend --> Pages
+    
     Trading --> Exchange[DreamDEX SDK]
     Trading --> AI[AI Copilot]
     Trading --> OnChain[On-Chain Contracts]
-
-    Exchange --> MarketDiscovery[Market Discovery]
-    Exchange --> OrderExecution[Order Execution]
-    Exchange --> Settlement[Settlement Detection]
-
-    OnChain --> StreakReg[StreakRegistry]
-    OnChain --> ShieldMgr[ShieldManager]
-    OnChain --> ChallengeA[ChallengeArena]
-    OnChain --> ScoreOrc[ScoreOracle]
-
-    AI --> Momentum[Momentum Signal]
-    AI --> Volatility[Volatility Signal]
-    AI --> Probability[Probability Signal]
-    AI --> RiskGates[Risk Gates]
-
-    StreakReg --> Blockchain[Somnia Shannon Testnet]
-    ShieldMgr --> Blockchain
-    ChallengeA --> Blockchain
-    ScoreOrc --> Blockchain
-
-    MarketDiscovery --> DreamDEX[DreamDEX Indexer]
-    OrderExecution --> DreamDEX
-    Settlement --> DreamDEX
-
-    Landing --> AnimatedBG[Animated Canvas Background]
-    Landing --> CursorGlow[Cursor Glow Effect]
+    
+    subgraph SDK[DreamDEX SDK Layer]
+        MarketDiscovery[Market Discovery]
+        OrderExecution[Order Execution]
+        Settlement[Settlement Detection]
+    end
+    
+    Exchange --> SDK
+    
+    subgraph Contracts[Smart Contracts]
+        StreakReg[StreakRegistry]
+        ShieldMgr[ShieldManager]
+        ChallengeA[ChallengeArena]
+        ScoreOrc[ScoreOracle]
+    end
+    
+    OnChain --> Contracts
+    
+    subgraph AI_Layer[AI Copilot]
+        Momentum[Momentum Signal]
+        Volatility[Volatility Signal]
+        Probability[Probability Signal]
+        RiskGates[Risk Gates]
+    end
+    
+    AI --> AI_Layer
+    
+    subgraph Blockchain[Somnia Shannon Testnet]
+        BC[Chain 50312]
+    end
+    
+    StreakReg --> BC
+    ShieldMgr --> BC
+    ChallengeA --> BC
+    ScoreOrc --> BC
+    
+    subgraph DreamDEX[Indexer Infrastructure]
+        IDX[GraphQL API]
+    end
+    
+    MarketDiscovery --> IDX
+    OrderExecution --> IDX
+    Settlement --> IDX
+    
+    Landing --> AnimatedBG[Animated Canvas]
+    Landing --> CursorGlow[Cursor Glow]
 ```
 
 ### Data Flow
 
-```
+```mermaid
 flowchart LR
-    Connect[Connect Wallet] --> Select[Select Market]
+    Connect([Connect Wallet]) --> Select[Select Market]
     Select --> Predict[Predict UP or DOWN]
     Predict --> Execute[Execute Trade via SDK]
     Execute --> Watch[Watch Live BTC Price]
     Watch --> Settle[Settlement Window Closes]
+    
     Settle --> Result{Win or Lose?}
     Result -->|Win| Streak[Streak Grows]
     Result -->|Lose| Shield{Shield Active?}
+    
     Shield -->|Yes| Protect[Shield Absorbs Loss]
     Shield -->|No| Reset[Streak Resets]
+    
     Streak --> Score[Score Updates On-Chain]
     Protect --> Score
     Reset --> Score
-    Score --> Share[Share Streak Card]
+    
+    Score --> Share([Share Streak Card])
 ```
 
 ---
