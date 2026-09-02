@@ -59,8 +59,8 @@ export default function Home() {
           <motion.h1 initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
             className="text-5xl sm:text-6xl lg:text-[5.5rem] font-extrabold text-text mb-7 leading-[1.08] tracking-tight">
-            <InteractiveText text="Build your streak." className="block" />
-            <span className="block text-gradient mt-1"><InteractiveText text="Ride the wave." /></span>
+            <span className="block">Build your streak.</span>
+            <span className="block mt-1" style={{ color: "#2563eb" }}>Ride the wave.</span>
           </motion.h1>
 
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
