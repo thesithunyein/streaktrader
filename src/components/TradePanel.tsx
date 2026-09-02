@@ -38,12 +38,13 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
       const baseSymbol = market.symbol.replace(/#(YES|NO)$/i, "");
       const orderSymbol = side === "UP" ? baseSymbol : baseSymbol;
 
+      // Use limit order at 0.50 (50%) — works even with no opposite-side liquidity
       await placeOrder(
         orderSymbol,
         "buy",
         stake,
-        undefined, // market order, no limit price
-        "IOC" // immediate or cancel
+        0.50, // limit price: buy at 0.50 tUSDC per token
+        "GTC" // good till cancelled
       );
 
       // If order succeeds, create the local streak trade
@@ -56,7 +57,16 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
 
       onClose();
     } catch (e: any) {
-      setTradeError(e.message || "Trade failed. Check your balance and try again.");
+      const msg = e?.message || "Trade failed";
+      if (msg.includes("empty") || msg.includes("no liquidity")) {
+        setTradeError("Order book empty. Try a different market or wait for liquidity.");
+      } else if (msg.includes("balance") || msg.includes("insufficient")) {
+        setTradeError("Insufficient balance. Get more STT from the faucet.");
+      } else if (msg.includes("chain") || msg.includes("network")) {
+        setTradeError("Wrong network. Switch MetaMask to Shannon Testnet.");
+      } else {
+        setTradeError(msg);
+      }
     } finally {
       setPlacing(false);
     }
