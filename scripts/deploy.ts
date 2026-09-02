@@ -1,77 +1,105 @@
 // @ts-nocheck
-import hre from "hardhat";
+// Load .env manually before anything else
+import { readFileSync } from "fs";
+const envContent = readFileSync(".env", "utf-8");
+for (const line of envContent.split("\n")) {
+  const trimmed = line.trim();
+  if (trimmed && !trimmed.startsWith("#")) {
+    const eqIdx = trimmed.indexOf("=");
+    if (eqIdx > 0) {
+      const key = trimmed.substring(0, eqIdx).trim();
+      const val = trimmed.substring(eqIdx + 1).trim();
+      process.env[key] = val;
+    }
+  }
+}
+
+import { createWalletClient, http, createPublicClient } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { somniaTestnet } from "viem/chains";
+import path from "path";
+
+const SHANNON_RPC = "https://api.infra.testnet.somnia.network";
+const rawKey = process.env.DEPLOYER_PRIVATE_KEY || "";
+const pk = rawKey.startsWith("0x") ? rawKey : `0x${rawKey}`;
+
+function loadBytecode(contractName: string): `0x${string}` {
+  const artifact = JSON.parse(
+    readFileSync(path.join("artifacts", "contracts", `${contractName}.sol`, `${contractName}.json`), "utf-8")
+  );
+  return artifact.bytecode;
+}
+
+function loadABI(contractName: string) {
+  const artifact = JSON.parse(
+    readFileSync(path.join("artifacts", "contracts", `${contractName}.sol`, `${contractName}.json`), "utf-8")
+  );
+  return artifact.abi;
+}
 
 async function main() {
-  const ethers = (hre as any).ethers;
-  const [deployer] = await ethers.getSigners();
-  console.log("Deploying contracts with:", deployer.address);
+  console.log("Private key length:", pk.length);
+  console.log("Private key prefix:", pk.substring(0, 6));
+  
+  const account = privateKeyToAccount(pk as `0x${string}`);
+  console.log("Deployer address:", account.address);
 
-  // 1. Deploy StreakRegistry
-  console.log("\n--- Deploying StreakRegistry ---");
-  const StreakRegistry = await ethers.getContractFactory("StreakRegistry");
-  const streakRegistry = await StreakRegistry.deploy();
-  await streakRegistry.waitForDeployment();
-  const streakAddr = await streakRegistry.getAddress();
-  console.log("StreakRegistry deployed to:", streakAddr);
+  const client = createWalletClient({
+    account,
+    chain: somniaTestnet,
+    transport: http(SHANNON_RPC),
+  });
 
-  // 2. Deploy ShieldManager
-  console.log("\n--- Deploying ShieldManager ---");
-  const ShieldManager = await ethers.getContractFactory("ShieldManager");
-  const shieldManager = await ShieldManager.deploy();
-  await shieldManager.waitForDeployment();
-  const shieldAddr = await shieldManager.getAddress();
-  console.log("ShieldManager deployed to:", shieldAddr);
+  const chainId = await client.getChainId();
+  console.log("Connected to chain:", chainId);
 
-  // 3. Deploy ChallengeArena
-  console.log("\n--- Deploying ChallengeArena ---");
-  const ChallengeArena = await ethers.getContractFactory("ChallengeArena");
-  const challengeArena = await ChallengeArena.deploy();
-  await challengeArena.waitForDeployment();
-  const challengeAddr = await challengeArena.getAddress();
-  console.log("ChallengeArena deployed to:", challengeAddr);
+  const pubClient = createPublicClient({
+    chain: somniaTestnet,
+    transport: http(SHANNON_RPC),
+  });
 
-  // 4. Deploy ScoreOracle
-  console.log("\n--- Deploying ScoreOracle ---");
-  const ScoreOracle = await ethers.getContractFactory("ScoreOracle");
-  const scoreOracle = await ScoreOracle.deploy();
-  await scoreOracle.waitForDeployment();
-  const scoreAddr = await scoreOracle.getAddress();
-  console.log("ScoreOracle deployed to:", scoreAddr);
+  const contracts: Record<string, string> = {};
+  const contractNames = ["StreakRegistry", "ShieldManager", "ChallengeArena", "ScoreOracle"];
+
+  for (const name of contractNames) {
+    console.log(`\n--- Deploying ${name} ---`);
+    const bytecode = loadBytecode(name);
+    const hash = await client.deployContract({
+      abi: loadABI(name),
+      bytecode,
+      chain: somniaTestnet,
+    });
+    console.log(`  Tx hash: ${hash}`);
+    
+    const receipt = await pubClient.waitForTransactionReceipt({ hash });
+    console.log(`  Deployed at: ${receipt.contractAddress}`);
+    contracts[name] = receipt.contractAddress!;
+  }
 
   // Summary
   console.log("\n=== DEPLOYMENT SUMMARY ===");
   console.log("Network: Shannon Testnet (Chain 50312)");
-  console.log("Deployer:", deployer.address);
-  console.log("\nContract Addresses:");
-  console.log("StreakRegistry:", streakAddr);
-  console.log("ShieldManager:", shieldAddr);
-  console.log("ChallengeArena:", challengeAddr);
-  console.log("ScoreOracle:", scoreAddr);
+  console.log("Deployer:", account.address);
+  for (const [name, addr] of Object.entries(contracts)) {
+    console.log(`${name}: ${addr}`);
+  }
 
-  // Save addresses to file
-  const fs = require("fs");
+  // Save addresses
   const addresses = {
     network: "Shannon Testnet",
     chainId: 50312,
-    deployer: deployer.address,
-    contracts: {
-      StreakRegistry: streakAddr,
-      ShieldManager: shieldAddr,
-      ChallengeArena: challengeAddr,
-      ScoreOracle: scoreAddr,
-    },
+    deployer: account.address,
+    contracts,
     deployedAt: new Date().toISOString(),
   };
-  fs.writeFileSync(
-    "src/lib/contracts.json",
-    JSON.stringify(addresses, null, 2)
-  );
+  const { writeFileSync } = await import("fs");
+  writeFileSync("src/lib/contracts.json", JSON.stringify(addresses, null, 2));
   console.log("\nAddresses saved to src/lib/contracts.json");
 }
 
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(error);
+    console.error("DEPLOY FAILED:", error);
     process.exit(1);
   });
