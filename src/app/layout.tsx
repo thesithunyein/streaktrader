@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description:
     "The prediction market trading app where every win builds your streak and multiplies your earnings. Built on DreamDEX Event Contracts.",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/logo.png",
   },
 };
 
