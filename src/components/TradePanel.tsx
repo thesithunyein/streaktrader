@@ -77,13 +77,13 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
       const baseSymbol = market.symbol.replace(/#(YES|NO)$/i, "");
       const orderSymbol = side === "UP" ? baseSymbol : baseSymbol;
 
-      // Use limit order at 0.50 (50%) — works even with no opposite-side liquidity
+      // placeOrder now handles order book fetching + crossing the touch automatically
       await placeOrder(
         orderSymbol,
         "buy",
         stake,
-        0.50, // limit price: buy at 0.50 tUSDC per token
-        "GTC" // good till cancelled
+        undefined, // let useExchange fetch book and set price
+        "IOC" // immediate or cancel — SDK recommended
       );
 
       // If order succeeds, create the local streak trade
