@@ -25,20 +25,28 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
 
   const [isWrongNetwork, setIsWrongNetwork] = useState(false);
 
-  // Check network on mount and when address changes
+  // Check network on mount, when address changes, and on chain change
   useEffect(() => {
     const checkNetwork = async () => {
       if (typeof window === "undefined" || !window.ethereum) return;
       try {
         const chainId = await window.ethereum.request({ method: "eth_chainId" });
-        setIsWrongNetwork(parseInt(chainId, 16) !== 50312);
+        const wrong = parseInt(chainId, 16) !== 50312;
+        setIsWrongNetwork(wrong);
+        if (!wrong) setTradeError(null);
       } catch {}
     };
     checkNetwork();
+    // Also check every 2 seconds to catch any changes
+    const interval = setInterval(checkNetwork, 2000);
     if (window.ethereum) {
       window.ethereum.on("chainChanged", checkNetwork);
-      return () => window.ethereum?.removeListener("chainChanged", checkNetwork);
+      return () => {
+        window.ethereum?.removeListener("chainChanged", checkNetwork);
+        clearInterval(interval);
+      };
     }
+    return () => clearInterval(interval);
   }, [address]);
 
   const handlePlaceTrade = async () => {
@@ -108,7 +116,7 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
     try {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x" + (50312).toString(16) }],
+        params: [{ chainId: "0xc488" }], // 50312 in hex
       });
     } catch {
       try {
@@ -116,7 +124,7 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
           method: "wallet_addEthereumChain",
           params: [
             {
-              chainId: "0x" + (50312).toString(16),
+              chainId: "0xc488",
               chainName: "Somnia Shannon Testnet",
               nativeCurrency: { name: "STT", symbol: "STT", decimals: 18 },
               rpcUrls: ["https://api.infra.testnet.somnia.network"],
@@ -126,6 +134,14 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
         });
       } catch {}
     }
+    // Re-check network after switch attempt
+    setTimeout(async () => {
+      try {
+        const chainId = await window.ethereum.request({ method: "eth_chainId" });
+        setIsWrongNetwork(parseInt(chainId, 16) !== 50312);
+        setTradeError(null);
+      } catch {}
+    }, 1000);
   };
 
   const toggleShield = () => {
