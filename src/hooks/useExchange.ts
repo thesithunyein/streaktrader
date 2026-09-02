@@ -127,35 +127,18 @@ export function useExchange(
         throw new Error(`Market "${symbol}" not found. Available: ${Object.keys(exchangeRef.current.markets).slice(0, 5).join(", ")}...`);
       }
 
-      // Fetch order book to get actual price (SDK docs recommendation)
-      let orderPrice = price;
-      if (!orderPrice && side === "buy") {
-        try {
-          const book = await exchangeRef.current.fetchOrderBook(symbol, 5);
-          const ask = book.asks[0]?.[0];
-          if (ask !== undefined) {
-            orderPrice = ask + 0.02; // cross the touch
-          } else {
-            // No asks, try bid + small buffer
-            const bid = book.bids[0]?.[0];
-            if (bid !== undefined) {
-              orderPrice = bid + 0.05;
-            } else {
-              orderPrice = 0.50; // fallback
-            }
-          }
-        } catch {
-          orderPrice = 0.50; // fallback
-        }
-      }
-
+      // Use MARKET order — SDK handles price via crossingPrice() with slippage
+      // SDK automatically: fetches book, crosses the touch, sets expiry, handles approval
       const order = await exchangeRef.current.createOrder(
         symbol,
-        orderPrice ? "limit" : "market",
+        "market", // SDK calculates crossing price automatically
         side,
         amount,
-        orderPrice,
-        { timeInForce: timeInForce || "IOC" } // IOC is SDK recommended
+        undefined, // no price needed for market orders
+        {
+          timeInForce: "IOC", // immediate or cancel — SDK recommended
+          slippage: 0.05, // 5% slippage tolerance
+        }
       );
       await refreshBalance();
       return order;
