@@ -198,55 +198,57 @@ flowchart LR
 
 ```
 streaktrader/
-  contracts/                    # Solidity smart contracts
-    StreakRegistry.sol          # On-chain streak tracking
-    ShieldManager.sol           # Shield minting/burning
-    ChallengeArena.sol          # Head-to-head challenges
-    ScoreOracle.sol             # Prediction score computation
-  scripts/
-    deploy.ts                   # Contract deployment script
-  src/
-    app/
-      page.tsx                  # Landing page
-      app/page.tsx              # Trading app
-      leaderboard/page.tsx      # On-chain leaderboard
-      history/page.tsx          # Trade history
-      api/copilot/route.ts      # AI copilot endpoint
-      api/streak/route.ts       # Streak persistence API
-      api/leaderboard/route.ts  # Leaderboard API
-    components/
-      AnimatedBackground.tsx    # Canvas animated waves
-      MouseEffect.tsx           # Cursor glow effect
-      Navbar.tsx                # Navigation with wallet connect
-      TradePanel.tsx            # Trade execution panel
-      SettlementView.tsx        # Settlement countdown + live chart
-      StreakBadge.tsx           # Stats bar with on-chain data
-      StreakCard.tsx            # Shareable streak card generator
-      MarketCard.tsx            # Market display card
-      ChallengeModal.tsx        # Challenge creation
-      ChallengeBanner.tsx       # Active challenge display
-      TradeProvider.tsx         # Context provider
-      CopilotSidebar.tsx        # AI copilot sidebar
-      Footer.tsx                # Site footer
-    hooks/
-      useWallet.ts              # MetaMask wallet connection
-      useExchange.ts            # DreamDEX SDK integration
-      useOnChain.ts             # Smart contract read/write
-      useMarkets.ts             # Live market discovery
-      useStreakSync.ts          # Cross-device streak sync
-    lib/
-      store.ts                  # Zustand store
-      contracts.ts              # Contract addresses + ABIs
-      abis/                     # Contract ABI files
-  test/
-    StreakRegistry.test.ts      # 8 tests
-    ShieldManager.test.ts       # 6 tests
-    ScoreOracle.test.ts         # 7 tests
-  docs/
-    SDK_FEEDBACK_REPORT.md      # DreamDEX SDK feedback
-    PRESENTATION.md             # Hackathon presentation
-  hardhat.config.ts
-  package.json
+├── contracts/
+│   ├── StreakRegistry.sol       -- On-chain streak tracking
+│   ├── ShieldManager.sol        -- Shield minting/burning
+│   ├── ChallengeArena.sol       -- Head-to-head challenges
+│   └── ScoreOracle.sol          -- Prediction score computation
+├── scripts/
+│   └── deploy.ts                -- Contract deployment
+├── src/
+│   ├── app/
+│   │   ├── page.tsx             -- Landing page
+│   │   ├── app/page.tsx         -- Trading app
+│   │   ├── leaderboard/page.tsx -- On-chain leaderboard
+│   │   ├── history/page.tsx     -- Trade history
+│   │   └── api/
+│   │       ├── copilot/route.ts -- AI copilot endpoint
+│   │       ├── streak/route.ts  -- Streak persistence
+│   │       └── leaderboard/route.ts -- Leaderboard
+│   ├── components/
+│   │   ├── AnimatedBackground.tsx -- Canvas animated waves
+│   │   ├── MouseEffect.tsx      -- Cursor glow effect
+│   │   ├── Navbar.tsx           -- Navigation + wallet
+│   │   ├── TradePanel.tsx       -- Trade execution
+│   │   ├── SettlementView.tsx   -- Settlement + live chart
+│   │   ├── StreakBadge.tsx      -- Stats bar
+│   │   ├── StreakCard.tsx       -- Shareable card generator
+│   │   ├── MarketCard.tsx       -- Market display
+│   │   ├── ChallengeModal.tsx   -- Challenge creation
+│   │   ├── ChallengeBanner.tsx  -- Active challenge
+│   │   ├── TradeProvider.tsx    -- Context provider
+│   │   ├── CopilotSidebar.tsx   -- AI copilot sidebar
+│   │   └── Footer.tsx           -- Site footer
+│   ├── hooks/
+│   │   ├── useWallet.ts         -- MetaMask connection
+│   │   ├── useExchange.ts       -- DreamDEX SDK
+│   │   ├── useOnChain.ts        -- Contract read/write
+│   │   ├── useMarkets.ts        -- Market discovery
+│   │   └── useStreakSync.ts     -- Cross-device sync
+│   └── lib/
+│       ├── store.ts             -- Zustand store
+│       ├── contracts.ts         -- Addresses + ABIs
+│       └── abis/                -- Contract ABIs
+├── test/
+│   ├── StreakRegistry.test.ts   -- 8 tests
+│   ├── ShieldManager.test.ts    -- 6 tests
+│   └── ScoreOracle.test.ts      -- 7 tests
+├── docs/
+│   ├── SDK_FEEDBACK_REPORT.md   -- SDK feedback
+│   └── PRESENTATION.md          -- Presentation deck
+├── hardhat.config.ts
+├── package.json
+└── README.md
 ```
 
 ---
