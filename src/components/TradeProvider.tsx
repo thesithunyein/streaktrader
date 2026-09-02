@@ -4,6 +4,7 @@ import { createContext, useContext, type ReactNode } from "react";
 import { useWallet } from "@/hooks/useWallet";
 import { useExchange } from "@/hooks/useExchange";
 import { useOnChain } from "@/hooks/useOnChain";
+import { useStreakSync } from "@/hooks/useStreakSync";
 
 interface TradeContextType {
   // Wallet
@@ -46,6 +47,7 @@ interface TradeContextType {
   updateScoreOnChain: (streak: number, bestStreak: number, totalTrades: number, wins: number) => Promise<string>;
   activateShieldOnChain: () => Promise<string>;
   refreshOnChain: () => Promise<void>;
+  syncNow: () => Promise<void>;
 }
 
 const TradeContext = createContext<TradeContextType | null>(null);
@@ -64,6 +66,7 @@ export default function TradeProvider({ children }: { children: ReactNode }) {
     wallet.address
   );
   const onChain = useOnChain(wallet.walletClient, wallet.address);
+  const { loadFromAPI, saveToAPI } = useStreakSync(wallet.address);
 
   return (
     <TradeContext.Provider
@@ -97,6 +100,7 @@ export default function TradeProvider({ children }: { children: ReactNode }) {
         updateScoreOnChain: onChain.updateScore,
         activateShieldOnChain: onChain.activateShield,
         refreshOnChain: onChain.refreshOnChainData,
+        syncNow: saveToAPI,
       }}
     >
       {children}

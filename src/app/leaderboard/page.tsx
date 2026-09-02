@@ -63,51 +63,67 @@ export default function LeaderboardPage() {
   const fetchOnChainLeaderboard = async () => {
     setLoading(true);
     try {
-      const client = createPublicClient({
-        chain: somniaShannon,
-        transport: http("https://api.infra.testnet.somnia.network"),
-      });
+      // 1. Fetch from API (cross-device sync)
+      const apiRes = await fetch("/api/leaderboard");
+      const apiData = await apiRes.json();
 
-      // For now, read the deployer's data as proof of concept
-      // In production, you'd index all users from events
-      const deployer = "0x7A35f63F81357DaDE2cff8f5699b935786Aa9Da2" as Address;
+      if (apiData.leaderboard && apiData.leaderboard.length > 0) {
+        const apiEntries = apiData.leaderboard.map((e: any) => ({
+          address: e.address,
+          streak: e.streak,
+          bestStreak: e.bestStreak,
+          totalTrades: e.totalTrades,
+          wins: e.wins,
+          winRate: e.winRate,
+          score: e.predictionScore,
+        }));
+        setEntries(apiEntries);
+      } else {
+        // 2. Fallback to on-chain data
+        const client = createPublicClient({
+          chain: somniaShannon,
+          transport: http("https://api.infra.testnet.somnia.network"),
+        });
 
-      const streakResult = await client.readContract({
-        address: CONTRACT_ADDRESSES.StreakRegistry as Address,
-        abi: ABIS.StreakRegistry,
-        functionName: "getRecord",
-        args: [deployer],
-      });
+        const deployer = "0x7A35f63F81357DaDE2cff8f5699b935786Aa9Da2" as Address;
 
-      const [streak, bestStreak, totalTrades, wins, winRate] = streakResult as [bigint, bigint, bigint, bigint, bigint];
+        const streakResult = await client.readContract({
+          address: CONTRACT_ADDRESSES.StreakRegistry as Address,
+          abi: ABIS.StreakRegistry,
+          functionName: "getRecord",
+          args: [deployer],
+        });
 
-      const scoreResult = await client.readContract({
-        address: CONTRACT_ADDRESSES.ScoreOracle as Address,
-        abi: ABIS.ScoreOracle,
-        functionName: "getScore",
-        args: [deployer],
-      });
-      const score = scoreResult as bigint;
+        const [streak, bestStreak, totalTrades, wins, winRate] = streakResult as [bigint, bigint, bigint, bigint, bigint];
 
-      // Update the deployer's entry with real on-chain data
-      const updatedEntries = DEMO_ENTRIES.map((e) =>
-        e.address.toLowerCase() === deployer.toLowerCase()
-          ? {
-              ...e,
-              streak: Number(streak),
-              bestStreak: Number(bestStreak),
-              totalTrades: Number(totalTrades),
-              wins: Number(wins),
-              winRate: Number(winRate),
-              score: Number(score),
-            }
-          : e
-      ).sort((a, b) => b.score - a.score || b.bestStreak - a.bestStreak);
+        const scoreResult = await client.readContract({
+          address: CONTRACT_ADDRESSES.ScoreOracle as Address,
+          abi: ABIS.ScoreOracle,
+          functionName: "getScore",
+          args: [deployer],
+        });
+        const score = scoreResult as bigint;
 
-      setEntries(updatedEntries);
+        const updatedEntries = DEMO_ENTRIES.map((e) =>
+          e.address.toLowerCase() === deployer.toLowerCase()
+            ? {
+                ...e,
+                streak: Number(streak),
+                bestStreak: Number(bestStreak),
+                totalTrades: Number(totalTrades),
+                wins: Number(wins),
+                winRate: Number(winRate),
+                score: Number(score),
+              }
+            : e
+        ).sort((a, b) => b.score - a.score || b.bestStreak - a.bestStreak);
+
+        setEntries(updatedEntries);
+      }
+
       setLastUpdated(new Date().toLocaleTimeString());
     } catch (e) {
-      console.error("Failed to fetch on-chain leaderboard:", e);
+      console.error("Failed to fetch leaderboard:", e);
     } finally {
       setLoading(false);
     }
