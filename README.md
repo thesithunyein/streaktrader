@@ -1,80 +1,187 @@
-<div align="center">
+# 🔥 StreakTrader
 
-<img src="public/logo.png" alt="StreakTrader Logo" width="120" />
+**Predict. Win. Streak. Multiply.**
 
-# StreakTrader 🔥
+StreakTrader is a gamified prediction market platform built on [DreamDEX Event Contracts](https://docs.dreamdex.io/developers/event-contracts) and the [Somnia](https://somnia.network) blockchain. Users predict whether BTC or ETH will go UP or DOWN within 15-minute windows, building winning streaks that multiply their payouts.
 
-**Build your streak. Ride the wave.**
+Unlike traditional prediction market interfaces, StreakTrader wraps event contracts in an emotional, social experience — with on-chain streak tracking, streak shields, prediction scores, and shareable streak cards.
 
-The prediction market trading app where every win builds your streak and multiplies your earnings.
+## 🎯 What Makes StreakTrader Unique
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=flat-square&logo=vercel)](https://streaktrader.sithunyein.com)
-[![Built on Somnia](https://img.shields.io/badge/Built%20on-Somnia-blue?style=flat-square)](https://somnia.network)
-[![DreamDEX](https://img.shields.io/badge/Powered%20by-DreamDEX-purple?style=flat-square)](https://dreamdex.io)
+| Feature | What It Does | On-Chain? |
+|---------|-------------|-----------|
+| **Streak Multiplier** | Consecutive wins grow your multiplier (1x → 2x → 3x...) | ✅ StreakRegistry |
+| **Prediction Score** | 0–100 skill rating based on win rate, streak, volume, consistency | ✅ ScoreOracle |
+| **Streak Shield** | Protect your streak from one loss. Free daily, max 3 stored | ✅ ShieldManager |
+| **Head-to-Head Challenges** | Challenge a friend on the same market | ✅ ChallengeArena |
+| **Shareable Streak Cards** | One-tap export beautiful streak images for Twitter | Client-side |
+| **Live Price Chart** | Real-time BTC price during settlement countdown | Binance API |
 
-**[Live App](https://streaktrader.sithunyein.com)** · **[GitHub](https://github.com/thesithunyein/streaktrader)**
+## 🏗 Architecture
 
-</div>
+```
+┌─────────────────────────────────────────────────────┐
+│                    Frontend (Next.js)                 │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────┐  │
+│  │  Trade    │  │ Settlement│  │  Leaderboard     │  │
+│  │  Panel    │  │  View     │  │  (on-chain read) │  │
+│  └────┬─────┘  └────┬─────┘  └────────┬─────────┘  │
+│       │              │                  │             │
+│  ┌────┴──────────────┴──────────────────┴─────────┐  │
+│  │              TradeProvider                      │  │
+│  │  ┌─────────────┐  ┌──────────────────────────┐ │  │
+│  │  │ useExchange  │  │     useOnChain            │ │  │
+│  │  │ (SDK trade)  │  │  (StreakRegistry,         │ │  │
+│  │  │              │  │   ShieldManager,           │ │  │
+│  │  │              │  │   ChallengeArena,          │ │  │
+│  │  │              │  │   ScoreOracle)             │ │  │
+│  │  └──────┬───────┘  └────────────┬─────────────┘ │  │
+│  └─────────┼───────────────────────┼────────────────┘  │
+└────────────┼───────────────────────┼──────────────────┘
+             │                       │
+    ┌────────┴────────┐    ┌─────────┴──────────┐
+    │  DreamDEX SDK   │    │  Somnia Blockchain  │
+    │  (Markets,      │    │  (4 Smart Contracts)│
+    │   Orders,       │    │                     │
+    │   Settlement)   │    │  Chain 50312        │
+    └─────────────────┘    └─────────────────────┘
+```
 
----
+## ⛓ Deployed Contracts (Shannon Testnet)
 
-## What is StreakTrader?
+| Contract | Address | Purpose |
+|----------|---------|---------|
+| **StreakRegistry** | [`0x423b8701da3a251a3a3fc2d241b71e8d05744c91`](https://shannon-explorer.somnia.network/address/0x423b8701da3a251a3a3fc2d241b71e8d05744c91) | Records streak, bestStreak, totalTrades, wins per wallet |
+| **ShieldManager** | [`0xec4efbe18915ed9bb78e928dd637134c1456b7e3`](https://shannon-explorer.somnia.network/address/0xec4efbe18915ed9bb78e928dd637134c1456b7e3) | Manages shield minting, activation, and daily claims |
+| **ChallengeArena** | [`0xcc1ef2948269d702c719e6ba1a55d25b3c05b262`](https://shannon-explorer.somnia.network/address/0xcc1ef2948269d702c719e6ba1a55d25b3c05b262) | Head-to-head challenges with on-chain stakes |
+| **ScoreOracle** | [`0x13bb32402bcffdb486c675f943be7b07bba54d60`](https://shannon-explorer.somnia.network/address/0x13bb32402bcffdb486c675f943be7b07bba54d60) | Computes prediction score (0–100) on-chain |
 
-StreakTrader is a consumer-facing prediction market app that makes trading Bitcoin and Ethereum event contracts engaging through a streak-based gamification system. Every correct prediction extends your streak. Your streak grows your multiplier. Your multiplier multiplies your earnings.
+**Network:** Somnia Shannon Testnet (Chain ID: 50312)  
+**RPC:** `https://api.infra.testnet.somnia.network`  
+**Explorer:** [shannon-explorer.somnia.network](https://shannon-explorer.somnia.network)
 
-## Features
+## 🚀 Live Demo
 
-- **Live Market Feed** — Real-time BTC and ETH event contracts with live probability bars
-- **One-Click Trading** — Pick UP or DOWN, set your stake, trade instantly
-- **Streak Mechanic** — Consecutive wins build your streak and increase your payout multiplier
-- **Settlement Countdown** — Tension-building countdown with live price tracking
-- **Win/Lose Reveals** — Confetti on wins, clean reset on losses
-- **Lock Streak** — Cash out your multiplier earnings without risking the next trade
-- **Trade History** — Track your streak progress, win rate, and P&L
-- **Premium Dark UI** — Glass morphism, gradient buttons, micro-interactions
+**[streaktrader.sithunyein.com](https://streaktrader.sithunyein.com)**
 
-## Tech Stack
+### How to Test
+
+1. Connect MetaMask to Shannon Testnet (Chain 50312)
+2. Get STT from the [Google Cloud faucet](https://cloud.google.com/application/web3/faucet/somnia/shannon)
+3. Go to the [Trading page](https://streaktrader.sithunyein.com/app)
+4. Select UP or DOWN, set your stake, and place a trade
+5. Watch the live BTC price chart during settlement
+6. Your streak is recorded on-chain — check the [Leaderboard](https://streaktrader.sithunyein.com/leaderboard)
+
+## 🛠 Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Next.js 15 (App Router) |
-| Styling | Tailwind CSS v4 |
-| State | Zustand |
-| Animation | Canvas Confetti |
-| Blockchain | @somnia-chain/markets-sdk v0.28+ |
-| Network | Somnia Shannon Testnet (Chain 50312) |
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS |
+| Animations | Framer Motion, canvas-confetti |
+| State | Zustand (local), viem (on-chain) |
+| Wallet | MetaMask via viem custom transport |
+| Blockchain | Somnia Shannon Testnet (EVM-compatible L1) |
+| Trading | @somnia-chain/markets-sdk (DreamDEX) |
+| Smart Contracts | Solidity 0.8.24, Hardhat |
+| Shareable Cards | html-to-image |
+| Price Data | Binance API (real-time BTC price) |
+| Hosting | Vercel |
 
-## Getting Started
+## 📁 Project Structure
+
+```
+streaktrader/
+├── contracts/                    # Solidity smart contracts
+│   ├── StreakRegistry.sol       # On-chain streak tracking
+│   ├── ShieldManager.sol        # Shield minting/burning
+│   ├── ChallengeArena.sol       # Head-to-head challenges
+│   └── ScoreOracle.sol          # Prediction score computation
+├── scripts/
+│   └── deploy.ts                # Contract deployment script
+├── src/
+│   ├── app/
+│   │   ├── page.tsx             # Landing page (animated background, features)
+│   │   ├── app/page.tsx         # Trading app (markets, trade panel)
+│   │   ├── leaderboard/page.tsx # Real on-chain leaderboard
+│   │   └── history/page.tsx     # Trade history
+│   ├── components/
+│   │   ├── AnimatedBackground.tsx  # Canvas animated waves
+│   │   ├── MouseEffect.tsx      # Cursor glow, parallax, interactive text
+│   │   ├── Navbar.tsx           # Navigation with wallet connect
+│   │   ├── TradePanel.tsx       # Trade execution panel
+│   │   ├── SettlementView.tsx   # Settlement countdown + live price chart
+│   │   ├── StreakBadge.tsx      # Stats bar with on-chain data
+│   │   ├── StreakCard.tsx       # Shareable streak card generator
+│   │   ├── MarketCard.tsx       # Market display card
+│   │   ├── ChallengeModal.tsx   # Head-to-head challenge creation
+│   │   ├── ChallengeBanner.tsx  # Active challenge display
+│   │   ├── TradeProvider.tsx    # Context provider (wallet + exchange + on-chain)
+│   │   └── Footer.tsx           # Site footer
+│   ├── hooks/
+│   │   ├── useWallet.ts         # MetaMask wallet connection
+│   │   ├── useExchange.ts       # DreamDEX SDK integration
+│   │   ├── useOnChain.ts        # Smart contract read/write hooks
+│   │   └── useMarkets.ts        # Live market discovery
+│   └── lib/
+│       ├── store.ts             # Zustand store (streak, trades, shields)
+│       ├── contracts.ts         # Contract addresses + ABIs
+│       └── abis/                # Contract ABI files
+├── hardhat.config.ts            # Hardhat config for Shannon testnet
+├── package.json
+└── README.md
+```
+
+## 🔧 Local Development
 
 ```bash
-# Clone
+# Clone the repo
 git clone https://github.com/thesithunyein/streaktrader.git
 cd streaktrader
 
-# Install
+# Install dependencies
 npm install
 
-# Run
+# Run dev server
 npm run dev
+
+# Build for production
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+## 📜 Smart Contract Functions
 
-## How It Works
+### StreakRegistry
+- `recordTrade(user, won)` — Records a trade result, updates streak
+- `getRecord(user)` — Returns streak, bestStreak, totalTrades, wins, winRate
+- `resetStreak(user)` — Owner-only streak reset
 
-1. **Connect your wallet** to Shannon Testnet
-2. **Pick a live market** — BTC or ETH, 15-min or 1-hour window
-3. **Choose UP or DOWN** — will the price close above or below the opening price?
-4. **Set your stake** — 1 to 50 tUSDC
-5. **Wait for settlement** — watch the countdown with live price tracking
-6. **Win → streak grows, multiplier increases** · **Lose → streak resets to 0**
+### ShieldManager
+- `claimFreeShield(user)` — Claim 1 free shield every 24h (max 3)
+- `activateShield(user)` — Consume a shield on trade
+- `purchaseShields(user, amount)` — Buy extra shields for 1 tUSDC each
+- `getShieldState(user)` — Returns shield count, canClaimFree, totalUsed
 
-## Built For
+### ChallengeArena
+- `createChallenge(creator, marketSymbol, side, stake)` — Create a challenge
+- `acceptChallenge(id, opponent, side)` — Accept a challenge
+- `settleChallenge(id, winner)` — Settle and distribute payout
+- `getChallenge(id)` — Read challenge details
 
-- [Somnia × DreamDEX Event Contracts Hackathon](https://dorahacks.io/hackathon/event-contracts)
-- Powered by [DreamDEX Event Contracts](https://docs.dreamdex.io/developers/event-contracts)
-- Built on [Somnia Shannon Testnet](https://testnet.somnia.network)
+### ScoreOracle
+- `updateScore(user, streak, bestStreak, totalTrades, wins)` — Recompute score
+- `getScore(user)` — Returns score (0–100)
+- `getScoreData(user)` — Full breakdown (winRateScore, streakScore, volumeScore, consistencyScore)
 
-## License
+## 🏆 Hackathon Submission
+
+**Somnia × DreamDEX Event Contracts Hackathon**
+
+- **Project:** StreakTrader
+- **Category:** Consumer-facing prediction market with gamification
+- **Innovation:** On-chain streak tracking, prediction scores, streak shields, shareable cards
+- **Network:** Somnia Shannon Testnet (Chain 50312)
+
+## 📄 License
 
 MIT
