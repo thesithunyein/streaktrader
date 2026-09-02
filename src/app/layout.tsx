@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: "StreakTrader — Build Your Streak. Ride the Wave.",
   description:
     "The prediction market trading app where every win builds your streak and multiplies your earnings. Built on DreamDEX Event Contracts.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
