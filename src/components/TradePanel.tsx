@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStreakStore } from "@/lib/store";
 import { useTrade } from "@/components/TradeProvider";
@@ -23,24 +23,45 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
   const potentialPayout = stake * multiplier;
   const presets = [1, 5, 10, 25, 50];
 
+  const [isWrongNetwork, setIsWrongNetwork] = useState(false);
+
+  // Check network on mount and when address changes
+  useEffect(() => {
+    const checkNetwork = async () => {
+      if (typeof window === "undefined" || !window.ethereum) return;
+      try {
+        const chainId = await window.ethereum.request({ method: "eth_chainId" });
+        setIsWrongNetwork(parseInt(chainId, 16) !== 50312);
+      } catch {}
+    };
+    checkNetwork();
+    if (window.ethereum) {
+      window.ethereum.on("chainChanged", checkNetwork);
+      return () => window.ethereum?.removeListener("chainChanged", checkNetwork);
+    }
+  }, [address]);
+
   const handlePlaceTrade = async () => {
     if (!address) {
       setTradeError("Connect your wallet first");
       return;
     }
 
-    // Auto-switch to correct network before trading
+    // Check network first
     if (typeof window !== "undefined" && window.ethereum) {
       try {
         const chainId = await window.ethereum.request({ method: "eth_chainId" });
         if (parseInt(chainId, 16) !== 50312) {
-          await switchNetwork();
+          setIsWrongNetwork(true);
+          setTradeError("Wrong network. Click Switch to change.");
+          return;
         }
       } catch {}
     }
 
     setPlacing(true);
     setTradeError(null);
+    setIsWrongNetwork(false);
 
     try {
       // UP = buy YES token, DOWN = buy NO token
@@ -243,15 +264,13 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
           )}
         </div>
 
-        {tradeError && (
+        {(tradeError || isWrongNetwork) && (
           <div className="mb-4 p-3 rounded-xl bg-down/10 border border-down/20">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-down">{tradeError}</span>
-              {tradeError.includes("network") && (
-                <button onClick={switchNetwork} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-down/20 hover:bg-down/30 text-down text-xs font-semibold">
-                  <RefreshCw className="w-3 h-3" /> Switch
-                </button>
-              )}
+              <span className="text-sm text-down">{tradeError || "Wrong network"}</span>
+              <button onClick={switchNetwork} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-down/20 hover:bg-down/30 text-down text-xs font-semibold">
+                <RefreshCw className="w-3 h-3" /> Switch
+              </button>
             </div>
           </div>
         )}
