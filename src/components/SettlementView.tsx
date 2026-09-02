@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStreakStore } from "@/lib/store";
 import { useTrade } from "@/components/TradeProvider";
-import { Zap, CheckCircle, XCircle, Lock, ArrowRight, Loader2, AlertCircle, Shield, ShieldCheck } from "lucide-react";
+import { Zap, CheckCircle, XCircle, Lock, ArrowRight, Loader2, AlertCircle, Shield, ShieldCheck, Link2 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 // Real BTC price from Binance public API
@@ -157,12 +157,14 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
 
 export default function SettlementView() {
   const { currentTrade, showSettlement, showResult, streak, bestStreak, resolveTrade, dismissResult, trades, activeShield, shields } = useStreakStore();
-  const { exchange, address, redeem } = useTrade();
+  const { exchange, address, redeem, recordTradeOnChain, updateScoreOnChain, activateShieldOnChain, refreshOnChain } = useTrade();
   const [countdown, setCountdown] = useState(30);
   const [isResolving, setIsResolving] = useState(false);
   const [settled, setSettled] = useState(false);
   const [entryPrice] = useState(() => 67000 + Math.random() * 2000);
   const resolvedRef = useRef(false);
+  const [onChainTxHash, setOnChainTxHash] = useState<string | null>(null);
+  const [onChainStatus, setOnChainStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (!showSettlement || showResult || !currentTrade) return;
@@ -211,16 +213,65 @@ export default function SettlementView() {
     }
   }, [countdown, showResult, showSettlement, settled, exchange]);
 
+  // After trade resolves, record to on-chain contracts
+  useEffect(() => {
+    if (!showResult || !currentTrade || !address) return;
+
+    const recordToChain = async () => {
+      const won = showResult === "WIN";
+
+      // 1. Record trade on-chain (StreakRegistry)
+      try {
+        setOnChainStatus("Recording streak on-chain...");
+        const txHash = await recordTradeOnChain(won);
+        setOnChainTxHash(txHash);
+        setOnChainStatus("Streak recorded ✓");
+      } catch (e) {
+        console.error("Failed to record streak on-chain:", e);
+        setOnChainStatus("On-chain record failed (local only)");
+      }
+
+      // 2. Update prediction score on-chain (ScoreOracle)
+      try {
+        await updateScoreOnChain(
+          won ? streak + 1 : 0,
+          Math.max(bestStreak, won ? streak + 1 : 0),
+          trades.length + 1,
+          won ? (useStreakStore.getState().wins) + 1 : useStreakStore.getState().wins
+        );
+      } catch (e) {
+        console.error("Failed to update score on-chain:", e);
+      }
+
+      // 3. If shield was used and lost, record shield activation on-chain
+      if (currentTrade.shieldUsed && showResult === "WIN") {
+        try {
+          await activateShieldOnChain();
+        } catch (e) {
+          console.error("Failed to activate shield on-chain:", e);
+        }
+      }
+
+      // 4. Refresh on-chain data
+      try {
+        await refreshOnChain();
+      } catch {}
+    };
+
+    recordToChain();
+  }, [showResult, currentTrade?.id]);
+
   const handleDismiss = useCallback(() => {
     setCountdown(30);
     setIsResolving(false);
     setSettled(false);
+    setOnChainTxHash(null);
+    setOnChainStatus(null);
     resolvedRef.current = false;
     dismissResult();
   }, [dismissResult]);
 
   const handleShare = useCallback(() => {
-    // Trigger share modal in parent
     const event = new CustomEvent("share-streak");
     window.dispatchEvent(event);
     handleDismiss();
@@ -315,14 +366,14 @@ export default function SettlementView() {
               <div className="text-2xl font-bold text-up mb-1">
                 {currentTrade?.shieldUsed ? "Shield Protected!" : "You Won!"}
               </div>
-              <div className="text-sm text-text-dim mb-6">
+              <div className="text-sm text-text-dim mb-4">
                 {currentTrade?.shieldUsed
                   ? "Your streak is safe — Shield absorbed the loss"
                   : `+${((currentTrade?.stake || 0) * (currentTrade?.multiplier || 1)).toFixed(1)} tUSDC earned`}
               </div>
             </motion.div>
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
-              className="bg-slate-50 rounded-xl p-4 mb-5 border border-border">
+              className="bg-slate-50 rounded-xl p-4 mb-3 border border-border">
               <div className="flex items-center justify-center gap-3">
                 <Zap className="w-8 h-8 text-accent" />
                 <div>
@@ -331,7 +382,29 @@ export default function SettlementView() {
                 </div>
               </div>
             </motion.div>
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}
+
+            {/* On-chain status */}
+            {onChainStatus && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+                className="mb-3 p-2 rounded-lg bg-accent/5 border border-accent/10">
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                  <span className="text-[10px] font-medium text-accent">{onChainStatus}</span>
+                </div>
+                {onChainTxHash && (
+                  <a
+                    href={`https://shannon-explorer.somnia.network/tx/${onChainTxHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1 mt-1 text-[10px] text-accent/70 hover:text-accent"
+                  >
+                    <Link2 className="w-3 h-3" /> View on Explorer
+                  </a>
+                )}
+              </motion.div>
+            )}
+
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}
               className="grid grid-cols-2 gap-3">
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleDismiss}
                 className="btn-primary py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2">
@@ -359,10 +432,31 @@ export default function SettlementView() {
               <XCircle className="w-10 h-10 text-down" />
             </motion.div>
             <div className="text-2xl font-bold text-down mb-1">Streak Broken</div>
-            <div className="text-sm text-text-dim mb-6">-{(currentTrade?.stake || 0).toFixed(1)} tUSDC lost</div>
-            <div className="bg-slate-50 rounded-xl p-3 mb-5 border border-border">
+            <div className="text-sm text-text-dim mb-4">-{(currentTrade?.stake || 0).toFixed(1)} tUSDC lost</div>
+            <div className="bg-slate-50 rounded-xl p-3 mb-3 border border-border">
               <div className="text-sm text-text-dim">Streak reset to <span className="font-bold text-text">1x</span></div>
             </div>
+
+            {/* On-chain status */}
+            {onChainStatus && (
+              <div className="mb-3 p-2 rounded-lg bg-down/5 border border-down/10">
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-down animate-pulse" />
+                  <span className="text-[10px] font-medium text-down">{onChainStatus}</span>
+                </div>
+                {onChainTxHash && (
+                  <a
+                    href={`https://shannon-explorer.somnia.network/tx/${onChainTxHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1 mt-1 text-[10px] text-down/70 hover:text-down"
+                  >
+                    <Link2 className="w-3 h-3" /> View on Explorer
+                  </a>
+                )}
+              </div>
+            )}
+
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleDismiss}
               className="w-full btn-primary py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2">
               Try Again <ArrowRight className="w-4 h-4" />

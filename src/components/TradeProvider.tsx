@@ -3,6 +3,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { useWallet } from "@/hooks/useWallet";
 import { useExchange } from "@/hooks/useExchange";
+import { useOnChain } from "@/hooks/useOnChain";
 
 interface TradeContextType {
   // Wallet
@@ -20,6 +21,17 @@ interface TradeContextType {
   exchangeError: string | null;
   marketsLoaded: boolean;
 
+  // On-chain gamification
+  onChainStreak: number;
+  onChainBestStreak: number;
+  onChainTotalTrades: number;
+  onChainWins: number;
+  onChainWinRate: number;
+  onChainPredictionScore: number;
+  onChainShields: number;
+  onChainCanClaimFree: boolean;
+  onChainLoading: boolean;
+
   // Actions
   refreshBalance: () => Promise<void>;
   placeOrder: (
@@ -30,6 +42,10 @@ interface TradeContextType {
     timeInForce?: "IOC" | "GTC" | "FOK"
   ) => Promise<any>;
   redeem: (symbol: string, amount: number) => Promise<any>;
+  recordTradeOnChain: (won: boolean) => Promise<string>;
+  updateScoreOnChain: (streak: number, bestStreak: number, totalTrades: number, wins: number) => Promise<string>;
+  activateShieldOnChain: () => Promise<string>;
+  refreshOnChain: () => Promise<void>;
 }
 
 const TradeContext = createContext<TradeContextType | null>(null);
@@ -47,6 +63,7 @@ export default function TradeProvider({ children }: { children: ReactNode }) {
     wallet.publicClient,
     wallet.address
   );
+  const onChain = useOnChain(wallet.walletClient, wallet.address);
 
   return (
     <TradeContext.Provider
@@ -65,6 +82,21 @@ export default function TradeProvider({ children }: { children: ReactNode }) {
         refreshBalance: exchange.refreshBalance,
         placeOrder: exchange.placeOrder,
         redeem: exchange.redeem,
+
+        // On-chain gamification
+        onChainStreak: onChain.streak,
+        onChainBestStreak: onChain.bestStreak,
+        onChainTotalTrades: onChain.totalTrades,
+        onChainWins: onChain.wins,
+        onChainWinRate: onChain.winRate,
+        onChainPredictionScore: onChain.predictionScore,
+        onChainShields: onChain.shields,
+        onChainCanClaimFree: onChain.canClaimFree,
+        onChainLoading: onChain.loading,
+        recordTradeOnChain: onChain.recordTrade,
+        updateScoreOnChain: onChain.updateScore,
+        activateShieldOnChain: onChain.activateShield,
+        refreshOnChain: onChain.refreshOnChainData,
       }}
     >
       {children}
