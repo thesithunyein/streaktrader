@@ -149,6 +149,13 @@ npm run dev
 npm run build
 ```
 
+## 📄 Documentation
+
+| Document | Purpose |
+|----------|----------|
+| [SDK Feedback Report](docs/SDK_FEEDBACK_REPORT.md) | DreamDEX SDK experience and suggestions |
+| [Presentation Deck](docs/PRESENTATION.md) | Hackathon presentation slides |
+
 ## 📜 Smart Contract Functions
 
 ### StreakRegistry
