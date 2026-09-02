@@ -57,7 +57,7 @@ function MarketSkeleton({ delay = 0 }: { delay?: number }) {
 }
 
 export default function TradingApp() {
-  const { markets: liveMarkets, loading, error } = useMarkets();
+  const { markets: liveMarkets, loading, error, refetch } = useMarkets();
   const [selectedMarket, setSelectedMarket] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -148,8 +148,19 @@ export default function TradingApp() {
 
           {/* Error state */}
           {error && (
-            <div className="mt-3 p-3 rounded-xl bg-down/10 border border-down/20 text-sm text-down">
-              {error}
+            <div className="mt-3 p-4 rounded-xl bg-down/10 border border-down/20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-down animate-pulse" />
+                  <span className="text-sm text-down font-medium">{error}</span>
+                </div>
+                <button
+                  onClick={() => refetch?.()}
+                  className="px-3 py-1.5 rounded-lg bg-down/20 hover:bg-down/30 text-down text-xs font-semibold transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
             </div>
           )}
         </div>

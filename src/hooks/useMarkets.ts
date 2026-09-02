@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { SomniaMarkets } from "@somnia-chain/markets-sdk";
 import { somniaShannon } from "@somnia-chain/markets-sdk/chains";
 import { SOMNIA_TESTNET_ADDRESSES } from "@somnia-chain/markets-sdk";
 
 export interface LiveMarket {
-  symbol: string;       // YES/UP token symbol (e.g. "BTC-118500-31DEC26/USDC#YES")
-  downSymbol: string;   // NO/DOWN token symbol (e.g. "BTC-118500-31DEC26/USDC#NO")
-  marketSymbol: string; // Market symbol without outcome (e.g. "BTC-118500-31DEC26/USDC")
+  symbol: string;
+  downSymbol: string;
+  marketSymbol: string;
   underlying: string;
   window: string;
   expiry: number;
@@ -32,22 +32,48 @@ function getReadExchange(): SomniaMarkets {
   return readExchange;
 }
 
+// Retry wrapper with exponential backoff
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+  baseDelay = 2000
+): Promise<T> {
+  let lastError: any;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      lastError = e;
+      if (attempt < maxRetries) {
+        await new Promise((r) => setTimeout(r, baseDelay * Math.pow(2, attempt)));
+      }
+    }
+  }
+  throw lastError;
+}
+
 export function useMarkets() {
   const [markets, setMarkets] = useState<LiveMarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const mountedRef = useRef(true);
 
   const fetchMarkets = useCallback(async () => {
+    if (!mountedRef.current) return;
+
     try {
       const exchange = getReadExchange();
 
-      // Load markets first — populates exchange.markets with UnifiedMarket objects
-      await exchange.loadMarkets();
+      // Load markets with retry
+      await withRetry(() => exchange.loadMarkets(), 2, 3000);
 
-      // Get live binary markets from the indexer
-      const binaryMarkets = await exchange.client.listLiveBinaryMarkets({
-        limit: 20,
-      });
+      // Get live binary markets with retry
+      const binaryMarkets = await withRetry(
+        () => exchange.client.listLiveBinaryMarkets({ limit: 20 }),
+        2,
+        3000
+      );
 
       const liveMarkets: LiveMarket[] = [];
 
@@ -59,9 +85,6 @@ export function useMarkets() {
           );
           if (onchain.status !== 1) continue;
 
-          // Get the UnifiedMarket from exchange.markets to find outcome symbols
-          // The market symbol format is: {asset}-{strike}-{expiryDate}/USDC
-          // We need to find it in exchange.markets
           let upSymbol = "";
           let downSymbol = "";
           let marketSymbol = "";
@@ -70,10 +93,9 @@ export function useMarkets() {
           for (const [sym, unifiedMarket] of Object.entries(exchange.markets)) {
             if (unifiedMarket.id === m.marketId || unifiedMarket.id === m.poolAddress) {
               marketSymbol = sym;
-              // Get outcome symbols from the UnifiedMarket
               if (unifiedMarket.outcomes && unifiedMarket.outcomes.length >= 2) {
-                upSymbol = unifiedMarket.outcomes[0].symbol; // YES
-                downSymbol = unifiedMarket.outcomes[1].symbol; // NO
+                upSymbol = unifiedMarket.outcomes[0].symbol;
+                downSymbol = unifiedMarket.outcomes[1].symbol;
               }
               break;
             }
@@ -81,7 +103,6 @@ export function useMarkets() {
 
           // Fallback: construct symbol from binary market data
           if (!upSymbol) {
-            // Try to find any market with matching asset
             for (const [sym, unifiedMarket] of Object.entries(exchange.markets)) {
               if (unifiedMarket.base && unifiedMarket.base.includes(m.asset)) {
                 marketSymbol = sym;
@@ -114,9 +135,13 @@ export function useMarkets() {
             // Use default probability
           }
 
-          // Determine window from intervalSec
           const intervalSec = m.intervalSec || 900;
-          const window = intervalSec === 900 ? "15 min" : intervalSec === 3600 ? "1 hour" : `${Math.round(intervalSec / 60)} min`;
+          const window =
+            intervalSec === 900
+              ? "15 min"
+              : intervalSec === 3600
+              ? "1 hour"
+              : `${Math.round(intervalSec / 60)} min`;
 
           liveMarkets.push({
             symbol: upSymbol,
@@ -135,20 +160,43 @@ export function useMarkets() {
         }
       }
 
-      setMarkets(liveMarkets);
-      setError(null);
+      if (mountedRef.current) {
+        setMarkets(liveMarkets);
+        setError(null);
+        setRetryCount(0);
+      }
     } catch (e: any) {
-      setError(e.message || "Failed to fetch markets");
+      if (mountedRef.current) {
+        const msg = e?.message || "Failed to fetch markets";
+        // Make error message user-friendly
+        if (msg.includes("timed out") || msg.includes("timeout")) {
+          setError("Testnet indexer is responding slowly. Retrying automatically...");
+        } else {
+          setError(msg);
+        }
+      }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
+  // Manual retry
+  const retry = useCallback(() => {
+    setError(null);
+    setLoading(true);
+    setRetryCount((c) => c + 1);
     fetchMarkets();
-    const interval = setInterval(fetchMarkets, 10000);
-    return () => clearInterval(interval);
   }, [fetchMarkets]);
 
-  return { markets, loading, error, refetch: fetchMarkets };
+  useEffect(() => {
+    mountedRef.current = true;
+    fetchMarkets();
+    const interval = setInterval(fetchMarkets, 15000);
+    return () => {
+      mountedRef.current = false;
+      clearInterval(interval);
+    };
+  }, [fetchMarkets, retryCount]);
+
+  return { markets, loading, error, refetch: retry };
 }
