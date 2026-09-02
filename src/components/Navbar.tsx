@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Trophy, BarChart3, Wallet, LogOut, Loader2, History } from "lucide-react";
+import { Trophy, BarChart3, Wallet, LogOut, Loader2, History, AlertTriangle } from "lucide-react";
+
+const SHANNON_CHAIN_ID = 50312;
+const SHANNON_CHAIN_HEX = `0x${SHANNON_CHAIN_ID.toString(16)}`;
 
 function NavLink({ href, icon: Icon, label }: { href: string; icon: any; label: string }) {
   const [isActive, setIsActive] = useState(false);
@@ -37,6 +40,7 @@ export default function Navbar() {
   const [address, setAddress] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [streak, setStreak] = useState(0);
+  const [wrongNetwork, setWrongNetwork] = useState(false);
 
   useEffect(() => {
     try {
@@ -53,23 +57,85 @@ export default function Navbar() {
       if (typeof window === "undefined" || !window.ethereum) return;
       try {
         const accounts = await window.ethereum.request({ method: "eth_accounts" });
-        if (accounts && accounts.length > 0) setAddress(accounts[0]);
+        if (accounts && accounts.length > 0) {
+          setAddress(accounts[0]);
+          // Check chain
+          const chainId = await window.ethereum.request({ method: "eth_chainId" });
+          if (parseInt(chainId, 16) !== SHANNON_CHAIN_ID) {
+            setWrongNetwork(true);
+          } else {
+            setWrongNetwork(false);
+          }
+        }
       } catch {}
     };
     checkWallet();
+
+    // Listen for chain changes
+    if (window.ethereum) {
+      const handleChainChanged = (chainId: string) => {
+        if (parseInt(chainId, 16) !== SHANNON_CHAIN_ID) {
+          setWrongNetwork(true);
+        } else {
+          setWrongNetwork(false);
+        }
+      };
+      window.ethereum.on("chainChanged", handleChainChanged);
+      return () => window.ethereum?.removeListener("chainChanged", handleChainChanged);
+    }
   }, []);
 
   const connect = async () => {
     if (typeof window === "undefined" || !window.ethereum) return;
     setConnecting(true);
+    setWrongNetwork(false);
     try {
+      // Request accounts (shows MetaMask popup)
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+
+      // Check chain and switch if needed
+      const chainId = await window.ethereum.request({ method: "eth_chainId" });
+      if (parseInt(chainId, 16) !== SHANNON_CHAIN_ID) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: SHANNON_CHAIN_HEX }],
+          });
+        } catch {
+          // Chain not in MetaMask, add it
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: SHANNON_CHAIN_HEX,
+                chainName: "Somnia Shannon Testnet",
+                nativeCurrency: { name: "STT", symbol: "STT", decimals: 18 },
+                rpcUrls: ["https://api.infra.testnet.somnia.network"],
+                blockExplorerUrls: ["https://shannon-explorer.somnia.network"],
+              },
+            ],
+          });
+        }
+      }
+
       setAddress(accounts[0]);
-    } catch {}
+      setWrongNetwork(false);
+    } catch (e: any) {
+      console.error("Connect failed:", e);
+    }
     setConnecting(false);
   };
 
-  const disconnect = () => { setAddress(null); };
+  const disconnect = async () => {
+    // Revoke permissions so MetaMask shows popup next time
+    if (typeof window !== "undefined" && window.ethereum) {
+      try {
+        await window.ethereum.request({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] });
+      } catch {}
+    }
+    setAddress(null);
+    setWrongNetwork(false);
+  };
 
   const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : null;
 
@@ -104,10 +170,17 @@ export default function Navbar() {
 
           {address ? (
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl" style={{ background: "#f8fafc", border: "1px solid #e2e8f0" }}>
-                <div className="w-2 h-2 rounded-full" style={{ background: "#16a34a" }} />
-                <span className="text-xs font-mono hidden sm:inline" style={{ color: "#64748b" }}>{shortAddress}</span>
-              </div>
+              {wrongNetwork ? (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl" style={{ background: "#fef2f2", border: "1px solid #fecaca" }}>
+                  <AlertTriangle className="w-3.5 h-3.5" style={{ color: "#dc2626" }} />
+                  <span className="text-xs font-semibold hidden sm:inline" style={{ color: "#dc2626" }}>Wrong Network</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl" style={{ background: "#f8fafc", border: "1px solid #e2e8f0" }}>
+                  <div className="w-2 h-2 rounded-full" style={{ background: "#16a34a" }} />
+                  <span className="text-xs font-mono hidden sm:inline" style={{ color: "#64748b" }}>{shortAddress}</span>
+                </div>
+              )}
               <button onClick={disconnect} className="p-2 rounded-xl transition-colors" style={{ color: "#64748b" }} title="Disconnect">
                 <LogOut className="w-4 h-4" />
               </button>
