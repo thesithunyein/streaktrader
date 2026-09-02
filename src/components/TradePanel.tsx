@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStreakStore } from "@/lib/store";
 import { useTrade } from "@/components/TradeProvider";
-import { ArrowUp, ArrowDown, X, Zap, AlertTriangle, Loader2, Shield, ShieldCheck, Swords } from "lucide-react";
+import { ArrowUp, ArrowDown, X, Zap, AlertTriangle, Loader2, Shield, ShieldCheck, Swords, RefreshCw } from "lucide-react";
 
 interface TradePanelProps {
   market: { symbol: string; downSymbol: string; underlying: string; window: string; upProbability: number; poolAddress?: string };
@@ -27,6 +27,16 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
     if (!address) {
       setTradeError("Connect your wallet first");
       return;
+    }
+
+    // Auto-switch to correct network before trading
+    if (typeof window !== "undefined" && window.ethereum) {
+      try {
+        const chainId = await window.ethereum.request({ method: "eth_chainId" });
+        if (parseInt(chainId, 16) !== 50312) {
+          await switchNetwork();
+        }
+      } catch {}
     }
 
     setPlacing(true);
@@ -69,6 +79,31 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
       }
     } finally {
       setPlacing(false);
+    }
+  };
+
+  const switchNetwork = async () => {
+    if (typeof window === "undefined" || !window.ethereum) return;
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x" + (50312).toString(16) }],
+      });
+    } catch {
+      try {
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [
+            {
+              chainId: "0x" + (50312).toString(16),
+              chainName: "Somnia Shannon Testnet",
+              nativeCurrency: { name: "STT", symbol: "STT", decimals: 18 },
+              rpcUrls: ["https://api.infra.testnet.somnia.network"],
+              blockExplorerUrls: ["https://shannon-explorer.somnia.network"],
+            },
+          ],
+        });
+      } catch {}
     }
   };
 
@@ -209,8 +244,15 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
         </div>
 
         {tradeError && (
-          <div className="mb-4 p-3 rounded-xl bg-down/10 border border-down/20 text-sm text-down">
-            {tradeError}
+          <div className="mb-4 p-3 rounded-xl bg-down/10 border border-down/20">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-down">{tradeError}</span>
+              {tradeError.includes("network") && (
+                <button onClick={switchNetwork} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-down/20 hover:bg-down/30 text-down text-xs font-semibold">
+                  <RefreshCw className="w-3 h-3" /> Switch
+                </button>
+              )}
+            </div>
           </div>
         )}
 
