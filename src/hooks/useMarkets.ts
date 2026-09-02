@@ -191,7 +191,7 @@ export function useMarkets() {
   useEffect(() => {
     mountedRef.current = true;
     fetchMarkets();
-    const interval = setInterval(fetchMarkets, 15000);
+    const interval = setInterval(fetchMarkets, 30000);
     return () => {
       mountedRef.current = false;
       clearInterval(interval);

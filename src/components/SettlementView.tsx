@@ -144,7 +144,7 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
         <div className={`text-[10px] font-semibold ${isWinning ? "text-up" : "text-down"}`}>
           {price > 0 ? (
             <>
-              {change >= 0 ? "▲" : "▼"} {Math.abs(change).toFixed(2)}% · {isWinning ? "WINNING" : "LOSING"}
+              {change >= 0 ? "\u25B2" : "\u25BC"} {Math.abs(change).toFixed(2)}% \u00B7 {isWinning ? "WINNING" : "LOSING"}
             </>
           ) : (
             "Loading price..."
@@ -157,13 +157,13 @@ function PriceChart({ side, entryPrice }: { side: "UP" | "DOWN"; entryPrice: num
 
 export default function SettlementView() {
   const { currentTrade, showSettlement, showResult, streak, bestStreak, resolveTrade, dismissResult, trades, activeShield, shields } = useStreakStore();
-  const { exchange, address, redeem, recordTradeOnChain, updateScoreOnChain, activateShieldOnChain, refreshOnChain } = useTrade();
+  const { exchange, address, redeem } = useTrade();
   const [countdown, setCountdown] = useState(30);
   const [isResolving, setIsResolving] = useState(false);
   const [settled, setSettled] = useState(false);
   const [entryPrice] = useState(() => 67000 + Math.random() * 2000);
   const resolvedRef = useRef(false);
-  const [onChainTxHash, setOnChainTxHash] = useState<string | null>(null);
+  const [onChainTxHash] = useState<string | null>(null);
   const [onChainStatus, setOnChainStatus] = useState<string | null>(null);
 
   useEffect(() => {
@@ -213,59 +213,17 @@ export default function SettlementView() {
     }
   }, [countdown, showResult, showSettlement, settled, exchange]);
 
-  // After trade resolves, record to on-chain contracts
+  // After trade resolves — save locally (on-chain contracts require owner wallet)
   useEffect(() => {
     if (!showResult || !currentTrade || !address) return;
-
-    const recordToChain = async () => {
-      const won = showResult === "WIN";
-
-      // 1. Record trade on-chain (StreakRegistry)
-      try {
-        setOnChainStatus("Recording streak on-chain...");
-        const txHash = await recordTradeOnChain(won);
-        setOnChainTxHash(txHash);
-        setOnChainStatus("Streak recorded ✓");
-      } catch (e) {
-        console.error("Failed to record streak on-chain:", e);
-        setOnChainStatus("On-chain record failed (local only)");
-      }
-
-      // 2. Update prediction score on-chain (ScoreOracle)
-      try {
-        await updateScoreOnChain(
-          won ? streak + 1 : 0,
-          Math.max(bestStreak, won ? streak + 1 : 0),
-          trades.length + 1,
-          won ? (useStreakStore.getState().wins) + 1 : useStreakStore.getState().wins
-        );
-      } catch (e) {
-        console.error("Failed to update score on-chain:", e);
-      }
-
-      // 3. If shield was used and lost, record shield activation on-chain
-      if (currentTrade.shieldUsed && showResult === "WIN") {
-        try {
-          await activateShieldOnChain();
-        } catch (e) {
-          console.error("Failed to activate shield on-chain:", e);
-        }
-      }
-
-      // 4. Refresh on-chain data
-      try {
-        await refreshOnChain();
-      } catch {}
-    };
-
-    recordToChain();
+    const won = showResult === "WIN";
+    setOnChainStatus(won ? "Streak saved locally" : "Loss recorded locally");
   }, [showResult, currentTrade?.id]);
 
   const handleDismiss = useCallback(() => {
     setCountdown(30);
     setIsResolving(false);
     setSettled(false);
-    setOnChainTxHash(null);
     setOnChainStatus(null);
     resolvedRef.current = false;
     dismissResult();
@@ -330,7 +288,7 @@ export default function SettlementView() {
               </div>
               <div className="flex items-center gap-1.5 text-accent">
                 <Zap className="w-3.5 h-3.5" />
-                <span className="text-xs font-semibold">{streak}x → {streak + 1}x</span>
+                <span className="text-xs font-semibold">{streak}x &rarr; {streak + 1}x</span>
               </div>
             </div>
 
@@ -368,7 +326,7 @@ export default function SettlementView() {
               </div>
               <div className="text-sm text-text-dim mb-4">
                 {currentTrade?.shieldUsed
-                  ? "Your streak is safe — Shield absorbed the loss"
+                  ? "Your streak is safe \u2014 Shield absorbed the loss"
                   : `+${((currentTrade?.stake || 0) * (currentTrade?.multiplier || 1)).toFixed(1)} tUSDC earned`}
               </div>
             </motion.div>
@@ -444,16 +402,6 @@ export default function SettlementView() {
                   <div className="w-1.5 h-1.5 rounded-full bg-down animate-pulse" />
                   <span className="text-[10px] font-medium text-down">{onChainStatus}</span>
                 </div>
-                {onChainTxHash && (
-                  <a
-                    href={`https://shannon-explorer.somnia.network/tx/${onChainTxHash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1 mt-1 text-[10px] text-down/70 hover:text-down"
-                  >
-                    <Link2 className="w-3 h-3" /> View on Explorer
-                  </a>
-                )}
               </div>
             )}
 
