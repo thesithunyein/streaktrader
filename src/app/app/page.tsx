@@ -12,6 +12,7 @@ import SettlementView from "@/components/SettlementView";
 import StreakCard from "@/components/StreakCard";
 import ChallengeModal from "@/components/ChallengeModal";
 import ChallengeBanner from "@/components/ChallengeBanner";
+import CopilotSidebar from "@/components/CopilotSidebar";
 import Footer from "@/components/Footer";
 import { useMarkets } from "@/hooks/useMarkets";
 import { Activity, Loader2 } from "lucide-react";
@@ -214,6 +215,29 @@ export default function TradingApp() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* AI Copilot */}
+      {selectedMarket && (
+        <CopilotSidebar
+          market={selectedMarket}
+          onSuggestion={(s) => {
+            // Auto-select the suggested side in trade panel
+            setSelectedMarket({ ...selectedMarket, _suggestedSide: s });
+          }}
+        />
+      )}
+
+      {/* Floating copilot button when no market selected */}
+      {!selectedMarket && (
+        <CopilotSidebar
+          market={{
+            symbol: "Select a market",
+            underlying: "BTC",
+            window: "15m",
+            upProbability: 50,
+          }}
+        />
+      )}
     </div>
   );
 }

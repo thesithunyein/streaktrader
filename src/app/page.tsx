@@ -9,11 +9,12 @@ import AnimatedBackground from "@/components/AnimatedBackground";
 import { MouseParallax, InteractiveText, CursorGlow } from "@/components/MouseEffect";
 import {
   Zap, Shield, TrendingUp, Activity, ArrowRight, Flame,
-  Trophy, BarChart3, Clock, ChevronRight, Award, Share2, ShieldCheck,
+  Trophy, BarChart3, Clock, ChevronRight, Award, Share2, ShieldCheck, Brain,
 } from "lucide-react";
 
 const FEATURES = [
   { icon: Zap, title: "One-Tap Trading", desc: "Pick UP or DOWN, set your stake, confirm. No order books, no complexity — just a prediction." },
+  { icon: Brain, title: "AI Copilot", desc: "AI-powered market analysis suggests UP or DOWN with confidence scores and reasoning. Your edge in every trade." },
   { icon: Flame, title: "Streak Multiplier", desc: "Every consecutive win grows your multiplier. The longer your streak, the higher your payout on every trade." },
   { icon: ShieldCheck, title: "Streak Shield", desc: "Protect your streak from a single loss. Free shields refresh daily — or buy extra for peace of mind." },
   { icon: Award, title: "Prediction Score", desc: "Your 0-100 skill rating based on win rate, streak, and consistency. Share it to prove your edge." },
