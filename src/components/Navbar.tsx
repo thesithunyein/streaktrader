@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Trophy, BarChart3, Wallet, LogOut, Loader2, History } from "lucide-react";
@@ -8,10 +7,8 @@ import { Trophy, BarChart3, Wallet, LogOut, Loader2, History } from "lucide-reac
 export default function Navbar() {
   const [address, setAddress] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
-  const [balance, setBalance] = useState(0);
   const [streak, setStreak] = useState(0);
 
-  // Load streak from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem("streaktrader");
@@ -22,15 +19,12 @@ export default function Navbar() {
     } catch {}
   }, []);
 
-  // Check wallet connection
   useEffect(() => {
     const checkWallet = async () => {
       if (typeof window === "undefined" || !window.ethereum) return;
       try {
         const accounts = await window.ethereum.request({ method: "eth_accounts" });
-        if (accounts && accounts.length > 0) {
-          setAddress(accounts[0]);
-        }
+        if (accounts && accounts.length > 0) setAddress(accounts[0]);
       } catch {}
     };
     checkWallet();
@@ -46,10 +40,7 @@ export default function Navbar() {
     setConnecting(false);
   };
 
-  const disconnect = () => {
-    setAddress(null);
-    setBalance(0);
-  };
+  const disconnect = () => { setAddress(null); };
 
   const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : null;
 
@@ -57,38 +48,41 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 glass-strong border-b border-border">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <a href="/" className="flex items-center gap-3 group" style={{ textDecoration: "none" }}>
           <div className="w-9 h-9 rounded-xl overflow-hidden relative shadow-md group-hover:shadow-lg transition-shadow">
             <Image src="/logo.png" alt="StreakTrader" fill className="object-cover" />
           </div>
           <span className="text-lg font-bold text-text hidden sm:block">
             Streak<span className="text-gradient">Trader</span>
           </span>
-        </Link>
+        </a>
 
-        {/* Navigation Links — always work, no dependencies */}
+        {/* Navigation Links — plain <a> tags, always work */}
         <div className="flex items-center gap-1 sm:gap-6">
-          <Link
+          <a
             href="/app"
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-text-dim hover:text-accent hover:bg-accent/5 transition-all"
+            style={{ textDecoration: "none" }}
           >
             <BarChart3 className="w-4 h-4" />
             <span>Trade</span>
-          </Link>
-          <Link
+          </a>
+          <a
             href="/leaderboard"
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-text-dim hover:text-accent hover:bg-accent/5 transition-all"
+            style={{ textDecoration: "none" }}
           >
             <Trophy className="w-4 h-4" />
             <span>Leaderboard</span>
-          </Link>
-          <Link
+          </a>
+          <a
             href="/history"
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-text-dim hover:text-accent hover:bg-accent/5 transition-all"
+            style={{ textDecoration: "none" }}
           >
             <History className="w-4 h-4" />
             <span>History</span>
-          </Link>
+          </a>
         </div>
 
         {/* Wallet */}
