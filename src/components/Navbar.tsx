@@ -26,24 +26,24 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-1 sm:gap-6">
           <Link
             href="/app"
-            className="flex items-center gap-2 text-sm text-text-dim hover:text-text transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-text-dim hover:text-accent hover:bg-accent/5 transition-all"
           >
             <BarChart3 className="w-4 h-4" />
             <span className="hidden sm:inline">Trade</span>
           </Link>
           <Link
             href="/leaderboard"
-            className="flex items-center gap-2 text-sm text-text-dim hover:text-text transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-text-dim hover:text-accent hover:bg-accent/5 transition-all"
           >
             <Trophy className="w-4 h-4" />
             <span className="hidden sm:inline">Leaderboard</span>
           </Link>
           <Link
             href="/history"
-            className="flex items-center gap-2 text-sm text-text-dim hover:text-text transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-text-dim hover:text-accent hover:bg-accent/5 transition-all"
           >
             <BarChart3 className="w-4 h-4" />
             <span className="hidden sm:inline">History</span>
