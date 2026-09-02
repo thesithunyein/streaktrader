@@ -34,7 +34,9 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
 
     try {
       // UP = buy YES token, DOWN = buy NO token
-      const orderSymbol = side === "UP" ? market.symbol : market.downSymbol;
+      // Strip #YES/#NO suffix — SDK expects base market symbol
+      const baseSymbol = market.symbol.replace(/#(YES|NO)$/i, "");
+      const orderSymbol = side === "UP" ? baseSymbol : baseSymbol;
 
       await placeOrder(
         orderSymbol,
