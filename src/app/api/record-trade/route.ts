@@ -28,18 +28,22 @@ async function signAndSend(encodedData: `0x${string}`, to: `0x${string}`): Promi
 
   const account = privateKeyToAccount(DEPLOYER_PRIVATE_KEY);
   const nonce = await publicClient.getTransactionCount({ address: DEPLOYER_ADDRESS });
-  const gasPrice = await publicClient.getGasPrice();
-  const chainId = somniaShannon.id;
+  const block = await publicClient.getBlock();
+  const baseFee = block.baseFeePerGas || BigInt(0);
 
-  // Build transaction — legacy format (type 0x0)
+  // EIP-1559 transaction — Shannon testnet has baseFeePerGas
+  const maxPriorityFeePerGas = BigInt(1000000000); // 1 Gwei tip
+  const maxFeePerGas = baseFee * BigInt(2) + maxPriorityFeePerGas; // 2x base + tip
+
   const tx = {
     to,
     data: encodedData,
     nonce,
-    gasLimit: BigInt(200000),
-    gasPrice: (gasPrice * BigInt(120)) / BigInt(100), // 20% buffer
-    chainId,
-    type: "legacy" as const,
+    gasLimit: BigInt(300000),
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+    chainId: somniaShannon.id,
+    type: "eip1559" as const,
   };
 
   // Sign locally
