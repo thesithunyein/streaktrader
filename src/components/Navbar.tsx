@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X, ChevronDown, Flame, Zap, History } from "lucide-react";
 
 function Animate({
@@ -80,8 +81,8 @@ export default function Navbar() {
         {/* Logo */}
         <Animate delay={0} direction="down">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] rounded-[8px] bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] flex items-center justify-center">
-              <span className="text-white font-bold text-[14px] sm:text-[16px]">S</span>
+            <div className="w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] rounded-[8px] overflow-hidden relative">
+              <Image src="/logo.png" alt="StreakTrader" fill className="object-cover" />
             </div>
             <span className="text-white text-[22px] sm:text-[26px] font-[450] leading-none tracking-[-0.02em]">
               StreakTrader

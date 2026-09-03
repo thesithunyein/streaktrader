@@ -46,6 +46,10 @@ const FEATURES = [
   { icon: Clock, title: "Live Settlement", desc: "Watch real-time BTC price during settlement. Feel every second." },
 ];
 
+// Text colors for white cards on dark background
+const CARD_TEXT = "#0f172a";
+const CARD_TEXT_DIM = "#64748b";
+
 const STEPS = [
   { num: "01", title: "Connect Wallet", desc: "One click to connect. No sign-up, no emails, no KYC." },
   { num: "02", title: "Pick a Market", desc: "Browse live BTC and ETH event contracts with 15-minute windows." },
@@ -64,15 +68,15 @@ function StreakCard() {
   const maxHeight = Math.max(...BAR_HEIGHTS);
   return (
     <Animate delay={900} direction="scale" className="w-full max-w-[405px] mx-auto lg:mx-0">
-      <div className="w-full rounded-[24px] sm:rounded-[33px] bg-[rgba(17,16,15,0.35)] backdrop-blur-[20px] p-5 sm:p-8 pb-5 sm:pb-6 border border-white/[0.06]">
-        <p className="text-white text-[16px] sm:text-[20px] font-[450] leading-[20px] mb-3 sm:mb-4">Streak Performance</p>
+      <div className="w-full rounded-[24px] sm:rounded-[33px] glass p-5 sm:p-8 pb-5 sm:pb-6">
+        <p className="text-[16px] sm:text-[20px] font-[450] leading-[20px] mb-3 sm:mb-4" style={{color: CARD_TEXT}}>Streak Performance</p>
         <p className="mb-2 sm:mb-3">
-          <span className="text-white text-[28px] sm:text-[46px] font-[450] leading-[1]">5x</span>
-          <span className="text-white/20 text-[28px] sm:text-[46px] font-[450] leading-[1]"> current</span>
+          <span className="text-[28px] sm:text-[46px] font-[450] leading-[1]" style={{color: CARD_TEXT}}>5x</span>
+          <span className="text-[28px] sm:text-[46px] font-[450] leading-[1]" style={{color: CARD_TEXT_DIM, opacity: 0.4}}> current</span>
         </p>
         <div className="flex items-center gap-[10px] mb-6 sm:mb-8">
-          <span className="px-[6px] py-[7px] bg-white/20 rounded-[6px] text-white text-[12px] sm:text-[14px] font-[450] leading-[14px]">+32.4%</span>
-          <span className="text-white/80 text-[12px] sm:text-[14px] font-[450] leading-[14px] opacity-70">win rate this session</span>
+          <span className="px-[6px] py-[7px] bg-accent/10 rounded-[6px] text-accent text-[12px] sm:text-[14px] font-[450] leading-[14px]">+32.4%</span>
+          <span className="text-[12px] sm:text-[14px] font-[450] leading-[14px]" style={{color: CARD_TEXT_DIM, opacity: 0.7}}>win rate this session</span>
         </div>
         <div className="relative">
           <div className="flex items-end gap-[1.5px] h-[80px] sm:h-[100px]">
@@ -85,7 +89,7 @@ function StreakCard() {
                   className="flex-1 rounded-[0.5px] animate-bar-grow origin-bottom"
                   style={{
                     height: `${heightPercent}%`,
-                    backgroundColor: isProjected ? "rgba(255,255,255,0.1)" : "white",
+                    backgroundColor: isProjected ? "rgba(37,99,235,0.1)" : "#2563eb",
                     animationDelay: `${1100 + i * 30}ms`,
                   }}
                 />
@@ -96,7 +100,7 @@ function StreakCard() {
             {[0, 1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="absolute top-0 bottom-0 w-px bg-white/10"
+                className="absolute top-0 bottom-0 w-px bg-slate-200"
                 style={{ left: `${((i + 1) / 5) * 100}%` }}
               />
             ))}
@@ -105,8 +109,7 @@ function StreakCard() {
             {["10:00", "12:00", "14:00", "16:00", "16:00"].map((t, i) => (
               <span
                 key={i}
-                className="text-[9px] sm:text-[10px] font-[450] leading-[10px] text-white/80"
-                style={{ opacity: i >= 3 ? 0.4 : 1 }}
+                className="text-[9px] sm:text-[10px] font-[450] leading-[10px]" style={{color: CARD_TEXT_DIM, opacity: i >= 3 ? 0.4 : 1}}
               >
                 {t}
               </span>
@@ -177,16 +180,16 @@ export default function Home() {
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
         <Animate delay={0} direction="up" className="text-center mb-12">
           <span className="text-xs font-semibold text-accent uppercase tracking-widest">How it works</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mt-3">From zero to streak in four taps</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold mt-3" style={{color: CARD_TEXT}}>From zero to streak in four taps</h2>
         </Animate>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {STEPS.map((step, i) => (
             <Animate key={step.num} delay={200 + i * 100} direction="up">
               <div className="glass rounded-[20px] p-5 sm:p-6 card-hover relative">
-                <div className="text-5xl font-black text-white/5 absolute top-4 right-4">{step.num}</div>
+                <div className="text-5xl font-black text-slate-100 absolute top-4 right-4">{step.num}</div>
                 <div className="text-sm font-bold text-accent mb-2">Step {step.num}</div>
-                <div className="text-base sm:text-lg font-bold text-white mb-2">{step.title}</div>
-                <div className="text-sm text-white/60 leading-relaxed">{step.desc}</div>
+                <div className="text-base sm:text-lg font-bold mb-2" style={{color: CARD_TEXT}}>{step.title}</div>
+                <div className="text-sm leading-relaxed" style={{color: CARD_TEXT_DIM}}>{step.desc}</div>
               </div>
             </Animate>
           ))}
@@ -197,7 +200,7 @@ export default function Home() {
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
         <Animate delay={0} direction="up" className="text-center mb-12">
           <span className="text-xs font-semibold text-accent uppercase tracking-widest">Features</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mt-3">Built for serious traders</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold mt-3" style={{color: CARD_TEXT}}>Built for serious traders</h2>
         </Animate>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {FEATURES.map((feat, i) => (
@@ -206,8 +209,8 @@ export default function Home() {
                 <div className="w-11 h-11 rounded-[12px] bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/15 transition-colors">
                   <feat.icon className="w-5 h-5 text-accent" />
                 </div>
-                <div className="text-base font-bold text-white mb-2">{feat.title}</div>
-                <div className="text-sm text-white/60 leading-relaxed">{feat.desc}</div>
+                <div className="text-base font-bold mb-2" style={{color: CARD_TEXT}}>{feat.title}</div>
+                <div className="text-sm leading-relaxed" style={{color: CARD_TEXT_DIM}}>{feat.desc}</div>
               </div>
             </Animate>
           ))}
@@ -219,8 +222,8 @@ export default function Home() {
         <Animate delay={0} direction="scale">
           <div className="glass rounded-[32px] p-8 sm:p-12 text-center relative overflow-hidden">
             <span className="text-xs font-semibold text-accent uppercase tracking-widest">Powered by</span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mt-3 mb-4">DreamDEX Event Contracts</h2>
-            <p className="text-white/60 max-w-xl mx-auto mb-8 leading-relaxed">
+            <h2 className="text-2xl sm:text-3xl font-bold mt-3 mb-4" style={{color: CARD_TEXT}}>DreamDEX Event Contracts</h2>
+            <p className="max-w-xl mx-auto mb-8 leading-relaxed" style={{color: CARD_TEXT_DIM}}>
               Every trade settles on-chain via Somnia&apos;s high-performance L1.
               Zero fees, provably fair, fully transparent.
             </p>
@@ -249,8 +252,8 @@ export default function Home() {
       {/* CTA */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24 text-center">
         <Animate delay={0} direction="up">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to trade?</h2>
-          <p className="text-white/60 mb-8 max-w-lg mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{color: CARD_TEXT}}>Ready to trade?</h2>
+          <p className="mb-8 max-w-lg mx-auto" style={{color: CARD_TEXT_DIM}}>
             Start predicting. Build your streak. Multiply your earnings.
           </p>
           <Link

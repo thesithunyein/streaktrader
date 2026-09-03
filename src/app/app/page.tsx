@@ -189,8 +189,8 @@ export default function TradingApp() {
             <div className="w-16 h-16 rounded-[16px] overflow-hidden relative mx-auto mb-5 shadow-lg shadow-accent/20">
               <Image src="/logo.png" alt="StreakTrader" fill className="object-cover" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Welcome to StreakTrader</h3>
-            <p className="text-sm text-white/60 mb-6 leading-relaxed">
+            <h3 className="text-xl font-bold mb-2" style={{color: "#0f172a"}}>Welcome to StreakTrader</h3>
+            <p className="text-sm mb-6 leading-relaxed" style={{color: "#64748b"}}>
               Predict whether BTC or ETH goes up or down. Win consecutive
               trades to build your streak multiplier.
             </p>
@@ -204,7 +204,7 @@ export default function TradingApp() {
                   <div className="w-8 h-8 rounded-[8px] bg-accent/10 flex items-center justify-center shrink-0">
                     <span className="text-accent text-sm font-bold">{item.num}</span>
                   </div>
-                  <span className="text-sm text-white/80">{item.text}</span>
+                  <span className="text-sm" style={{color: "#0f172a"}}>{item.text}</span>
                 </div>
               ))}
             </div>
