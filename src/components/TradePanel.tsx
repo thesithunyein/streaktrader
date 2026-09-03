@@ -16,6 +16,7 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
   const [side, setSide] = useState<"UP" | "DOWN">("UP");
   const [stake, setStake] = useState(10);
   const [placing, setPlacing] = useState(false);
+  const [placingStep, setPlacingStep] = useState("");
   const [tradeError, setTradeError] = useState<string | null>(null);
   const { placeTrade, streak, getMultiplier, shields, activeShield, activateShield, deactivateShield } = useStreakStore();
   const { address, placeOrder } = useTrade();
@@ -70,12 +71,17 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
     setPlacing(true);
     setTradeError(null);
     setIsWrongNetwork(false);
+    setPlacingStep("Fetching order book...");
 
     try {
       // UP = buy YES token, DOWN = buy NO token
       // Strip #YES/#NO suffix — SDK expects base market symbol
       const baseSymbol = market.symbol.replace(/#(YES|NO)$/i, "");
       const orderSymbol = side === "UP" ? baseSymbol : baseSymbol;
+
+      // Small delay so user sees the step message
+      await new Promise(r => setTimeout(r, 500));
+      setPlacingStep("Confirm in MetaMask...");
 
       // placeOrder now handles order book fetching + crossing the touch automatically
       await placeOrder(
@@ -112,6 +118,7 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
       }
     } finally {
       setPlacing(false);
+      setPlacingStep("");
     }
   };
 
@@ -306,7 +313,7 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
           {placing ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              Placing order...
+              {placingStep || "Confirm in MetaMask..."}
             </>
           ) : !address ? (
             "Connect Wallet to Trade"
