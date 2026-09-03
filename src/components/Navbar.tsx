@@ -115,12 +115,12 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {address ? (
               <>
-                <span className="h-[46px] flex items-center px-4 text-slate-600 text-[14px] font-[450]">
+                <span className="h-[46px] flex items-center px-4 text-white/80 text-[14px] font-[450]">
                   {truncateAddr(address)}
                 </span>
                 <button
                   onClick={disconnect}
-                  className="h-[46px] px-6 rounded-[11px] border border-slate-200 text-slate-600 text-[14px] font-[450] hover:bg-slate-50 transition-colors"
+                  className="h-[46px] px-6 rounded-[11px] border border-white/30 text-white text-[14px] font-[450] hover:bg-white/10 transition-colors"
                 >
                   Disconnect
                 </button>
@@ -128,7 +128,7 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={connectWallet}
-                className="h-[46px] px-6 rounded-[11px] btn-primary text-white text-[14px] font-[450] font-semibold"
+                className="h-[46px] px-6 rounded-[11px] bg-white text-[#0f172a] text-[14px] font-[450] font-semibold hover:bg-white/90 transition-colors"
               >
                 Connect Wallet
               </button>
