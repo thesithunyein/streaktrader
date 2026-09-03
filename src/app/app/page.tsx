@@ -140,8 +140,8 @@ export default function TradingApp() {
               <div className="w-14 h-14 rounded-[14px] bg-accent/5 flex items-center justify-center mx-auto mb-4">
                 <Activity className="w-7 h-7 text-accent/40" />
               </div>
-              <p className="text-sm font-semibold text-white mb-1.5">No markets open right now</p>
-              <p className="text-xs text-white/40 max-w-xs mx-auto leading-relaxed">
+              <p className="text-sm font-semibold text-slate-900 mb-1.5">No markets open right now</p>
+              <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
                 BTC and ETH event contracts open on a rolling schedule.
                 New trading windows launch every 15 minutes.
               </p>
