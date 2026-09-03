@@ -18,8 +18,9 @@ export interface LiveMarket {
   status: number;
 }
 
-// Read-only exchange for market discovery (no wallet needed)
+// Singleton read-only exchange — reuse the same connection
 let readExchange: SomniaMarkets | null = null;
+let exchangeRefCount = 0;
 
 function getReadExchange(): SomniaMarkets {
   if (readExchange) return readExchange;
@@ -32,11 +33,20 @@ function getReadExchange(): SomniaMarkets {
   return readExchange;
 }
 
+function releaseReadExchange() {
+  if (readExchange && exchangeRefCount <= 0) {
+    try {
+      readExchange.close();
+    } catch {}
+    readExchange = null;
+  }
+}
+
 // Retry wrapper with exponential backoff
 async function withRetry<T>(
   fn: () => Promise<T>,
-  maxRetries = 3,
-  baseDelay = 2000
+  maxRetries = 2,
+  baseDelay = 3000
 ): Promise<T> {
   let lastError: any;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -45,7 +55,9 @@ async function withRetry<T>(
     } catch (e) {
       lastError = e;
       if (attempt < maxRetries) {
-        await new Promise((r) => setTimeout(r, baseDelay * Math.pow(2, attempt)));
+        await new Promise((r) =>
+          setTimeout(r, baseDelay * Math.pow(2, attempt))
+        );
       }
     }
   }
@@ -58,12 +70,15 @@ export function useMarkets() {
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const mountedRef = useRef(true);
+  const abortRef = useRef(false);
 
   const fetchMarkets = useCallback(async () => {
-    if (!mountedRef.current) return;
+    if (!mountedRef.current || abortRef.current) return;
+    abortRef.current = true;
 
     try {
       const exchange = getReadExchange();
+      exchangeRefCount++;
 
       // Load markets with retry
       await withRetry(() => exchange.loadMarkets(), 2, 3000);
@@ -89,11 +104,19 @@ export function useMarkets() {
           let downSymbol = "";
           let marketSymbol = "";
 
-          // Try to find the market in exchange.markets by marketId
-          for (const [sym, unifiedMarket] of Object.entries(exchange.markets)) {
-            if (unifiedMarket.id === m.marketId || unifiedMarket.id === m.poolAddress) {
+          // Find the market in exchange.markets by marketId
+          for (const [sym, unifiedMarket] of Object.entries(
+            exchange.markets
+          )) {
+            if (
+              unifiedMarket.id === m.marketId ||
+              unifiedMarket.id === m.poolAddress
+            ) {
               marketSymbol = sym;
-              if (unifiedMarket.outcomes && unifiedMarket.outcomes.length >= 2) {
+              if (
+                unifiedMarket.outcomes &&
+                unifiedMarket.outcomes.length >= 2
+              ) {
                 upSymbol = unifiedMarket.outcomes[0].symbol;
                 downSymbol = unifiedMarket.outcomes[1].symbol;
               }
@@ -103,10 +126,18 @@ export function useMarkets() {
 
           // Fallback: construct symbol from binary market data
           if (!upSymbol) {
-            for (const [sym, unifiedMarket] of Object.entries(exchange.markets)) {
-              if (unifiedMarket.base && unifiedMarket.base.includes(m.asset)) {
+            for (const [sym, unifiedMarket] of Object.entries(
+              exchange.markets
+            )) {
+              if (
+                unifiedMarket.base &&
+                unifiedMarket.base.includes(m.asset)
+              ) {
                 marketSymbol = sym;
-                if (unifiedMarket.outcomes && unifiedMarket.outcomes.length >= 2) {
+                if (
+                  unifiedMarket.outcomes &&
+                  unifiedMarket.outcomes.length >= 2
+                ) {
                   upSymbol = unifiedMarket.outcomes[0].symbol;
                   downSymbol = unifiedMarket.outcomes[1].symbol;
                 }
@@ -140,8 +171,8 @@ export function useMarkets() {
             intervalSec === 900
               ? "15 min"
               : intervalSec === 3600
-              ? "1 hour"
-              : `${Math.round(intervalSec / 60)} min`;
+                ? "1 hour"
+                : `${Math.round(intervalSec / 60)} min`;
 
           liveMarkets.push({
             symbol: upSymbol,
@@ -168,15 +199,18 @@ export function useMarkets() {
     } catch (e: any) {
       if (mountedRef.current) {
         const msg = e?.message || "Failed to fetch markets";
-        // Make error message user-friendly
         if (msg.includes("timed out") || msg.includes("timeout")) {
-          setError("Testnet indexer is responding slowly. Retrying automatically...");
+          setError(
+            "Testnet indexer is responding slowly. Retrying automatically..."
+          );
         } else {
           setError(msg);
         }
       }
     } finally {
       if (mountedRef.current) setLoading(false);
+      abortRef.current = false;
+      exchangeRefCount--;
     }
   }, []);
 
@@ -191,7 +225,8 @@ export function useMarkets() {
   useEffect(() => {
     mountedRef.current = true;
     fetchMarkets();
-    const interval = setInterval(fetchMarkets, 30000);
+    // Poll every 60s instead of 30s to prevent resource exhaustion
+    const interval = setInterval(fetchMarkets, 60000);
     return () => {
       mountedRef.current = false;
       clearInterval(interval);

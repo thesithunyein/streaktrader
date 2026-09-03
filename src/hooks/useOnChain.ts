@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { createPublicClient, createWalletClient, custom, http, type PublicClient, type WalletClient, type Address } from "viem";
 import { somniaShannon } from "@somnia-chain/markets-sdk/chains";
 import { CONTRACT_ADDRESSES, ABIS } from "@/lib/contracts";
@@ -19,6 +19,12 @@ interface OnChainState {
   error: string | null;
 }
 
+// Singleton public client — avoid creating a new one per render
+const publicClient = createPublicClient({
+  chain: somniaShannon,
+  transport: http("https://api.infra.testnet.somnia.network"),
+});
+
 export function useOnChain(walletClient: WalletClient | null, address: Address | null) {
   const [state, setState] = useState<OnChainState>({
     streak: 0,
@@ -32,11 +38,6 @@ export function useOnChain(walletClient: WalletClient | null, address: Address |
     totalChallenges: 0,
     loading: false,
     error: null,
-  });
-
-  const publicClient = createPublicClient({
-    chain: somniaShannon,
-    transport: http("https://api.infra.testnet.somnia.network"),
   });
 
   // Read on-chain data
