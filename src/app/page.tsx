@@ -123,7 +123,7 @@ function StreakCard() {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#080A19]">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative w-full h-screen overflow-hidden bg-[#080A19]">
         <video
@@ -180,7 +180,7 @@ export default function Home() {
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
         <Animate delay={0} direction="up" className="text-center mb-12">
           <span className="text-xs font-semibold text-accent uppercase tracking-widest">How it works</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mt-3">From zero to streak in four taps</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mt-3">From zero to streak in four taps</h2>
         </Animate>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {STEPS.map((step, i) => (
@@ -200,7 +200,7 @@ export default function Home() {
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
         <Animate delay={0} direction="up" className="text-center mb-12">
           <span className="text-xs font-semibold text-accent uppercase tracking-widest">Features</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mt-3">Built for serious traders</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mt-3">Built for serious traders</h2>
         </Animate>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {FEATURES.map((feat, i) => (
@@ -252,8 +252,8 @@ export default function Home() {
       {/* CTA */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24 text-center">
         <Animate delay={0} direction="up">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to trade?</h2>
-          <p className="text-white/60 mb-8 max-w-lg mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Ready to trade?</h2>
+          <p className="text-slate-500 mb-8 max-w-lg mx-auto">
             Start predicting. Build your streak. Multiply your earnings.
           </p>
           <Link

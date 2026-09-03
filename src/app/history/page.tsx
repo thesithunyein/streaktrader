@@ -26,7 +26,7 @@ export default function HistoryPage() {
   const winRate = getWinRate();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#080A19]">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main className="flex-1 max-w-6xl mx-auto w-full px-5 sm:px-8 pt-6 pb-12">
         <div className="flex items-center justify-between mb-8">

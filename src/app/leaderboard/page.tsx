@@ -100,7 +100,7 @@ export default function LeaderboardPage() {
   const topThree = entries.slice(0, 3);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#080A19]">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main className="flex-1 max-w-4xl mx-auto w-full px-5 sm:px-8 pt-6 pb-12">
         <div className="flex items-center justify-between mb-8">
@@ -108,11 +108,11 @@ export default function LeaderboardPage() {
             <Link href="/app" className="flex items-center gap-1.5 text-sm text-white/40 hover:text-accent transition-colors mb-2">
               <ArrowLeft className="w-4 h-4" /> Back to Trading
             </Link>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 flex items-center gap-3">
               <Trophy className="w-7 h-7 text-[#f59e0b]" />
               Leaderboard
             </h1>
-            <p className="text-sm text-white/40 mt-1">Top traders ranked by Prediction Score</p>
+            <p className="text-sm text-slate-500 mt-1">Top traders ranked by Prediction Score</p>
           </div>
           <button onClick={fetchLeaderboard} disabled={loading}
             className="p-2.5 rounded-[12px] glass hover:bg-white/[0.06] transition-colors">

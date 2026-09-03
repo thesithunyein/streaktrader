@@ -94,7 +94,7 @@ export default function TradingApp() {
   const markets = liveMarkets;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#080A19]">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-5 sm:px-8 pt-4 pb-8">
@@ -109,7 +109,7 @@ export default function TradingApp() {
         <div className="mb-8">
           <div className="flex items-center gap-2.5 mb-4">
             <div className={`w-2 h-2 rounded-full ${loading ? "bg-accent/40 animate-pulse" : "bg-accent"}`} />
-            <h2 className="text-lg font-bold text-white">Live Markets</h2>
+            <h2 className="text-lg font-bold text-slate-900">Live Markets</h2>
             {loading && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/10 border border-accent/15">
                 <Loader2 className="w-3 h-3 text-accent animate-spin" />
