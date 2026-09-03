@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import {
   Zap, Shield, TrendingUp, ArrowRight, Flame,
-  Trophy, Clock, Award, Share2, ShieldCheck, Brain,
+  Trophy, Award, Share2, ShieldCheck, Brain,
 } from "lucide-react";
 
 function Animate({
@@ -43,7 +43,6 @@ const FEATURES = [
   { icon: ShieldCheck, title: "Streak Shield", desc: "Protect your streak from a single loss. Free shields refresh daily." },
   { icon: Award, title: "Prediction Score", desc: "Your 0-100 skill rating based on win rate, streak, and consistency." },
   { icon: Share2, title: "Shareable Cards", desc: "One-tap export your streak as a beautiful image. Share on Twitter." },
-  { icon: Clock, title: "Live Settlement", desc: "Watch real-time BTC price during settlement. Feel every second." },
 ];
 
 // Text colors for white cards on dark background
