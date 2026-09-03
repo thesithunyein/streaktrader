@@ -130,12 +130,39 @@ export default function TradingApp() {
               <MarketSkeleton delay={240} />
             </div>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {markets.map((market, i) => (
-                <Animate key={market.symbol} delay={i * 80} direction="up">
-                  <MarketCard {...market} onTrade={() => setSelectedMarket(market)} />
-                </Animate>
-              ))}
+            <div className="space-y-6">
+              {/* Group markets by underlying */}
+              {["BTC", "ETH"].map((asset) => {
+                const assetMarkets = markets.filter((m) => m.underlying === asset);
+                if (assetMarkets.length === 0) return null;
+                const isBTC = asset === "BTC";
+                return (
+                  <div key={asset}>
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: isBTC ? "rgba(247,147,26,0.1)" : "rgba(98,126,234,0.1)" }}>
+                        {isBTC ? (
+                          <svg viewBox="0 0 32 32" className="w-4 h-4"><circle cx="16" cy="16" r="16" fill="#F7931A"/><text x="16" y="21" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">₿</text></svg>
+                        ) : (
+                          <svg viewBox="0 0 400 400" className="w-4 h-4"><rect width="400" height="400" rx="80" fill="#627EEA"/><polygon points="200,60 340,210 200,280" fill="#FFF"/><polygon points="200,60 60,210 200,280" fill="#C4C8CC"/></svg>
+                        )}
+                      </div>
+                      <h3 className="text-sm font-bold" style={{ color: isBTC ? "#F7931A" : "#627EEA" }}>
+                        {asset} Markets
+                      </h3>
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        {assetMarkets.length} contract{assetMarkets.length > 1 ? "s" : ""} open
+                      </span>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {assetMarkets.map((market, i) => (
+                        <Animate key={market.symbol} delay={i * 80} direction="up">
+                          <MarketCard {...market} onTrade={() => setSelectedMarket(market)} />
+                        </Animate>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
