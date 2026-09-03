@@ -639,6 +639,12 @@ export default function SettlementView() {
             >
               Try Again <ArrowRight className="w-4 h-4" />
             </motion.button>
+            <button
+              onClick={handleDismiss}
+              className="w-full mt-2 py-2 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              Close
+            </button>
           </motion.div>
         </motion.div>
       )}
