@@ -168,7 +168,7 @@ function PriceChart({
         style={{ imageRendering: "auto" }}
       />
       <div className="flex justify-between items-center mt-2 px-1">
-        <div className="text-[10px] text-text-muted">
+        <div className="text-[10px] text-slate-400">
           Entry: ${entryPrice.toLocaleString()}
         </div>
         <div
@@ -371,7 +371,7 @@ export default function SettlementView() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", damping: 25 }}
-            className="relative bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full mx-4 text-center border border-border shadow-2xl"
+            className="relative bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full mx-4 text-center border border-slate-200 shadow-2xl"
           >
             {/* Shield active indicator */}
             {currentTrade.shieldUsed && (
@@ -400,7 +400,7 @@ export default function SettlementView() {
               className={`text-5xl sm:text-6xl font-mono font-bold mb-2 ${
                 countdown <= 5 && countdown > 0
                   ? "text-down"
-                  : "text-text"
+                  : "text-slate-900"
               }`}
             >
               {countdown <= 0 ? (
@@ -409,7 +409,7 @@ export default function SettlementView() {
                 `0:${countdown.toString().padStart(2, "0")}`
               )}
             </motion.div>
-            <div className="text-sm text-text-dim mb-4">
+            <div className="text-sm text-slate-500 mb-4">
               {countdown <= 0
                 ? isResolving
                   ? "Settling on-chain..."
@@ -418,7 +418,7 @@ export default function SettlementView() {
             </div>
 
             {/* Live price chart */}
-            <div className="mb-4 rounded-xl bg-slate-50 border border-border p-3">
+            <div className="mb-4 rounded-xl bg-slate-50 border border-slate-200 p-3">
               <PriceChart
                 side={currentTrade.side}
                 entryPrice={entryPrice}
@@ -426,7 +426,7 @@ export default function SettlementView() {
             </div>
 
             {/* Position info */}
-            <div className="bg-slate-50 rounded-xl p-3 mb-4 border border-border flex items-center justify-between">
+            <div className="bg-slate-50 rounded-xl p-3 mb-4 border border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div
                   className={`px-3 py-1.5 rounded-lg font-bold text-sm ${
@@ -437,7 +437,7 @@ export default function SettlementView() {
                 >
                   {currentTrade.side}
                 </div>
-                <div className="text-sm text-text-dim">
+                <div className="text-sm text-slate-500">
                   {currentTrade.stake} tUSDC
                 </div>
               </div>
@@ -466,7 +466,7 @@ export default function SettlementView() {
             {!exchange && countdown <= 0 && (
               <div className="mt-4 p-3 rounded-xl bg-accent/5 border border-accent/15 flex items-center gap-2">
                 <Loader2 className="w-4 h-4 text-accent shrink-0 animate-spin" />
-                <span className="text-xs text-text-dim">
+                <span className="text-xs text-slate-500">
                   Connect wallet for real settlement
                 </span>
               </div>
@@ -488,7 +488,7 @@ export default function SettlementView() {
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", damping: 15, stiffness: 200 }}
-            className="relative bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full mx-4 text-center border border-border shadow-2xl"
+            className="relative bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full mx-4 text-center border border-slate-200 shadow-2xl"
           >
             <motion.div
               initial={{ scale: 0 }}
@@ -508,7 +508,7 @@ export default function SettlementView() {
                   ? "Shield Protected!"
                   : "You Won!"}
               </div>
-              <div className="text-sm text-text-dim mb-4">
+              <div className="text-sm text-slate-500 mb-4">
                 {currentTrade?.shieldUsed
                   ? "Your streak is safe \u2014 Shield absorbed the loss"
                   : `+${((currentTrade?.stake || 0) * (currentTrade?.multiplier || 1)).toFixed(1)} tUSDC earned`}
@@ -518,7 +518,7 @@ export default function SettlementView() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="bg-slate-50 rounded-xl p-4 mb-3 border border-border"
+              className="bg-slate-50 rounded-xl p-4 mb-3 border border-slate-200"
             >
               <div className="flex items-center justify-center gap-3">
                 <Zap className="w-8 h-8 text-accent" />
@@ -526,7 +526,7 @@ export default function SettlementView() {
                   <div className="text-3xl font-bold font-mono text-gradient">
                     {streak}
                   </div>
-                  <div className="text-xs text-text-dim uppercase">
+                  <div className="text-xs text-slate-500 uppercase">
                     New Streak
                   </div>
                 </div>
@@ -598,7 +598,7 @@ export default function SettlementView() {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", damping: 20 }}
-            className="relative bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full mx-4 text-center border border-border shadow-2xl"
+            className="relative bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full mx-4 text-center border border-slate-200 shadow-2xl"
           >
             <motion.div
               initial={{ x: -10 }}
@@ -611,13 +611,13 @@ export default function SettlementView() {
             <div className="text-2xl font-bold text-down mb-1">
               Streak Broken
             </div>
-            <div className="text-sm text-text-dim mb-4">
+            <div className="text-sm text-slate-500 mb-4">
               -{(currentTrade?.stake || 0).toFixed(1)} tUSDC lost
             </div>
-            <div className="bg-slate-50 rounded-xl p-3 mb-3 border border-border">
-              <div className="text-sm text-text-dim">
+            <div className="bg-slate-50 rounded-xl p-3 mb-3 border border-slate-200">
+              <div className="text-sm text-slate-500">
                 Streak reset to{" "}
-                <span className="font-bold text-text">1x</span>
+                <span className="font-bold text-slate-900">1x</span>
               </div>
             </div>
 

@@ -160,29 +160,29 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full sm:w-[420px] max-h-[90vh] overflow-y-auto bg-white rounded-t-3xl sm:rounded-3xl p-6 border border-border shadow-2xl"
+        className="relative w-full sm:w-[420px] max-h-[90vh] overflow-y-auto bg-white rounded-t-3xl sm:rounded-3xl p-6 border border-slate-200 shadow-2xl"
       >
         <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
-          <X className="w-4 h-4 text-text-dim" />
+          <X className="w-4 h-4 text-slate-500" />
         </button>
 
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm text-text-dim">{market.underlying}</span>
-            <span className="text-xs text-text-muted">·</span>
-            <span className="text-sm text-text-dim">{market.window}</span>
+            <span className="text-sm text-slate-500">{market.underlying}</span>
+            <span className="text-xs text-slate-400">·</span>
+            <span className="text-sm text-slate-500">{market.window}</span>
           </div>
-          <div className="text-lg font-bold text-text">{market.symbol}</div>
+          <div className="text-lg font-bold text-slate-900">{market.symbol}</div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-5">
           <motion.button whileTap={{ scale: 0.95 }} onClick={() => setSide("UP")}
-            className={`py-4 rounded-2xl font-bold text-sm flex flex-col items-center gap-2 transition-all ${side === "UP" ? "bg-up/10 border-2 border-up/30 text-up glow-up" : "bg-slate-50 border border-border text-text-dim hover:border-up/20"}`}>
+            className={`py-4 rounded-2xl font-bold text-sm flex flex-col items-center gap-2 transition-all ${side === "UP" ? "bg-up/10 border-2 border-up/30 text-up glow-up" : "bg-slate-50 border border-slate-200 text-slate-500 hover:border-up/20"}`}>
             <ArrowUp className="w-6 h-6" /><span>UP</span>
             <span className="text-xs opacity-70">{market.upProbability.toFixed(0)}%</span>
           </motion.button>
           <motion.button whileTap={{ scale: 0.95 }} onClick={() => setSide("DOWN")}
-            className={`py-4 rounded-2xl font-bold text-sm flex flex-col items-center gap-2 transition-all ${side === "DOWN" ? "bg-down/10 border-2 border-down/30 text-down glow-down" : "bg-slate-50 border border-border text-text-dim hover:border-down/20"}`}>
+            className={`py-4 rounded-2xl font-bold text-sm flex flex-col items-center gap-2 transition-all ${side === "DOWN" ? "bg-down/10 border-2 border-down/30 text-down glow-down" : "bg-slate-50 border border-slate-200 text-slate-500 hover:border-down/20"}`}>
             <ArrowDown className="w-6 h-6" /><span>DOWN</span>
             <span className="text-xs opacity-70">{(100 - market.upProbability).toFixed(0)}%</span>
           </motion.button>
@@ -196,7 +196,7 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
               <Zap className="w-5 h-5 text-accent" />
               <div className="flex-1">
                 <div className="text-sm font-semibold text-accent">{streak}x streak active</div>
-                <div className="text-xs text-text-dim">Multiplier applied to payout</div>
+                <div className="text-xs text-slate-500">Multiplier applied to payout</div>
               </div>
               <div className="text-lg font-bold font-mono text-accent">{multiplier}x</div>
             </motion.div>
@@ -211,27 +211,27 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
               className={`w-full p-3 rounded-xl flex items-center gap-3 transition-all ${
                 activeShield
                   ? "bg-accent/10 border-2 border-accent/30"
-                  : "bg-slate-50 border border-border hover:border-accent/20"
+                  : "bg-slate-50 border border-slate-200 hover:border-accent/20"
               }`}
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${activeShield ? "bg-accent/20" : "bg-slate-100"}`}>
                 {activeShield ? (
                   <ShieldCheck className="w-5 h-5 text-accent" />
                 ) : (
-                  <Shield className="w-5 h-5 text-text-dim" />
+                  <Shield className="w-5 h-5 text-slate-500" />
                 )}
               </div>
               <div className="flex-1 text-left">
-                <div className={`text-sm font-semibold ${activeShield ? "text-accent" : "text-text"}`}>
+                <div className={`text-sm font-semibold ${activeShield ? "text-accent" : "text-slate-900"}`}>
                   {activeShield ? "Shield Active" : "Activate Shield"}
                 </div>
-                <div className="text-xs text-text-dim">
+                <div className="text-xs text-slate-500">
                   {activeShield
                     ? "This trade is protected from streak loss"
                     : `${shields} shield${shields > 1 ? "s" : ""} remaining — protects your streak`}
                 </div>
               </div>
-              <div className={`text-xs font-bold px-2 py-1 rounded-lg ${activeShield ? "bg-accent/20 text-accent" : "bg-slate-100 text-text-dim"}`}>
+              <div className={`text-xs font-bold px-2 py-1 rounded-lg ${activeShield ? "bg-accent/20 text-accent" : "bg-slate-100 text-slate-500"}`}>
                 {shields}x
               </div>
             </button>
@@ -239,41 +239,41 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
         )}
 
         <div className="mb-5">
-          <label className="text-xs font-semibold text-text-dim uppercase tracking-wider mb-2 block">Stake (tUSDC)</label>
+          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Stake (tUSDC)</label>
           <div className="relative">
             <input type="number" value={stake} onChange={(e) => setStake(Math.max(0.1, Number(e.target.value)))}
-              className="w-full bg-slate-50 border border-border rounded-xl px-4 py-3 text-xl font-mono font-bold text-text focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all" min="0.1" step="0.1" />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-text-dim">tUSDC</span>
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xl font-mono font-bold text-slate-900 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all" min="0.1" step="0.1" />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500">tUSDC</span>
           </div>
           <div className="flex gap-2 mt-2">
             {presets.map((p) => (
               <motion.button key={p} whileTap={{ scale: 0.95 }} onClick={() => setStake(p)}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${stake === p ? "bg-accent/10 text-accent border border-accent/20" : "bg-slate-50 text-text-dim border border-border hover:border-accent/20"}`}>
+                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${stake === p ? "bg-accent/10 text-accent border border-accent/20" : "bg-slate-50 text-slate-500 border border-slate-200 hover:border-accent/20"}`}>
                 {p}
               </motion.button>
             ))}
           </div>
         </div>
 
-        <div className="mb-5 p-4 rounded-xl bg-slate-50 border border-border">
+        <div className="mb-5 p-4 rounded-xl bg-slate-50 border border-slate-200">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-text-dim">If you WIN</span>
+            <span className="text-sm text-slate-500">If you WIN</span>
             <span className="text-sm font-bold text-up">+{potentialPayout.toFixed(1)} tUSDC</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-dim">If you LOSE</span>
+            <span className="text-sm text-slate-500">If you LOSE</span>
             <span className={`text-sm font-bold ${activeShield ? "text-accent line-through" : "text-down"}`}>
               {activeShield ? "Protected by Shield" : `-${stake.toFixed(1)} tUSDC`}
             </span>
           </div>
           {streak > 0 && !activeShield && (
-            <div className="mt-2 pt-2 border-t border-border flex items-center gap-1.5">
+            <div className="mt-2 pt-2 border-t border-slate-200 flex items-center gap-1.5">
               <AlertTriangle className="w-3 h-3 text-down" />
               <span className="text-xs text-down">Losing resets your {streak}x streak</span>
             </div>
           )}
           {activeShield && (
-            <div className="mt-2 pt-2 border-t border-border flex items-center gap-1.5">
+            <div className="mt-2 pt-2 border-t border-slate-200 flex items-center gap-1.5">
               <ShieldCheck className="w-3 h-3 text-accent" />
               <span className="text-xs text-accent">Shield will protect your streak if you lose</span>
             </div>

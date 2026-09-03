@@ -183,7 +183,7 @@ export default function StreakCard({ onClose }: StreakCardProps) {
         <div className="mt-4 flex gap-3">
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             onClick={handleDownload}
-            className="flex-1 py-3.5 rounded-xl bg-white text-text font-bold text-sm flex items-center justify-center gap-2 shadow-lg">
+            className="flex-1 py-3.5 rounded-xl bg-white text-slate-900 font-bold text-sm flex items-center justify-center gap-2 shadow-lg">
             <Download className="w-4 h-4" /> Download PNG
           </motion.button>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}

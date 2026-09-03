@@ -34,13 +34,13 @@ export default function ChallengeBanner({ onAcceptChallenge }: ChallengeBannerPr
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-sm font-semibold text-text">Active Challenge</span>
+                  <span className="text-sm font-semibold text-slate-900">Active Challenge</span>
                   <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-accent/10">
                     <Clock className="w-3 h-3 text-accent" />
                     <span className="text-[9px] font-bold text-accent">PENDING</span>
                   </div>
                 </div>
-                <div className="text-xs text-text-dim truncate">
+                <div className="text-xs text-slate-500 truncate">
                   {challenge.marketSymbol} · You picked {challenge.creatorSide} · {challenge.creatorStake} tUSDC
                 </div>
               </div>
@@ -60,7 +60,7 @@ export default function ChallengeBanner({ onAcceptChallenge }: ChallengeBannerPr
               key={challenge.id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-slate-50 border border-border rounded-xl p-3"
+              className="bg-slate-50 border border-slate-200 rounded-xl p-3"
             >
               <div className="flex items-center gap-2">
                 {challenge.result === "CREATOR_WON" ? (
@@ -69,7 +69,7 @@ export default function ChallengeBanner({ onAcceptChallenge }: ChallengeBannerPr
                   <XCircle className="w-4 h-4 text-down shrink-0" />
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs text-text-dim truncate">
+                  <div className="text-xs text-slate-500 truncate">
                     {challenge.marketSymbol} · {challenge.creatorSide}
                   </div>
                 </div>

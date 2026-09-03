@@ -69,19 +69,19 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
   const suggestionColor = (s: string) => {
     if (s === "UP") return "text-up";
     if (s === "DOWN") return "text-down";
-    return "text-text-dim";
+    return "text-slate-500";
   };
 
   const suggestionBg = (s: string) => {
     if (s === "UP") return "bg-up/10 border-up/20";
     if (s === "DOWN") return "bg-down/10 border-down/20";
-    return "bg-slate-50 border-border";
+    return "bg-slate-50 border-slate-200";
   };
 
   const signalIcon = (d: string) => {
     if (d === "UP") return <ArrowUp className="w-4 h-4 text-up" />;
     if (d === "DOWN") return <ArrowDown className="w-4 h-4 text-down" />;
-    return <Pause className="w-4 h-4 text-text-dim" />;
+    return <Pause className="w-4 h-4 text-slate-500" />;
   };
 
   const passedGates = result?.riskGates?.filter(g => g.passed).length ?? 0;
@@ -116,33 +116,33 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "100%", opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[420px] bg-white shadow-2xl border-l border-border overflow-y-auto"
+              className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[420px] bg-white shadow-2xl border-l border-slate-200 overflow-y-auto"
             >
               {/* Header */}
-              <div className="sticky top-0 bg-white/90 backdrop-blur-md border-b border-border px-5 py-4 flex items-center justify-between">
+              <div className="sticky top-0 bg-white/90 backdrop-blur-md border-b border-slate-200 px-5 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-blue-600 flex items-center justify-center">
                     <Brain className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-text">AI Copilot</div>
-                    <div className="text-[10px] text-text-dim">3 agents · 5 risk gates</div>
+                    <div className="text-sm font-bold text-slate-900">AI Copilot</div>
+                    <div className="text-[10px] text-slate-500">3 agents · 5 risk gates</div>
                   </div>
                 </div>
                 <button onClick={() => setIsOpen(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200">
-                  <X className="w-4 h-4 text-text-dim" />
+                  <X className="w-4 h-4 text-slate-500" />
                 </button>
               </div>
 
               <div className="p-5 space-y-4">
                 {/* Market Info */}
-                <div className="bg-slate-50 rounded-xl p-4 border border-border">
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-text-dim">Analyzing</span>
+                    <span className="text-xs text-slate-500">Analyzing</span>
                     <span className="text-xs font-medium text-accent">{market.window}</span>
                   </div>
-                  <div className="text-sm font-bold text-text">{market.symbol}</div>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-text-dim">
+                  <div className="text-sm font-bold text-slate-900">{market.symbol}</div>
+                  <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
                     <span>UP: {market.upProbability.toFixed(0)}%</span>
                     <span>DOWN: {(100 - market.upProbability).toFixed(0)}%</span>
                   </div>
@@ -152,8 +152,8 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
                 {loading && (
                   <div className="flex flex-col items-center py-8 gap-3">
                     <Loader2 className="w-8 h-8 text-accent animate-spin" />
-                    <div className="text-sm text-text-dim">Running 3 signal agents...</div>
-                    <div className="text-[10px] text-text-muted">Checking momentum, volatility, probability</div>
+                    <div className="text-sm text-slate-500">Running 3 signal agents...</div>
+                    <div className="text-[10px] text-slate-400">Checking momentum, volatility, probability</div>
                   </div>
                 )}
 
@@ -161,7 +161,7 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
                 {error && (
                   <div className="p-4 rounded-xl bg-down/5 border border-down/15">
                     <div className="text-sm text-down font-medium">Analysis failed</div>
-                    <div className="text-xs text-text-dim mt-1">{error}</div>
+                    <div className="text-xs text-slate-500 mt-1">{error}</div>
                     <button onClick={analyze} className="mt-2 text-xs text-accent font-medium hover:underline">Try again</button>
                   </div>
                 )}
@@ -179,7 +179,7 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
                         </div>
                         <div className="flex items-center gap-2">
                           <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                            result.source === "ai" ? "bg-accent/10 text-accent" : "bg-slate-100 text-text-dim"
+                            result.source === "ai" ? "bg-accent/10 text-accent" : "bg-slate-100 text-slate-500"
                           }`}>
                             {result.source === "ai" ? "AI" : "Heuristic"}
                           </span>
@@ -197,15 +197,15 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
                         }`}>
                           {result.suggestion === "UP" ? <ArrowUp className="w-8 h-8 text-up" /> :
                            result.suggestion === "DOWN" ? <ArrowDown className="w-8 h-8 text-down" /> :
-                           <Pause className="w-8 h-8 text-text-dim" />}
+                           <Pause className="w-8 h-8 text-slate-500" />}
                         </div>
                         <div>
                           <div className={`text-2xl font-black ${suggestionColor(result.suggestion)}`}>{result.suggestion}</div>
-                          <div className="text-xs text-text-dim">{result.confidence}% confidence</div>
+                          <div className="text-xs text-slate-500">{result.confidence}% confidence</div>
                         </div>
                         <div className="ml-auto text-right">
-                          <div className="text-xs text-text-dim">Consensus</div>
-                          <div className={`text-lg font-bold font-mono ${result.consensusScore > 0 ? "text-up" : result.consensusScore < 0 ? "text-down" : "text-text-dim"}`}>
+                          <div className="text-xs text-slate-500">Consensus</div>
+                          <div className={`text-lg font-bold font-mono ${result.consensusScore > 0 ? "text-up" : result.consensusScore < 0 ? "text-down" : "text-slate-500"}`}>
                             {result.consensusScore > 0 ? "+" : ""}{result.consensusScore}
                           </div>
                         </div>
@@ -222,31 +222,31 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
                     </div>
 
                     {/* Signal Agents */}
-                    <div className="bg-slate-50 rounded-xl p-4 border border-border">
+                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
                       <div className="flex items-center gap-2 mb-3">
                         <Activity className="w-4 h-4 text-accent" />
-                        <span className="text-xs font-semibold text-text uppercase tracking-wider">Signal Agents</span>
+                        <span className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Signal Agents</span>
                       </div>
                       <div className="space-y-2.5">
                         {result.signals.map((signal) => (
                           <div key={signal.name} className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-white border border-border flex items-center justify-center shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0">
                               {signalIcon(signal.direction)}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-text">{signal.name}</span>
+                                <span className="text-xs font-bold text-slate-900">{signal.name}</span>
                                 <span className={`text-[10px] font-medium ${
-                                  signal.direction === "UP" ? "text-up" : signal.direction === "DOWN" ? "text-down" : "text-text-dim"
+                                  signal.direction === "UP" ? "text-up" : signal.direction === "DOWN" ? "text-down" : "text-slate-500"
                                 }`}>
                                   {signal.direction}
                                 </span>
                               </div>
-                              <div className="text-[10px] text-text-dim truncate">{signal.reasoning}</div>
+                              <div className="text-[10px] text-slate-500 truncate">{signal.reasoning}</div>
                             </div>
                             <div className="text-right shrink-0">
-                              <div className="text-xs font-bold font-mono text-text">{signal.strength}%</div>
-                              <div className="text-[10px] text-text-muted">str</div>
+                              <div className="text-xs font-bold font-mono text-slate-900">{signal.strength}%</div>
+                              <div className="text-[10px] text-slate-400">str</div>
                             </div>
                           </div>
                         ))}
@@ -254,11 +254,11 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
                     </div>
 
                     {/* Risk Gates */}
-                    <div className="bg-slate-50 rounded-xl p-4 border border-border">
+                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <Shield className="w-4 h-4 text-accent" />
-                          <span className="text-xs font-semibold text-text uppercase tracking-wider">Risk Gates</span>
+                          <span className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Risk Gates</span>
                         </div>
                         <span className={`text-xs font-bold ${passedGates >= 4 ? "text-up" : passedGates >= 2 ? "text-yellow-600" : "text-down"}`}>
                           {passedGates}/{totalGates} passed
@@ -273,8 +273,8 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
                               <XCircle className="w-3.5 h-3.5 text-down shrink-0" />
                             )}
                             <div className="flex-1 min-w-0">
-                              <span className="text-xs font-medium text-text">{gate.name}</span>
-                              <span className="text-[10px] text-text-dim ml-1.5">{gate.reason}</span>
+                              <span className="text-xs font-medium text-slate-900">{gate.name}</span>
+                              <span className="text-[10px] text-slate-500 ml-1.5">{gate.reason}</span>
                             </div>
                           </div>
                         ))}
@@ -282,9 +282,9 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
                     </div>
 
                     {/* Reasoning */}
-                    <div className="bg-slate-50 rounded-xl p-4 border border-border">
-                      <div className="text-xs font-semibold text-text-dim uppercase tracking-wider mb-2">Reasoning</div>
-                      <div className="text-sm text-text leading-relaxed">{result.reasoning}</div>
+                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                      <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Reasoning</div>
+                      <div className="text-sm text-slate-900 leading-relaxed">{result.reasoning}</div>
                     </div>
 
                     {/* Apply Suggestion */}
@@ -305,7 +305,7 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
                       Re-analyze Market
                     </button>
 
-                    <div className="text-[10px] text-text-muted text-center leading-relaxed">
+                    <div className="text-[10px] text-slate-400 text-center leading-relaxed">
                       AI suggestions are for informational purposes only. Not financial advice. Always DYOR.
                     </div>
                   </motion.div>
