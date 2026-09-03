@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Menu, X, ChevronDown, Flame, Zap, History } from "lucide-react";
 
 function Animate({
@@ -75,6 +76,9 @@ export default function Navbar() {
   const truncateAddr = (addr: string) =>
     `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 
+  const pathname = usePathname();
+  const isLanding = pathname === "/";
+
   return (
     <>
       <nav className="w-full max-w-[1800px] mx-auto px-5 sm:px-8 md:px-[82px] pt-[20px] sm:pt-[30px] flex items-center justify-between relative z-50">
@@ -115,12 +119,16 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {address ? (
               <>
-                <span className="h-[46px] flex items-center px-4 text-white/80 text-[14px] font-[450]">
+                <span className={`h-[46px] flex items-center px-4 text-[14px] font-[450] ${isLanding ? "text-white/80" : "text-slate-600"}`}>
                   {truncateAddr(address)}
                 </span>
                 <button
                   onClick={disconnect}
-                  className="h-[46px] px-6 rounded-[11px] border border-white/30 text-white text-[14px] font-[450] hover:bg-white/10 transition-colors"
+                  className={`h-[46px] px-6 rounded-[11px] text-[14px] font-[450] transition-all ${
+                    isLanding
+                      ? "border border-white/30 text-white hover:bg-white/10"
+                      : "bg-gradient-to-r from-slate-100 to-slate-50 border border-slate-200 text-slate-700 hover:from-slate-200 hover:to-slate-100"
+                  }`}
                 >
                   Disconnect
                 </button>
@@ -128,7 +136,11 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={connectWallet}
-                className="h-[46px] px-6 rounded-[11px] bg-white text-[#0f172a] text-[14px] font-[450] font-semibold hover:bg-white/90 transition-colors"
+                className={`h-[46px] px-6 rounded-[11px] text-[14px] font-[450] font-semibold transition-all ${
+                  isLanding
+                    ? "bg-white text-[#0f172a] hover:bg-white/90"
+                    : "btn-primary text-white"
+                }`}
               >
                 Connect Wallet
               </button>
