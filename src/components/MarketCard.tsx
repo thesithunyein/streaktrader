@@ -47,7 +47,23 @@ export default function MarketCard(props: MarketCardProps) {
             {underlying === "BTC" ? (
               <svg viewBox="0 0 32 32" className="w-8 h-8"><circle cx="16" cy="16" r="16" fill="#F7931A"/><text x="16" y="21" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="sans-serif">₿</text></svg>
             ) : (
-              <svg viewBox="0 0 32 32" className="w-8 h-8"><circle cx="16" cy="16" r="16" fill="#627EEA"/><text x="16" y="21" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="sans-serif">Ξ</text></svg>
+              <svg viewBox="0 0 400 400" className="w-8 h-8">
+                <defs>
+                  <linearGradient id="ethGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#A2AAAD" />
+                    <stop offset="100%" stopColor="#C4C8CC" />
+                  </linearGradient>
+                  <linearGradient id="ethTop" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#FFFFFF" />
+                    <stop offset="100%" stopColor="#D4D7DC" />
+                  </linearGradient>
+                </defs>
+                <rect width="400" height="400" rx="80" fill="#627EEA"/>
+                <polygon points="200,60 340,210 200,280" fill="url(#ethTop)" />
+                <polygon points="200,60 60,210 200,280" fill="url(#ethGrad)" />
+                <polygon points="200,300 60,210 200,280" fill="url(#ethGrad)" opacity="0.8" />
+                <polygon points="200,300 340,210 200,280" fill="url(#ethTop)" opacity="0.6" />
+              </svg>
             )}
           </div>
           <div>
