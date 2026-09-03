@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   createPublicClient,
-  http,
   encodeFunctionData,
+  http,
   type Address,
 } from "viem";
 import { somniaShannon } from "@somnia-chain/markets-sdk/chains";
@@ -28,12 +28,19 @@ async function signAndSend(encodedData: `0x${string}`, to: `0x${string}`): Promi
 
   const account = privateKeyToAccount(DEPLOYER_PRIVATE_KEY);
   const nonce = await publicClient.getTransactionCount({ address: DEPLOYER_ADDRESS });
-  const block = await publicClient.getBlock();
-  const baseFee = block.baseFeePerGas || BigInt(0);
 
-  // EIP-1559 transaction — Shannon testnet has baseFeePerGas
+  // Get the actual gas price from RPC via raw fetch
+  const gasPriceRes = await fetch(RPC_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_gasPrice", params: [] }),
+  });
+  const gasPriceJson = await gasPriceRes.json();
+  const gasPrice = BigInt(gasPriceJson.result);
+
+  // EIP-1559 transaction — use RPC gas price * 2 for maxFee
   const maxPriorityFeePerGas = BigInt(1000000000); // 1 Gwei tip
-  const maxFeePerGas = baseFee * BigInt(2) + maxPriorityFeePerGas; // 2x base + tip
+  const maxFeePerGas = gasPrice * BigInt(2); // 2x current gas price
 
   const tx = {
     to,
@@ -46,10 +53,10 @@ async function signAndSend(encodedData: `0x${string}`, to: `0x${string}`): Promi
     type: "eip1559" as const,
   };
 
-  // Sign locally
+  // Sign locally using the noble account
   const signed = await account.signTransaction(tx);
 
-  // Broadcast
+  // Broadcast via eth_sendRawTransaction
   const hash = await publicClient.sendRawTransaction({ serializedTransaction: signed });
   return hash;
 }
