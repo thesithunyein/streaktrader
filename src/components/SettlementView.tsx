@@ -207,12 +207,40 @@ export default function SettlementView() {
     resolveTrade,
     dismissResult,
   } = useStreakStore();
-  const { exchange, redeem } = useTrade();
+  const { exchange, redeem, address } = useTrade();
   const [countdown, setCountdown] = useState(30);
   const [isResolving, setIsResolving] = useState(false);
   const [settled, setSettled] = useState(false);
   const [entryPrice] = useState(() => 67000 + Math.random() * 2000);
   const resolvedRef = useRef(false);
+  const [onChainStatus, setOnChainStatus] = useState<string | null>(null);
+  const [onChainTxHash, setOnChainTxHash] = useState<string | null>(null);
+
+  // After trade resolves — record on-chain via server API
+  useEffect(() => {
+    if (!showResult || !currentTrade || !address) return;
+    const won = showResult === "WIN";
+
+    setOnChainStatus("Recording on-chain...");
+
+    fetch("/api/record-trade", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ address, won }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setOnChainStatus("Recorded on-chain");
+          setOnChainTxHash(data.streakTxHash);
+        } else {
+          setOnChainStatus("On-chain record failed");
+        }
+      })
+      .catch(() => {
+        setOnChainStatus("On-chain record failed");
+      });
+  }, [showResult, currentTrade?.id, address]);
 
   useEffect(() => {
     if (!showSettlement || showResult || !currentTrade) return;
@@ -474,10 +502,35 @@ export default function SettlementView() {
               </div>
             </motion.div>
 
+            {/* On-chain status */}
+            {onChainStatus && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="mb-3 p-2 rounded-lg bg-accent/5 border border-accent/10"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                  <span className="text-[10px] font-medium text-accent">{onChainStatus}</span>
+                </div>
+                {onChainTxHash && (
+                  <a
+                    href={`https://shannon-explorer.somnia.network/tx/${onChainTxHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1 mt-1 text-[10px] text-accent/70 hover:text-accent"
+                  >
+                    View on Explorer
+                  </a>
+                )}
+              </motion.div>
+            )}
+
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.6 }}
               className="grid grid-cols-2 gap-3"
             >
               <motion.button
@@ -536,6 +589,16 @@ export default function SettlementView() {
                 <span className="font-bold text-text">1x</span>
               </div>
             </div>
+
+            {/* On-chain status */}
+            {onChainStatus && (
+              <div className="mb-3 p-2 rounded-lg bg-down/5 border border-down/10">
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-down animate-pulse" />
+                  <span className="text-[10px] font-medium text-down">{onChainStatus}</span>
+                </div>
+              </div>
+            )}
 
             <motion.button
               whileHover={{ scale: 1.02 }}
