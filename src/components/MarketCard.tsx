@@ -43,8 +43,12 @@ export default function MarketCard(props: MarketCardProps) {
     <div className="glass rounded-[16px] p-5 card-hover group">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-[8px] bg-[#2563eb]/10 flex items-center justify-center">
-            <span className="text-xs font-bold text-[#2563eb]">{underlying.slice(0, 2)}</span>
+          <div className="w-8 h-8 rounded-[8px] flex items-center justify-center overflow-hidden">
+            {underlying === "BTC" ? (
+              <svg viewBox="0 0 32 32" className="w-8 h-8"><circle cx="16" cy="16" r="16" fill="#F7931A"/><text x="16" y="21" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="sans-serif">₿</text></svg>
+            ) : (
+              <svg viewBox="0 0 32 32" className="w-8 h-8"><circle cx="16" cy="16" r="16" fill="#627EEA"/><text x="16" y="21" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="sans-serif">Ξ</text></svg>
+            )}
           </div>
           <div>
             <div className="text-sm font-semibold text-slate-900">{underlying}</div>
