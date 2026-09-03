@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import StatsBar from "@/components/StreakBadge";
 import MarketCard from "@/components/MarketCard";
@@ -17,42 +15,57 @@ import Footer from "@/components/Footer";
 import { useMarkets } from "@/hooks/useMarkets";
 import { Activity, Loader2 } from "lucide-react";
 
-// Professional loading skeleton with shimmer
+function Animate({
+  children,
+  delay = 0,
+  className = "",
+  direction = "up",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+  direction?: "up" | "down" | "scale";
+}) {
+  const dirMap: Record<string, string> = {
+    up: "animate-fade-up",
+    down: "animate-fade-down",
+    scale: "animate-fade-scale",
+  };
+  return (
+    <div
+      className={`opacity-0 ${dirMap[direction]} ${className}`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function MarketSkeleton({ delay = 0 }: { delay?: number }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-      className="glass rounded-2xl p-5 overflow-hidden relative"
+    <div
+      className="glass rounded-[20px] p-5 overflow-hidden relative opacity-0 animate-fade-up"
+      style={{ animationDelay: `${delay}ms` }}
     >
-      {/* Shimmer overlay */}
-      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-
+      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-slate-100 animate-pulse" />
+          <div className="w-9 h-9 rounded-[10px] bg-white/5 animate-pulse" />
           <div>
-            <div className="h-3.5 w-16 bg-slate-100 rounded-md mb-1.5 animate-pulse" />
-            <div className="h-2.5 w-12 bg-slate-100 rounded-md animate-pulse" />
+            <div className="h-3.5 w-16 bg-white/5 rounded-md mb-1.5 animate-pulse" />
+            <div className="h-2.5 w-12 bg-white/5 rounded-md animate-pulse" />
           </div>
         </div>
-        <div className="h-6 w-20 bg-slate-100 rounded-full animate-pulse" />
+        <div className="h-6 w-20 bg-white/5 rounded-full animate-pulse" />
       </div>
-
       <div className="mb-4">
-        <div className="flex items-center justify-between mb-2.5">
-          <div className="h-2.5 w-10 bg-slate-100 rounded-md animate-pulse" />
-          <div className="h-2.5 w-12 bg-slate-100 rounded-md animate-pulse" />
-        </div>
-        <div className="h-2.5 rounded-full bg-slate-100 animate-pulse" />
+        <div className="h-2.5 rounded-full bg-white/5 animate-pulse" />
       </div>
-
       <div className="grid grid-cols-2 gap-3">
-        <div className="h-11 rounded-xl bg-slate-100 animate-pulse" />
-        <div className="h-11 rounded-xl bg-slate-100 animate-pulse" />
+        <div className="h-11 rounded-[12px] bg-white/5 animate-pulse" />
+        <div className="h-11 rounded-[12px] bg-white/5 animate-pulse" />
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -71,8 +84,6 @@ export default function TradingApp() {
       setShowOnboarding(true);
       localStorage.setItem("streaktrader-visited", "true");
     }
-
-    // Listen for share-streak events from SettlementView
     const handleShareStreak = () => setShowStreakCard(true);
     window.addEventListener("share-streak", handleShareStreak);
     return () => window.removeEventListener("share-streak", handleShareStreak);
@@ -83,25 +94,24 @@ export default function TradingApp() {
   const markets = liveMarkets;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#080A19]">
       <Navbar />
 
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 pt-4 pb-8">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-5 sm:px-8 pt-4 pb-8">
         {/* Stats */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+        <Animate delay={0} direction="up" className="mb-6">
           <StatsBar onShare={() => setShowStreakCard(true)} />
-        </motion.div>
+        </Animate>
 
-        {/* Challenge Banner */}
         <ChallengeBanner />
 
         {/* Live Markets */}
         <div className="mb-8">
           <div className="flex items-center gap-2.5 mb-4">
             <div className={`w-2 h-2 rounded-full ${loading ? "bg-accent/40 animate-pulse" : "bg-accent"}`} />
-            <h2 className="text-lg font-bold text-text">Live Markets</h2>
+            <h2 className="text-lg font-bold text-white">Live Markets</h2>
             {loading && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/5 border border-accent/10">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/10 border border-accent/15">
                 <Loader2 className="w-3 h-3 text-accent animate-spin" />
                 <span className="text-[10px] font-medium text-accent">Syncing</span>
               </div>
@@ -111,44 +121,35 @@ export default function TradingApp() {
           {loading && markets.length === 0 ? (
             <div className="grid gap-4 sm:grid-cols-2">
               <MarketSkeleton delay={0} />
-              <MarketSkeleton delay={0.08} />
-              <MarketSkeleton delay={0.16} />
-              <MarketSkeleton delay={0.24} />
+              <MarketSkeleton delay={80} />
+              <MarketSkeleton delay={160} />
+              <MarketSkeleton delay={240} />
             </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
-              <AnimatePresence>
-                {markets.map((market, i) => (
-                  <motion.div
-                    key={market.symbol}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08 }}
-                  >
-                    <MarketCard {...market} onTrade={() => setSelectedMarket(market)} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+              {markets.map((market, i) => (
+                <Animate key={market.symbol} delay={i * 80} direction="up">
+                  <MarketCard {...market} onTrade={() => setSelectedMarket(market)} />
+                </Animate>
+              ))}
             </div>
           )}
 
-          {/* Empty state */}
           {!loading && markets.length === 0 && !error && (
-            <div className="glass rounded-2xl p-8 sm:p-12 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-accent/5 flex items-center justify-center mx-auto mb-4">
+            <div className="glass rounded-[20px] p-8 sm:p-12 text-center">
+              <div className="w-14 h-14 rounded-[14px] bg-accent/5 flex items-center justify-center mx-auto mb-4">
                 <Activity className="w-7 h-7 text-accent/40" />
               </div>
-              <p className="text-sm font-semibold text-text mb-1.5">No markets open right now</p>
-              <p className="text-xs text-text-muted max-w-xs mx-auto leading-relaxed">
+              <p className="text-sm font-semibold text-white mb-1.5">No markets open right now</p>
+              <p className="text-xs text-white/40 max-w-xs mx-auto leading-relaxed">
                 BTC and ETH event contracts open on a rolling schedule.
-                New trading windows launch every 15 minutes — check back shortly.
+                New trading windows launch every 15 minutes.
               </p>
             </div>
           )}
 
-          {/* Error state */}
           {error && (
-            <div className="mt-3 p-4 rounded-xl bg-down/10 border border-down/20">
+            <div className="mt-3 p-4 rounded-[12px] bg-down/10 border border-down/20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-down animate-pulse" />
@@ -168,77 +169,64 @@ export default function TradingApp() {
 
       <Footer />
 
-      <AnimatePresence>
-        {selectedMarket && (
-          <TradePanel market={selectedMarket} onClose={() => setSelectedMarket(null)} onChallenge={() => setShowChallenge(true)} />
-        )}
-      </AnimatePresence>
+      {selectedMarket && (
+        <TradePanel market={selectedMarket} onClose={() => setSelectedMarket(null)} onChallenge={() => setShowChallenge(true)} />
+      )}
 
-      <AnimatePresence>
-        {showChallenge && selectedMarket && (
-          <ChallengeModal market={selectedMarket} onClose={() => setShowChallenge(false)} />
-        )}
-      </AnimatePresence>
+      {showChallenge && selectedMarket && (
+        <ChallengeModal market={selectedMarket} onClose={() => setShowChallenge(false)} />
+      )}
 
       <SettlementView />
 
-      <AnimatePresence>
-        {showStreakCard && <StreakCard onClose={() => setShowStreakCard(false)} />}
-      </AnimatePresence>
+      {showStreakCard && <StreakCard onClose={() => setShowStreakCard(false)} />}
 
       {/* Onboarding */}
-      <AnimatePresence>
-        {showOnboarding && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative glass-strong rounded-3xl p-8 max-w-sm w-full mx-4 text-center">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden relative mx-auto mb-5 shadow-lg shadow-accent/20">
-                <Image src="/logo.png" alt="StreakTrader" fill className="object-cover" />
-              </div>
-              <h3 className="text-xl font-bold text-text mb-2">Welcome to StreakTrader</h3>
-              <p className="text-sm text-text-dim mb-6 leading-relaxed">
-                Predict whether BTC or ETH goes up or down. Win consecutive
-                trades to build your streak multiplier and maximize earnings.
-              </p>
-              <div className="space-y-3 text-left mb-6">
-                {[
-                  { num: "1", text: "Pick a live market and choose UP or DOWN" },
-                  { num: "2", text: "Win trades to grow your streak multiplier" },
-                  { num: "3", text: "Higher streaks = higher payouts on every trade" },
-                ].map((item) => (
-                  <div key={item.num} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-                      <span className="text-accent text-sm font-bold">{item.num}</span>
-                    </div>
-                    <span className="text-sm text-text">{item.text}</span>
+      {showOnboarding && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center animate-fade-scale">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setShowOnboarding(false)} />
+          <div className="relative glass-strong rounded-[24px] p-8 max-w-sm w-full mx-4 text-center">
+            <div className="w-16 h-16 rounded-[16px] overflow-hidden relative mx-auto mb-5 shadow-lg shadow-accent/20">
+              <Image src="/logo.png" alt="StreakTrader" fill className="object-cover" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Welcome to StreakTrader</h3>
+            <p className="text-sm text-white/60 mb-6 leading-relaxed">
+              Predict whether BTC or ETH goes up or down. Win consecutive
+              trades to build your streak multiplier.
+            </p>
+            <div className="space-y-3 text-left mb-6">
+              {[
+                { num: "1", text: "Pick a live market and choose UP or DOWN" },
+                { num: "2", text: "Win trades to grow your streak multiplier" },
+                { num: "3", text: "Higher streaks = higher payouts on every trade" },
+              ].map((item) => (
+                <div key={item.num} className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-[8px] bg-accent/10 flex items-center justify-center shrink-0">
+                    <span className="text-accent text-sm font-bold">{item.num}</span>
                   </div>
-                ))}
-              </div>
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                onClick={() => setShowOnboarding(false)}
-                className="w-full btn-primary py-3 rounded-xl text-sm font-bold text-white">
-                Get Started
-              </motion.button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  <span className="text-sm text-white/80">{item.text}</span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowOnboarding(false)}
+              className="w-full btn-primary py-3 rounded-[12px] text-sm font-bold text-white"
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      )}
 
-      {/* AI Copilot */}
       {selectedMarket && (
         <CopilotSidebar
           market={selectedMarket}
           onSuggestion={(s) => {
-            // Auto-select the suggested side in trade panel
             setSelectedMarket({ ...selectedMarket, _suggestedSide: s });
           }}
         />
       )}
 
-      {/* Floating copilot button when no market selected */}
       {!selectedMarket && (
         <CopilotSidebar
           market={{

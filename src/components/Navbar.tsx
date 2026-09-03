@@ -1,203 +1,226 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Trophy, BarChart3, Wallet, LogOut, Loader2, History, AlertTriangle } from "lucide-react";
+import Link from "next/link";
+import { Menu, X, ChevronDown, Flame, Zap, History } from "lucide-react";
 
-const SHANNON_CHAIN_ID = 50312;
-const SHANNON_CHAIN_HEX = `0x${SHANNON_CHAIN_ID.toString(16)}`;
-
-function NavLink({ href, icon: Icon, label }: { href: string; icon: any; label: string }) {
-  const [isActive, setIsActive] = useState(false);
-
-  useEffect(() => {
-    setIsActive(window.location.pathname === href);
-  }, [href]);
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    window.location.href = href;
+function Animate({
+  children,
+  delay = 0,
+  className = "",
+  direction = "down",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+  direction?: "up" | "down" | "left" | "right" | "scale";
+}) {
+  const dirMap: Record<string, string> = {
+    up: "animate-fade-up",
+    down: "animate-fade-down",
+    left: "animate-fade-left",
+    right: "animate-fade-right",
+    scale: "animate-fade-scale",
   };
-
   return (
-    <a
-      href={href}
-      onClick={handleClick}
-      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-        isActive
-          ? "text-accent bg-accent/10"
-          : "text-text-dim hover:text-accent hover:bg-accent/5"
-      }`}
-      style={{ textDecoration: "none", cursor: "pointer" }}
+    <div
+      className={`opacity-0 ${dirMap[direction]} ${className}`}
+      style={{ animationDelay: `${delay}ms` }}
     >
-      <Icon className="w-4 h-4" />
-      <span>{label}</span>
-    </a>
+      {children}
+    </div>
   );
 }
 
 export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
   const [address, setAddress] = useState<string | null>(null);
-  const [connecting, setConnecting] = useState(false);
-  const [streak, setStreak] = useState(0);
-  const [wrongNetwork, setWrongNetwork] = useState(false);
 
   useEffect(() => {
+    const saved = localStorage.getItem("streaktrader_address");
+    if (saved) setAddress(saved);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  const connectWallet = async () => {
+    if (!(window as any).ethereum) {
+      alert("Please install MetaMask");
+      return;
+    }
     try {
-      const saved = localStorage.getItem("streaktrader");
-      if (saved) {
-        const data = JSON.parse(saved);
-        setStreak(data.streak || 0);
+      const accounts = await (window as any).ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      if (accounts[0]) {
+        setAddress(accounts[0]);
+        localStorage.setItem("streaktrader_address", accounts[0]);
       }
     } catch {}
-  }, []);
-
-  useEffect(() => {
-    const checkWallet = async () => {
-      if (typeof window === "undefined" || !window.ethereum) return;
-      try {
-        const accounts = await window.ethereum.request({ method: "eth_accounts" });
-        if (accounts && accounts.length > 0) {
-          setAddress(accounts[0]);
-          // Check chain
-          const chainId = await window.ethereum.request({ method: "eth_chainId" });
-          if (parseInt(chainId, 16) !== SHANNON_CHAIN_ID) {
-            setWrongNetwork(true);
-          } else {
-            setWrongNetwork(false);
-          }
-        }
-      } catch {}
-    };
-    checkWallet();
-
-    // Listen for chain changes
-    if (window.ethereum) {
-      const handleChainChanged = (chainId: string) => {
-        if (parseInt(chainId, 16) !== SHANNON_CHAIN_ID) {
-          setWrongNetwork(true);
-        } else {
-          setWrongNetwork(false);
-        }
-      };
-      window.ethereum.on("chainChanged", handleChainChanged);
-      return () => window.ethereum?.removeListener("chainChanged", handleChainChanged);
-    }
-  }, []);
-
-  const connect = async () => {
-    if (typeof window === "undefined" || !window.ethereum) return;
-    setConnecting(true);
-    setWrongNetwork(false);
-    try {
-      // Request accounts (shows MetaMask popup)
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-
-      // Check chain and switch if needed
-      const chainId = await window.ethereum.request({ method: "eth_chainId" });
-      if (parseInt(chainId, 16) !== SHANNON_CHAIN_ID) {
-        try {
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: SHANNON_CHAIN_HEX }],
-          });
-        } catch {
-          // Chain not in MetaMask, add it
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: SHANNON_CHAIN_HEX,
-                chainName: "Somnia Shannon Testnet",
-                nativeCurrency: { name: "STT", symbol: "STT", decimals: 18 },
-                rpcUrls: ["https://api.infra.testnet.somnia.network"],
-                blockExplorerUrls: ["https://shannon-explorer.somnia.network"],
-              },
-            ],
-          });
-        }
-      }
-
-      setAddress(accounts[0]);
-      setWrongNetwork(false);
-    } catch (e: any) {
-      console.error("Connect failed:", e);
-    }
-    setConnecting(false);
   };
 
-  const disconnect = async () => {
-    // Revoke permissions so MetaMask shows popup next time
-    if (typeof window !== "undefined" && window.ethereum) {
-      try {
-        await window.ethereum.request({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] });
-      } catch {}
-    }
+  const disconnect = () => {
     setAddress(null);
-    setWrongNetwork(false);
+    localStorage.removeItem("streaktrader_address");
   };
 
-  const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : null;
+  const truncateAddr = (addr: string) =>
+    `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border" style={{ background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)" }}>
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <>
+      <nav className="w-full max-w-[1800px] mx-auto px-5 sm:px-8 md:px-[82px] pt-[20px] sm:pt-[30px] flex items-center justify-between relative z-50">
         {/* Logo */}
-        <a href="/" onClick={(e) => { e.preventDefault(); window.location.href = "/"; }} style={{ textDecoration: "none", cursor: "pointer" }} className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl overflow-hidden relative shadow-md">
-            <Image src="/logo.png" alt="StreakTrader" fill className="object-cover" />
+        <Animate delay={0} direction="down">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] rounded-[8px] bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] flex items-center justify-center">
+              <span className="text-white font-bold text-[14px] sm:text-[16px]">S</span>
+            </div>
+            <span className="text-white text-[22px] sm:text-[26px] font-[450] leading-none tracking-[-0.02em]">
+              StreakTrader
+            </span>
+          </Link>
+        </Animate>
+
+        {/* Center nav pill (desktop) */}
+        <Animate delay={100} direction="down" className="hidden lg:block">
+          <div className="h-[52px] px-6 flex items-center gap-[30px] glass-pill rounded-[11px]">
+            {[
+              { label: "Trade", href: "/app", icon: Zap },
+              { label: "Leaderboard", href: "/leaderboard", icon: Flame },
+              { label: "History", href: "/history", icon: History },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="flex items-center gap-[5px] text-white/80 text-[14px] font-[450] leading-[14px] hover:text-white transition-colors"
+              >
+                <item.icon className="w-3.5 h-3.5" />
+                {item.label}
+              </Link>
+            ))}
           </div>
-          <span className="text-lg font-bold text-text hidden sm:block">
-            Streak<span style={{ color: "#2563eb" }}>Trader</span>
-          </span>
-        </a>
+        </Animate>
 
-        {/* Navigation Links */}
-        <div className="flex items-center gap-1 sm:gap-6">
-          <NavLink href="/app" icon={BarChart3} label="Trade" />
-          <NavLink href="/leaderboard" icon={Trophy} label="Leaderboard" />
-          <NavLink href="/history" icon={History} label="History" />
-        </div>
-
-        {/* Wallet */}
-        <div className="flex items-center gap-3">
-          {streak > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: "rgba(37,99,235,0.1)", border: "1px solid rgba(37,99,235,0.2)" }}>
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#2563eb" }} />
-              <span className="text-sm font-bold font-mono" style={{ color: "#2563eb" }}>{streak}x</span>
-            </div>
-          )}
-
-          {address ? (
-            <div className="flex items-center gap-2">
-              {wrongNetwork ? (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl" style={{ background: "#fef2f2", border: "1px solid #fecaca" }}>
-                  <AlertTriangle className="w-3.5 h-3.5" style={{ color: "#dc2626" }} />
-                  <span className="text-xs font-semibold hidden sm:inline" style={{ color: "#dc2626" }}>Wrong Network</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl" style={{ background: "#f8fafc", border: "1px solid #e2e8f0" }}>
-                  <div className="w-2 h-2 rounded-full" style={{ background: "#16a34a" }} />
-                  <span className="text-xs font-mono hidden sm:inline" style={{ color: "#64748b" }}>{shortAddress}</span>
-                </div>
-              )}
-              <button onClick={disconnect} className="p-2 rounded-xl transition-colors" style={{ color: "#64748b" }} title="Disconnect">
-                <LogOut className="w-4 h-4" />
+        {/* Right auth pill (desktop) */}
+        <Animate delay={200} direction="down" className="hidden lg:block">
+          <div className="h-[52px] p-[3px] bg-[rgba(0,0,0,0.35)] rounded-[13px] backdrop-blur-[17px] flex items-center gap-[5px]">
+            {address ? (
+              <>
+                <span className="px-6 h-[46px] flex items-center rounded-[11px] text-white/80 text-[14px] font-[450]">
+                  {truncateAddr(address)}
+                </span>
+                <button
+                  onClick={disconnect}
+                  className="h-[46px] px-6 rounded-[11px] bg-[#E9E9E9] text-[#0A0707] text-[14px] font-[450] hover:bg-white transition-colors"
+                >
+                  Disconnect
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={connectWallet}
+                className="h-[46px] px-6 rounded-[11px] bg-[#E9E9E9] text-[#0A0707] text-[14px] font-[450] hover:bg-white transition-colors"
+              >
+                Connect Wallet
               </button>
+            )}
+          </div>
+        </Animate>
+
+        {/* Mobile hamburger */}
+        <Animate delay={100} direction="down" className="lg:hidden">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-[44px] h-[44px] flex items-center justify-center rounded-[11px] glass-pill transition-colors hover:bg-white/10"
+            aria-label="Toggle menu"
+          >
+            <div className="relative w-5 h-5">
+              <Menu
+                className={`w-5 h-5 text-white absolute inset-0 transition-all duration-300 ease-out ${
+                  isOpen ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"
+                }`}
+              />
+              <X
+                className={`w-5 h-5 text-white absolute inset-0 transition-all duration-300 ease-out ${
+                  isOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"
+                }`}
+              />
             </div>
-          ) : (
-            <button
-              onClick={connect}
-              disabled={connecting}
-              className="px-4 py-2 rounded-xl text-sm font-semibold text-white flex items-center gap-2"
-              style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)", opacity: connecting ? 0.5 : 1 }}
-            >
-              {connecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wallet className="w-4 h-4" />}
-              <span className="hidden sm:inline">{connecting ? "Connecting..." : "Connect Wallet"}</span>
-            </button>
-          )}
+          </button>
+        </Animate>
+      </nav>
+
+      {/* Mobile menu overlay */}
+      <div
+        className={`lg:hidden fixed inset-0 z-40 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          isOpen ? "visible" : "invisible"
+        }`}
+      >
+        <div
+          className={`absolute inset-0 bg-[#080A19]/90 backdrop-blur-[24px] transition-opacity duration-500 ${
+            isOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => setIsOpen(false)}
+        />
+        <div
+          className={`absolute top-[76px] sm:top-[86px] left-4 right-4 sm:left-6 sm:right-6 glass-strong rounded-[20px] border border-white/[0.06] p-6 sm:p-8 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] origin-top ${
+            isOpen ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-[0.97]"
+          }`}
+        >
+          <div className="flex flex-col gap-1">
+            {["Trade", "Leaderboard", "History"].map((label, i) => (
+              <Link
+                key={label}
+                href={`/${label === "Trade" ? "app" : label.toLowerCase()}`}
+                onClick={() => setIsOpen(false)}
+                className={`flex items-center justify-between px-4 py-4 rounded-[12px] text-white/90 text-[18px] font-[450] hover:bg-white/[0.06] transition-all duration-300 ${
+                  isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-3"
+                }`}
+                style={{ transitionDelay: isOpen ? `${100 + i * 50}ms` : "0ms" }}
+              >
+                {label}
+                {label === "Trade" && <ChevronDown className="w-4 h-4 opacity-50 -rotate-90" />}
+              </Link>
+            ))}
+          </div>
+          <div className="h-px bg-white/10 my-5" />
+          <div
+            className={`flex flex-col gap-3 transition-all duration-300 ${
+              isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+            }`}
+            style={{ transitionDelay: isOpen ? "350ms" : "0ms" }}
+          >
+            {address ? (
+              <>
+                <span className="w-full h-[50px] flex items-center justify-center rounded-[12px] text-white/80 text-[15px] font-[450]">
+                  {truncateAddr(address)}
+                </span>
+                <button
+                  onClick={() => { disconnect(); setIsOpen(false); }}
+                  className="w-full h-[50px] rounded-[12px] bg-[#E9E9E9] text-[#0A0707] text-[15px] font-[450] transition-colors hover:bg-white"
+                >
+                  Disconnect
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => { connectWallet(); setIsOpen(false); }}
+                className="w-full h-[50px] rounded-[12px] bg-[#E9E9E9] text-[#0A0707] text-[15px] font-[450] transition-colors hover:bg-white"
+              >
+                Connect Wallet
+              </button>
+            )}
+          </div>
         </div>
       </div>
-    </nav>
+    </>
   );
 }
