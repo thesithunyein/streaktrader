@@ -81,10 +81,10 @@ export default function Navbar() {
         {/* Logo */}
         <Animate delay={0} direction="down">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] rounded-[8px] overflow-hidden relative">
+            <div className="w-[36px] h-[36px] sm:w-[40px] sm:h-[40px] rounded-[10px] overflow-hidden relative">
               <Image src="/logo.png" alt="StreakTrader" fill className="object-cover" />
             </div>
-            <span className="text-white text-[22px] sm:text-[26px] font-[450] leading-none tracking-[-0.02em]">
+            <span className="text-white text-[24px] sm:text-[28px] font-[450] leading-none tracking-[-0.02em]">
               StreakTrader
             </span>
           </Link>
