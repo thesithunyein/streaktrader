@@ -25,9 +25,9 @@ let exchangeRefCount = 0;
 function getReadExchange(): SomniaMarkets {
   if (readExchange) return readExchange;
   readExchange = new SomniaMarkets({
-    indexerUrl: "https://stg.api.dreamdex.io/v1/graphql",
+    indexerUrl: "https://dev.smk.somnia.host/v1/graphql",
     chain: somniaShannon,
-    wsRpcUrl: "wss://stg.api.dreamdex.io/ws/public",
+    wsRpcUrl: "wss://api.infra.testnet.somnia.network/ws",
     addresses: SOMNIA_TESTNET_ADDRESSES,
   });
   return readExchange;

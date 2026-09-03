@@ -40,9 +40,9 @@ export function useExchange(
     const initExchange = async () => {
       try {
         const exchange = new SomniaMarkets({
-          indexerUrl: "https://stg.api.dreamdex.io/v1/graphql",
+          indexerUrl: "https://dev.smk.somnia.host/v1/graphql",
           chain: somniaShannon,
-          wsRpcUrl: "wss://stg.api.dreamdex.io/ws/public",
+          wsRpcUrl: "wss://api.infra.testnet.somnia.network/ws",
           addresses: SOMNIA_TESTNET_ADDRESSES,
           walletClient,
         } as any);
