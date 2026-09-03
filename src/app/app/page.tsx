@@ -11,6 +11,9 @@ import StreakCard from "@/components/StreakCard";
 import ChallengeModal from "@/components/ChallengeModal";
 import ChallengeBanner from "@/components/ChallengeBanner";
 import CopilotSidebar from "@/components/CopilotSidebar";
+import SocialFeed from "@/components/SocialFeed";
+import TournamentMode from "@/components/TournamentMode";
+import StreakBetting from "@/components/StreakBetting";
 import Footer from "@/components/Footer";
 import { useMarkets } from "@/hooks/useMarkets";
 import { Activity, Loader2 } from "lucide-react";
@@ -195,6 +198,20 @@ export default function TradingApp() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* New Innovation Features */}
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          {/* Left: Social Feed + Tournaments */}
+          <div className="space-y-6">
+            <SocialFeed />
+            <TournamentMode />
+          </div>
+
+          {/* Right: Streak Betting */}
+          <div>
+            <StreakBetting />
+          </div>
         </div>
       </main>
 

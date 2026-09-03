@@ -51,10 +51,25 @@ export default function CopilotSidebar({ market, onSuggestion }: CopilotSidebarP
     setLoading(true);
     setError(null);
     try {
+      // Fetch real price history from Binance
+      const symbol = market.underlying === "BTC" ? "BTCUSDT" : "ETHUSDT";
+      let recentPrices: number[] = [];
+      try {
+        const priceRes = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1m&limit=30`);
+        const klines = await priceRes.json();
+        recentPrices = klines.map((k: any[]) => parseFloat(k[4])); // close prices
+      } catch {}
+
+      // Get current price
+      let currentPrice = market.currentPrice || 0;
+      if (!currentPrice && recentPrices.length > 0) {
+        currentPrice = recentPrices[recentPrices.length - 1];
+      }
+
       const res = await fetch("/api/copilot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ market }),
+        body: JSON.stringify({ market: { ...market, recentPrices, currentPrice } }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);

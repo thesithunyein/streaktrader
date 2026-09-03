@@ -38,11 +38,11 @@ function Animate({
 
 const FEATURES = [
   { icon: Zap, title: "One-Tap Trading", desc: "Pick UP or DOWN, set your stake, confirm. No order books, no complexity." },
-  { icon: Brain, title: "AI Copilot", desc: "AI-powered market analysis suggests UP or DOWN with confidence scores." },
+  { icon: Brain, title: "AI Copilot", desc: "Real AI analysis of momentum, volatility, and probability. Get data-driven signals." },
   { icon: Flame, title: "Streak Multiplier", desc: "Every consecutive win grows your multiplier. The longer your streak, the higher your payout." },
   { icon: ShieldCheck, title: "Streak Shield", desc: "Protect your streak from a single loss. Free shields refresh daily." },
-  { icon: Award, title: "Prediction Score", desc: "Your 0-100 skill rating based on win rate, streak, and consistency." },
-  { icon: Share2, title: "Shareable Cards", desc: "One-tap export your streak as a beautiful image. Share on Twitter." },
+  { icon: Share2, title: "Live Social Feed", desc: "See other traders' wins, losses, and streaks in real-time. Know what's happening." },
+  { icon: Award, title: "Tournaments", desc: "Weekly competitions with rankings and prizes. Compete for the top spot." },
 ];
 
 // Text colors for white cards on dark background
