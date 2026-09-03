@@ -140,14 +140,16 @@ export default function Home() {
               <div className="max-w-[593px]">
                 <Animate delay={300} direction="up">
                   <h1 className="text-white text-[36px] sm:text-[52px] md:text-[64px] lg:text-[72px] font-normal leading-[0.95] mb-5 sm:mb-8">
-                    Build your streak.
+                    Predict crypto.
                     <br />
-                    <span className="text-gradient">Ride the wave.</span>
+                    Build streaks.
+                    <br />
+                    <span className="text-gradient">Earn more.</span>
                   </h1>
                 </Animate>
                 <Animate delay={500} direction="up">
                   <p className="text-white/80 text-[16px] sm:text-[18px] md:text-[20px] font-[450] leading-[1.3] max-w-[370px] mb-7 sm:mb-10">
-                    Predict BTC and ETH price movements. Win consecutive trades to grow your streak multiplier. Zero fees, instant settlement.
+                    One-tap crypto predictions with streak rewards. The simplest way to trade on-chain.
                   </p>
                 </Animate>
                 <Animate delay={700} direction="up">

@@ -32,9 +32,20 @@
 
 ---
 
-StreakTrader is a gamified prediction market platform built on [DreamDEX Event Contracts](https://docs.dreamdex.io/developers/event-contracts) and the [Somnia](https://somnia.network) blockchain. Users predict whether BTC or ETH will go UP or DOWN within 15-minute windows, building winning streaks that multiply their payouts.
+StreakTrader is a gamified prediction market platform built on [DreamDEX Event Contracts](https://docs.dreamdex.io/developers/event-contracts) and the [Somnia](https://somnia.network) blockchain. One-tap crypto predictions with streak rewards. The simplest way to trade on-chain.
 
-Unlike traditional prediction market interfaces, StreakTrader wraps event contracts in an emotional, social experience — with on-chain streak tracking, streak shields, prediction scores, and shareable streak cards.
+---
+
+## The Problem
+
+Prediction markets are powerful, but broken for most people:
+
+- **Too complex** — Existing platforms require understanding order books, limit orders, slippage, and financial terminology. New users bounce in 30 seconds.
+- **No reason to return** — Trade once, forget forever. Zero retention mechanics. No habit loop.
+- **Isolated experience** — No social features, no competition, no community around trading.
+- **Intimidating UI** — Bloomberg terminal aesthetics that alienate casual users.
+
+StreakTrader fixes all four with gamification: streaks create daily habits, shields add strategic depth, challenges add social competition, and a clean UI makes it accessible to anyone.
 
 ---
 
