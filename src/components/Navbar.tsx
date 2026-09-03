@@ -127,7 +127,7 @@ export default function Navbar() {
               </>
             ) : (
               <button
-                onClick={connectWallet}                  className="h-[46px] px-6 rounded-[11px] bg-white text-[#2563eb] text-[14px] font-[450] hover:bg-white/90 transition-colors font-semibold"
+                onClick={connectWallet}                  className="h-[46px] px-6 rounded-[11px] btn-primary text-white text-[14px] font-[450] transition-colors font-semibold"
                 >
                   Connect Wallet
               </button>
@@ -212,7 +212,7 @@ export default function Navbar() {
               </>
             ) : (
               <button
-                onClick={() => { connectWallet(); setIsOpen(false); }}                  className="w-full h-[50px] rounded-[12px] bg-white text-[#2563eb] text-[15px] font-[450] font-semibold transition-colors hover:bg-white/90"
+                onClick={() => { connectWallet(); setIsOpen(false); }}                  className="w-full h-[50px] rounded-[12px] btn-primary text-white text-[15px] font-[450] font-semibold transition-colors"
                 >
                   Connect Wallet
               </button>
