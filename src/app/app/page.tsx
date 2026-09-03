@@ -139,11 +139,11 @@ export default function TradingApp() {
                 return (
                   <div key={asset}>
                     <div className="flex items-center gap-2.5 mb-3">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: isBTC ? "rgba(247,147,26,0.1)" : "rgba(98,126,234,0.1)" }}>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden" style={{ background: isBTC ? "rgba(247,147,26,0.1)" : "rgba(98,126,234,0.1)" }}>
                         {isBTC ? (
-                          <svg viewBox="0 0 32 32" className="w-4 h-4"><circle cx="16" cy="16" r="16" fill="#F7931A"/><text x="16" y="21" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">₿</text></svg>
+                          <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" alt="BTC" className="w-5 h-5" />
                         ) : (
-                          <svg viewBox="0 0 400 400" className="w-4 h-4"><rect width="400" height="400" rx="80" fill="#627EEA"/><polygon points="200,60 340,210 200,280" fill="#FFF"/><polygon points="200,60 60,210 200,280" fill="#C4C8CC"/></svg>
+                          <img src="https://assets.coingecko.com/coins/images/279/small/ethereum.png" alt="ETH" className="w-5 h-5" />
                         )}
                       </div>
                       <h3 className="text-sm font-bold" style={{ color: isBTC ? "#F7931A" : "#627EEA" }}>

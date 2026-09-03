@@ -68,17 +68,11 @@ export default function MarketCard(props: MarketCardProps) {
       {/* Header: Logo + Name + Time Window */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-[10px] flex items-center justify-center" style={{ background: colorLight, border: `1px solid ${colorBorder}` }}>
+          <div className="w-10 h-10 rounded-[10px] flex items-center justify-center overflow-hidden" style={{ background: colorLight, border: `1px solid ${colorBorder}` }}>
             {isBTC ? (
-              <svg viewBox="0 0 32 32" className="w-6 h-6"><circle cx="16" cy="16" r="16" fill="#F7931A"/><text x="16" y="21" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="sans-serif">₿</text></svg>
+              <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" alt="BTC" className="w-6 h-6" onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23F7931A'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='14' font-weight='bold'%3E₿%3C/text%3E%3C/svg%3E"; }} />
             ) : (
-              <svg viewBox="0 0 400 400" className="w-6 h-6">
-                <rect width="400" height="400" rx="80" fill="#627EEA"/>
-                <polygon points="200,60 340,210 200,280" fill="#FFFFFF" />
-                <polygon points="200,60 60,210 200,280" fill="#C4C8CC" />
-                <polygon points="200,300 60,210 200,280" fill="#C4C8CC" opacity="0.8" />
-                <polygon points="200,300 340,210 200,280" fill="#FFFFFF" opacity="0.6" />
-              </svg>
+              <img src="https://assets.coingecko.com/coins/images/279/small/ethereum.png" alt="ETH" className="w-6 h-6" onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23627EEA'/%3E%3Cpolygon points='16,4 28,16 16,22' fill='white'/%3E%3Cpolygon points='16,4 4,16 16,22' fill='%23C4C8CC'/%3E%3C/svg%3E"; }} />
             )}
           </div>
           <div>
