@@ -110,26 +110,27 @@ export default function Navbar() {
           </div>
         </Animate>
 
-        {/* Right auth pill (desktop) */}
+        {/* Right side — Connect Wallet (desktop) */}
         <Animate delay={200} direction="down" className="hidden lg:block">
-          <div className="h-[52px] p-[3px] bg-[rgba(0,0,0,0.35)] rounded-[13px] backdrop-blur-[17px] flex items-center gap-[5px]">
+          <div className="flex items-center gap-3">
             {address ? (
               <>
-                <span className="px-6 h-[46px] flex items-center rounded-[11px] text-white/80 text-[14px] font-[450]">
+                <span className="h-[46px] flex items-center px-4 text-slate-600 text-[14px] font-[450]">
                   {truncateAddr(address)}
                 </span>
                 <button
                   onClick={disconnect}
-                  className="h-[46px] px-6 rounded-[11px] bg-white/20 text-white text-[14px] font-[450] hover:bg-white/30 transition-colors"
+                  className="h-[46px] px-6 rounded-[11px] border border-slate-200 text-slate-600 text-[14px] font-[450] hover:bg-slate-50 transition-colors"
                 >
                   Disconnect
                 </button>
               </>
             ) : (
               <button
-                onClick={connectWallet}                  className="h-[46px] px-6 rounded-[11px] btn-primary text-white text-[14px] font-[450] transition-colors font-semibold"
-                >
-                  Connect Wallet
+                onClick={connectWallet}
+                className="h-[46px] px-6 rounded-[11px] btn-primary text-white text-[14px] font-[450] font-semibold"
+              >
+                Connect Wallet
               </button>
             )}
           </div>
@@ -139,17 +140,17 @@ export default function Navbar() {
         <Animate delay={100} direction="down" className="lg:hidden">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="w-[44px] h-[44px] flex items-center justify-center rounded-[11px] glass-pill transition-colors hover:bg-white/10"
+            className="w-[44px] h-[44px] flex items-center justify-center rounded-[11px] bg-slate-100 transition-colors hover:bg-slate-200"
             aria-label="Toggle menu"
           >
             <div className="relative w-5 h-5">
               <Menu
-                className={`w-5 h-5 text-white absolute inset-0 transition-all duration-300 ease-out ${
+                className={`w-5 h-5 text-slate-700 absolute inset-0 transition-all duration-300 ease-out ${
                   isOpen ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"
                 }`}
               />
               <X
-                className={`w-5 h-5 text-white absolute inset-0 transition-all duration-300 ease-out ${
+                className={`w-5 h-5 text-slate-700 absolute inset-0 transition-all duration-300 ease-out ${
                   isOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"
                 }`}
               />
@@ -165,33 +166,36 @@ export default function Navbar() {
         }`}
       >
         <div
-          className={`absolute inset-0 bg-[#080A19]/90 backdrop-blur-[24px] transition-opacity duration-500 ${
+          className={`absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity duration-500 ${
             isOpen ? "opacity-100" : "opacity-0"
           }`}
           onClick={() => setIsOpen(false)}
         />
         <div
-          className={`absolute top-[76px] sm:top-[86px] left-4 right-4 sm:left-6 sm:right-6 glass-strong rounded-[20px] border border-white/[0.06] p-6 sm:p-8 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] origin-top ${
+          className={`absolute top-[76px] sm:top-[86px] left-4 right-4 sm:left-6 sm:right-6 bg-white rounded-[20px] border border-slate-200 p-6 sm:p-8 shadow-xl transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] origin-top ${
             isOpen ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-[0.97]"
           }`}
         >
           <div className="flex flex-col gap-1">
-            {["Trade", "Leaderboard", "History"].map((label, i) => (
+            {[
+              { label: "Trade", href: "/app" },
+              { label: "Leaderboard", href: "/leaderboard" },
+              { label: "History", href: "/history" },
+            ].map((item, i) => (
               <Link
-                key={label}
-                href={`/${label === "Trade" ? "app" : label.toLowerCase()}`}
+                key={item.label}
+                href={item.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center justify-between px-4 py-4 rounded-[12px] text-white/90 text-[18px] font-[450] hover:bg-white/[0.06] transition-all duration-300 ${
+                className={`flex items-center justify-between px-4 py-4 rounded-[12px] text-slate-700 text-[18px] font-[450] hover:bg-slate-50 transition-all duration-300 ${
                   isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-3"
                 }`}
                 style={{ transitionDelay: isOpen ? `${100 + i * 50}ms` : "0ms" }}
               >
-                {label}
-                {label === "Trade" && <ChevronDown className="w-4 h-4 opacity-50 -rotate-90" />}
+                {item.label}
               </Link>
             ))}
           </div>
-          <div className="h-px bg-white/10 my-5" />
+          <div className="h-px bg-slate-100 my-5" />
           <div
             className={`flex flex-col gap-3 transition-all duration-300 ${
               isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
@@ -200,21 +204,22 @@ export default function Navbar() {
           >
             {address ? (
               <>
-                <span className="w-full h-[50px] flex items-center justify-center rounded-[12px] text-white/80 text-[15px] font-[450]">
+                <span className="w-full h-[50px] flex items-center justify-center rounded-[12px] text-slate-600 text-[15px] font-[450]">
                   {truncateAddr(address)}
                 </span>
                 <button
                   onClick={() => { disconnect(); setIsOpen(false); }}
-                  className="w-full h-[50px] rounded-[12px] bg-white/10 text-white text-[15px] font-[450] transition-colors hover:bg-white/20"
+                  className="w-full h-[50px] rounded-[12px] border border-slate-200 text-slate-600 text-[15px] font-[450] transition-colors hover:bg-slate-50"
                 >
                   Disconnect
                 </button>
               </>
             ) : (
               <button
-                onClick={() => { connectWallet(); setIsOpen(false); }}                  className="w-full h-[50px] rounded-[12px] btn-primary text-white text-[15px] font-[450] font-semibold transition-colors"
-                >
-                  Connect Wallet
+                onClick={() => { connectWallet(); setIsOpen(false); }}
+                className="w-full h-[50px] rounded-[12px] btn-primary text-white text-[15px] font-[450] font-semibold transition-colors"
+              >
+                Connect Wallet
               </button>
             )}
           </div>
