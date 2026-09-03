@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "StreakTrader — Build Your Streak. Ride the Wave.",
+  title: "StreakTrader — Predict crypto. Build streaks. Earn more.",
   description:
-    "The prediction market trading app where every win builds your streak and multiplies your earnings. Built on DreamDEX Event Contracts.",
+    "One-tap crypto predictions with streak rewards. The simplest way to trade on-chain. Built on DreamDEX Event Contracts.",
   icons: {
     icon: "/icon.png",
     apple: "/icon.png",

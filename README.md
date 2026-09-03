@@ -5,7 +5,7 @@
 <h1 align="center">StreakTrader</h1>
 
 <p align="center">
-  <strong>Predict. Win. Streak. Multiply.</strong>
+  <strong>Predict crypto. Build streaks. Earn more.</strong>
 </p>
 
 <p align="center">
@@ -57,9 +57,12 @@ StreakTrader fixes all four with gamification: streaks create daily habits, shie
 | **Prediction Score** | 0-100 skill rating based on win rate, streak, volume, consistency | ScoreOracle |
 | **Streak Shield** | Protect your streak from one loss. Free daily, max 3 stored | ShieldManager |
 | **Head-to-Head Challenges** | Challenge a friend on the same market | ChallengeArena |
+| **AI Copilot** | Real Binance price analysis with momentum, volatility, and probability signals | API |
+| **Live Social Feed** | See other traders' wins, losses, and streaks in real-time | KV Store |
+| **Tournaments** | Weekly competitions with rankings and prizes | KV Store |
+| **Streak Betting** | Bet on whether other traders keep their streak | Client-side |
 | **Shareable Streak Cards** | One-tap export beautiful streak images for Twitter | Client-side |
 | **Live Price Chart** | Real-time BTC price during settlement countdown | Binance API |
-| **AI Copilot** | Suggests UP/DOWN with confidence scores and risk analysis | API |
 
 ---
 
@@ -80,6 +83,8 @@ flowchart TB
     
     Trading --> Exchange[DreamDEX SDK]
     Trading --> AI[AI Copilot]
+    Trading --> Social[Social Feed]
+    Trading --> Tournament[Tournament Mode]
     Trading --> OnChain[On-Chain Contracts]
     
     subgraph SDK[DreamDEX SDK Layer]
@@ -225,6 +230,7 @@ streaktrader/
 │   │   └── api/
 │   │       ├── copilot/route.ts -- AI copilot endpoint
 │   │       ├── streak/route.ts  -- Streak persistence
+│   │       ├── history/route.ts -- Trade history
 │   │       └── leaderboard/route.ts -- Leaderboard
 │   ├── components/
 │   │   ├── AnimatedBackground.tsx -- Canvas animated waves
@@ -239,6 +245,9 @@ streaktrader/
 │   │   ├── ChallengeBanner.tsx  -- Active challenge
 │   │   ├── TradeProvider.tsx    -- Context provider
 │   │   ├── CopilotSidebar.tsx   -- AI copilot sidebar
+│   │   ├── SocialFeed.tsx       -- Live social feed
+│   │   ├── TournamentMode.tsx   -- Weekly tournaments
+│   │   ├── StreakBetting.tsx    -- Bet on others' streaks
 │   │   └── Footer.tsx           -- Site footer
 │   ├── hooks/
 │   │   ├── useWallet.ts         -- MetaMask connection
