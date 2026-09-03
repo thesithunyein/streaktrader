@@ -216,30 +216,61 @@ export default function SettlementView() {
   const [onChainStatus, setOnChainStatus] = useState<string | null>(null);
   const [onChainTxHash, setOnChainTxHash] = useState<string | null>(null);
 
-  // After trade resolves — record on-chain via server API
+  // After trade resolves — record on-chain via MetaMask + server fallback
+  const recordOnChain = async (won: boolean) => {
+    setOnChainStatus("Recording on-chain...");
+    try {
+      const { useOnChainRecord } = await import("@/hooks/useOnChainRecord");
+      // This is a workaround since we can't use hooks in callbacks
+      // Use direct fetch instead
+      if (typeof window !== "undefined" && (window as any).ethereum) {
+        try {
+          const ethereum = (window as any).ethereum;
+          const { Interface } = await import("ethers");
+          const { ABIS, CONTRACT_ADDRESSES } = await import("@/lib/contracts");
+          const accounts = await ethereum.request({ method: "eth_accounts" });
+          if (accounts && accounts.length > 0) {
+            const iface = new Interface(ABIS.StreakRegistry);
+            const data = iface.encodeFunctionData("recordTrade", [accounts[0], won]);
+            const txHash = await ethereum.request({
+              method: "eth_sendTransaction",
+              params: [{
+                from: accounts[0],
+                to: CONTRACT_ADDRESSES.StreakRegistry,
+                data,
+                gas: "0x7A120",
+              }],
+            });
+            setOnChainTxHash(txHash);
+            setOnChainStatus("Recorded on-chain");
+            return;
+          }
+        } catch (e) {
+          console.log("MetaMask recording failed, trying server:", e);
+        }
+      }
+      // Server fallback
+      const res = await fetch("/api/record-trade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address, won }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOnChainStatus("Recorded on-chain");
+        setOnChainTxHash(data.streakTxHash);
+      } else {
+        setOnChainStatus("On-chain record pending");
+      }
+    } catch {
+      setOnChainStatus("On-chain record pending");
+    }
+  };
+
   useEffect(() => {
     if (!showResult || !currentTrade || !address) return;
     const won = showResult === "WIN";
-
-    setOnChainStatus("Recording on-chain...");
-
-    fetch("/api/record-trade", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ address, won }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setOnChainStatus("Recorded on-chain");
-          setOnChainTxHash(data.streakTxHash);
-        } else {
-          setOnChainStatus("On-chain record failed");
-        }
-      })
-      .catch(() => {
-        setOnChainStatus("On-chain record failed");
-      });
+    recordOnChain(won);
   }, [showResult, currentTrade?.id, address]);
 
   useEffect(() => {

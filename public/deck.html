@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StreakTrader — Presentation Deck</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #ffffff; color: #0f172a; }
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 80px;
+      position: relative;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .slide-num {
+      position: absolute;
+      top: 40px;
+      right: 60px;
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+    .logo-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+    }
+    .logo-mark img { width: 100%; height: 100%; object-fit: cover; }
+    h1 { font-size: 56px; font-weight: 800; line-height: 1.05; margin-bottom: 16px; }
+    h2 { font-size: 40px; font-weight: 700; line-height: 1.15; margin-bottom: 12px; }
+    h3 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+    p { font-size: 18px; color: #64748b; line-height: 1.6; max-width: 640px; }
+    .accent { color: #2563eb; }
+    .tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #2563eb;
+      margin-bottom: 16px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 32px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 32px; }
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .card h3 { font-size: 18px; margin-bottom: 6px; }
+    .card p { font-size: 14px; color: #64748b; }
+    .stat-row { display: flex; gap: 48px; margin-top: 40px; }
+    .stat { text-align: left; }
+    .stat .num { font-size: 48px; font-weight: 800; color: #2563eb; }
+    .stat .label { font-size: 13px; color: #94a3b8; font-weight: 500; margin-top: 4px; }
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .flow-step {
+      background: #2563eb;
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .flow-arrow { color: #cbd5e1; font-size: 24px; }
+    .tech-list { list-style: none; margin-top: 20px; }
+    .tech-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 15px;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tech-list li::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2563eb;
+      flex-shrink: 0;
+    }
+    .cta-box {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      border-radius: 20px;
+      padding: 48px;
+      margin-top: 40px;
+      text-align: center;
+    }
+    .cta-box h2 { color: #fff; font-size: 36px; }
+    .cta-box p { color: rgba(255,255,255,0.8); margin: 12px auto 0; }
+    .link { color: #fff; font-weight: 600; font-size: 18px; margin-top: 20px; display: inline-block; }
+    .github-link {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 12px 28px;
+      background: #0f172a;
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    @media print { .slide { page-break-after: always; min-height: auto; padding: 40px; } }
+  </style>
+</head>
+<body>
+
+  <!-- Slide 1: Title -->
+  <div class="slide" style="align-items: center; text-align: center;">
+    <div class="slide-num">01 / 08</div>
+    <div class="logo-mark" style="margin: 0 auto 24px;"><img src="/logo.png" alt="StreakTrader" /></div>
+    <h1 style="font-size: 64px;">StreakTrader</h1>
+    <p style="font-size: 22px; color: #475569; max-width: 500px; margin: 0 auto;">
+      Gamified prediction markets on DreamDEX.<br />
+      Build streaks. Earn shields. Trade together.
+    </p>
+    <div class="stat-row" style="justify-content: center; margin-top: 48px;">
+      <div class="stat"><div class="num">5</div><div class="label">Smart Contracts</div></div>
+      <div class="stat"><div class="num">6</div><div class="label">Features</div></div>
+      <div class="stat"><div class="num">21</div><div class="label">Tests Passing</div></div>
+      <div class="stat"><div class="num">4</div><div class="label">Pages</div></div>
+    </div>
+  </div>
+
+  <!-- Slide 2: Problem -->
+  <div class="slide">
+    <div class="slide-num">02 / 08</div>
+    <div class="logo-mark"><img src="/logo.png" alt="" /></div>
+    <span class="tag">The Problem</span>
+    <h2>Prediction markets are intimidating</h2>
+    <p>
+      Existing platforms require deep financial knowledge, complex order books, and feel like Bloomberg terminals.
+      New users bounce in 30 seconds. There's no reason to come back tomorrow.
+    </p>
+    <div class="grid-3" style="margin-top: 48px;">
+      <div class="card">
+        <h3>Complex UI</h3>
+        <p>Order books, limit orders, slippage — overwhelming for beginners.</p>
+      </div>
+      <div class="card">
+        <h3>No Retention</h3>
+        <p>Trade once, never return. Zero reason to build a habit.</p>
+      </div>
+      <div class="card">
+        <h3>Isolated</h3>
+        <p>No social features, no competition, no community around trading.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: Solution -->
+  <div class="slide">
+    <div class="slide-num">03 / 08</div>
+    <div class="logo-mark"><img src="/logo.png" alt="" /></div>
+    <span class="tag">The Solution</span>
+    <h2>StreakTrader — Trading meets gaming</h2>
+    <p>
+      One-tap UP/DOWN predictions with streak multipliers, shields, and social competition.
+      Think Duolingo's engagement loops applied to prediction markets.
+    </p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>🎯 One-Tap Trading</h3>
+        <p>Pick UP or DOWN. Set stake. Done. No order books.</p>
+      </div>
+      <div class="card">
+        <h3>🔥 Streak Multiplier</h3>
+        <p>Win consecutive trades. Multiplier grows. Payouts increase.</p>
+      </div>
+      <div class="card">
+        <h3>🛡️ Streak Shield</h3>
+        <p>Protect your streak from one loss. Free shields daily.</p>
+      </div>
+      <div class="card">
+        <h3>🧠 AI Copilot</h3>
+        <p>AI-powered signals with confidence scores and risk gates.</p>
+      </div>
+      <div class="card">
+        <h3>📊 Prediction Score</h3>
+        <p>0-100 skill rating based on win rate, streak, and consistency.</p>
+      </div>
+      <div class="card">
+        <h3>🎴 Shareable Cards</h3>
+        <p>One-tap export your streak as a beautiful image for Twitter.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: Architecture -->
+  <div class="slide">
+    <div class="slide-num">04 / 08</div>
+    <div class="logo-mark"><img src="/logo.png" alt="" /></div>
+    <span class="tag">Architecture</span>
+    <h2>How it works</h2>
+    <div class="flow">
+      <div class="flow-step">👤 User</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">📱 StreakTrader App</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🔗 DreamDEX SDK</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">⛓️ Event Contracts</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🏦 Somnia L1</div>
+    </div>
+    <div class="grid-2" style="margin-top: 40px;">
+      <div>
+        <h3>Frontend</h3>
+        <ul class="tech-list">
+          <li>Next.js 16 + TypeScript</li>
+          <li>Tailwind CSS 4</li>
+          <li>Framer Motion animations</li>
+          <li>Canvas price charts (real Binance data)</li>
+          <li>canvas-confetti for celebrations</li>
+          <li>Responsive mobile-first design</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Smart Contracts</h3>
+        <ul class="tech-list">
+          <li>StreakRegistry — records trades on-chain</li>
+          <li>ShieldManager — manages shield claims</li>
+          <li>ChallengeArena — head-to-head challenges</li>
+          <li>ScoreOracle — computes prediction scores</li>
+          <li>StreakRegistryV2 — user-callable version</li>
+          <li>All deployed on Shannon Testnet</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: Innovation -->
+  <div class="slide">
+    <div class="slide-num">05 / 08</div>
+    <div class="logo-mark"><img src="/logo.png" alt="" /></div>
+    <span class="tag">Innovation</span>
+    <h2>What makes this different</h2>
+    <div class="grid-2" style="margin-top: 32px;">
+      <div>
+        <h3>Gamification Layer</h3>
+        <p>
+          No other hackathon project combines prediction markets with engagement loops.
+          Streaks create daily habits. Shields add strategic depth. Challenges add social competition.
+        </p>
+        <ul class="tech-list" style="margin-top: 20px;">
+          <li>Duolingo-style streak mechanics</li>
+          <li>Strategic shield usage (when to protect?)</li>
+          <li>Head-to-head challenge mode</li>
+          <li>Shareable streak cards for viral distribution</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Consumer-First Design</h3>
+        <p>
+          While others built tools for quant traders, we built for the person who watches BTC on their phone.
+          Premium UI, one-tap flows, zero complexity.
+        </p>
+        <ul class="tech-list" style="margin-top: 20px;">
+          <li>Apogee-inspired premium design</li>
+          <li>Mobile-first responsive layout</li>
+          <li>Confetti celebrations on wins</li>
+          <li>Real-time BTC price during settlement</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: Technical Deep Dive -->
+  <div class="slide">
+    <div class="slide-num">06 / 08</div>
+    <div class="logo-mark"><img src="/logo.png" alt="" /></div>
+    <span class="tag">Technical</span>
+    <h2>Under the hood</h2>
+    <div class="grid-2" style="margin-top: 32px;">
+      <div>
+        <h3>Smart Contracts (Solidity 0.8.24)</h3>
+        <ul class="tech-list">
+          <li><strong>StreakRegistry</strong> — Records trades with streak tracking, best streak, win rate</li>
+          <li><strong>ShieldManager</strong> — Daily shield claims with cooldown timer</li>
+          <li><strong>ChallengeArena</strong> — P2P challenges with stakes and time limits</li>
+          <li><strong>ScoreOracle</strong> — On-chain score computation (0-100)</li>
+          <li>21 unit tests across all contracts</li>
+        </ul>
+      </div>
+      <div>
+        <h3>SDK Integration</h3>
+        <ul class="tech-list">
+          <li><strong>DreamDEX Markets SDK</strong> — Real market discovery, order placement</li>
+          <li><strong>Binance API</strong> — Live BTC price during settlement</li>
+          <li><strong>MetaMask</strong> — Wallet connection, network switching, on-chain recording</li>
+          <li><strong>Server APIs</strong> — Leaderboard sync, streak persistence, trade recording</li>
+          <li><strong>AI Copilot</strong> — Signal analysis with risk gates</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: Demo Flow -->
+  <div class="slide">
+    <div class="slide-num">07 / 08</div>
+    <div class="logo-mark"><img src="/logo.png" alt="" /></div>
+    <span class="tag">Demo</span>
+    <h2>User journey</h2>
+    <div class="flow" style="margin-top: 40px;">
+      <div class="flow-step">1. Connect MetaMask</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">2. See live markets</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">3. Pick UP/DOWN</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">4. Watch live chart</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">5. Win → confetti!</div>
+    </div>
+    <div class="grid-3" style="margin-top: 48px;">
+      <div class="card">
+        <h3>Landing Page</h3>
+        <p>Premium hero with nebula video, animated charts, feature grid.</p>
+      </div>
+      <div class="card">
+        <h3>Trading Page</h3>
+        <p>Live market cards, AI copilot sidebar, one-tap trade panel.</p>
+      </div>
+      <div class="card">
+        <h3>Leaderboard</h3>
+        <p>Top traders ranked by score. Podium + table view.</p>
+      </div>
+      <div class="card">
+        <h3>History</h3>
+        <p>Trade timeline, streak visualization, P&L tracking.</p>
+      </div>
+      <div class="card">
+        <h3>Settlement</h3>
+        <p>30s countdown with live Binance BTC price chart.</p>
+      </div>
+      <div class="card">
+        <h3>Share Cards</h3>
+        <p>One-tap export streak as beautiful PNG for Twitter.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: CTA -->
+  <div class="slide" style="align-items: center; text-align: center;">
+    <div class="slide-num">08 / 08</div>
+    <div class="logo-mark" style="margin: 0 auto 24px;"><img src="/logo.png" alt="" /></div>
+    <h1>Ready to ride the wave?</h1>
+    <p style="text-align: center; margin: 0 auto;">
+      StreakTrader makes prediction markets fun, social, and addictive.
+      Built for everyone — not just quants.
+    </p>
+    <div class="cta-box">
+      <h2>streaktrader.sithunyein.com</h2>
+      <p>Built by Sithu Nyein · Powered by DreamDEX on Somnia</p>
+      <a href="https://github.com/thesithunyein/streaktrader" class="github-link">View Source on GitHub</a>
+    </div>
+    <div style="margin-top: 40px;">
+      <p style="font-size: 14px; color: #94a3b8;">
+        Shannon Testnet · DreamDEX Event Contracts · Somnia L1
+      </p>
+    </div>
+  </div>
+
+</body>
+</html>
