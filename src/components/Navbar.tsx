@@ -92,7 +92,7 @@ export default function Navbar() {
 
         {/* Center nav pill (desktop) */}
         <Animate delay={100} direction="down" className="hidden lg:block">
-          <div className="h-[52px] px-6 flex items-center gap-[30px] glass-pill rounded-[11px]">
+          <div className="h-[52px] px-6 flex items-center gap-[30px] bg-[#2563eb] rounded-[11px]">
             {[
               { label: "Trade", href: "/app", icon: Zap },
               { label: "Leaderboard", href: "/leaderboard", icon: Flame },
@@ -101,7 +101,7 @@ export default function Navbar() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="flex items-center gap-[5px] text-white/80 text-[14px] font-[450] leading-[14px] hover:text-white transition-colors"
+                className="flex items-center gap-[5px] text-white/90 text-[14px] font-[450] leading-[14px] hover:text-white transition-colors"
               >
                 <item.icon className="w-3.5 h-3.5" />
                 {item.label}
@@ -120,17 +120,16 @@ export default function Navbar() {
                 </span>
                 <button
                   onClick={disconnect}
-                  className="h-[46px] px-6 rounded-[11px] bg-[#E9E9E9] text-[#0A0707] text-[14px] font-[450] hover:bg-white transition-colors"
+                  className="h-[46px] px-6 rounded-[11px] bg-white/20 text-white text-[14px] font-[450] hover:bg-white/30 transition-colors"
                 >
                   Disconnect
                 </button>
               </>
             ) : (
               <button
-                onClick={connectWallet}
-                className="h-[46px] px-6 rounded-[11px] bg-[#E9E9E9] text-[#0A0707] text-[14px] font-[450] hover:bg-white transition-colors"
-              >
-                Connect Wallet
+                onClick={connectWallet}                  className="h-[46px] px-6 rounded-[11px] bg-white text-[#2563eb] text-[14px] font-[450] hover:bg-white/90 transition-colors font-semibold"
+                >
+                  Connect Wallet
               </button>
             )}
           </div>
@@ -206,17 +205,16 @@ export default function Navbar() {
                 </span>
                 <button
                   onClick={() => { disconnect(); setIsOpen(false); }}
-                  className="w-full h-[50px] rounded-[12px] bg-[#E9E9E9] text-[#0A0707] text-[15px] font-[450] transition-colors hover:bg-white"
+                  className="w-full h-[50px] rounded-[12px] bg-white/10 text-white text-[15px] font-[450] transition-colors hover:bg-white/20"
                 >
                   Disconnect
                 </button>
               </>
             ) : (
               <button
-                onClick={() => { connectWallet(); setIsOpen(false); }}
-                className="w-full h-[50px] rounded-[12px] bg-[#E9E9E9] text-[#0A0707] text-[15px] font-[450] transition-colors hover:bg-white"
-              >
-                Connect Wallet
+                onClick={() => { connectWallet(); setIsOpen(false); }}                  className="w-full h-[50px] rounded-[12px] bg-white text-[#2563eb] text-[15px] font-[450] font-semibold transition-colors hover:bg-white/90"
+                >
+                  Connect Wallet
               </button>
             )}
           </div>

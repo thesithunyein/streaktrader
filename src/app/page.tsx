@@ -155,7 +155,7 @@ export default function Home() {
                   <div className="flex flex-wrap gap-3 sm:gap-4">
                     <Link
                       href="/app"
-                      className="h-[46px] sm:h-[51px] px-5 sm:px-[27px] bg-[#E9E9E9] rounded-[12px] text-[#0A0707] text-[14px] sm:text-[15.5px] font-[450] leading-[15.5px] flex items-center gap-2 transition-opacity hover:opacity-90"
+                      className="h-[46px] sm:h-[51px] px-5 sm:px-[27px] btn-primary rounded-[12px] text-white text-[14px] sm:text-[15.5px] font-[450] leading-[15.5px] flex items-center gap-2"
                     >
                       Start Trading <ArrowRight className="w-4 h-4" />
                     </Link>
@@ -258,7 +258,7 @@ export default function Home() {
           </p>
           <Link
             href="/app"
-            className="inline-flex h-[51px] px-[27px] bg-[#E9E9E9] rounded-[12px] text-[#0A0707] text-[15.5px] font-[450] items-center gap-2 transition-opacity hover:opacity-90"
+            className="inline-flex h-[51px] px-[27px] btn-primary rounded-[12px] text-white text-[15.5px] font-[450] items-center gap-2"
           >
             Start Trading <ArrowRight className="w-4 h-4" />
           </Link>
