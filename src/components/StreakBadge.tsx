@@ -29,8 +29,8 @@ export default function StatsBar({ onShare }: StatsBarProps) {
           {/* Streak */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Flame className={`w-4 h-4 ${streak > 0 ? "text-[#f59e0b]" : "text-slate-300"}`} />
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Streak</span>
+              <Flame className={`w-4 h-4 ${streak > 0 ? "text-[#f59e0b]" : "text-slate-400"}`} />
+              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Streak</span>
             </div>
             <div className="text-2xl font-bold font-mono text-slate-900">
               {streak}<span className="text-sm text-slate-400">x</span>
@@ -40,8 +40,8 @@ export default function StatsBar({ onShare }: StatsBarProps) {
           {/* Win Rate */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <TrendingUp className="w-4 h-4 text-slate-300" />
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Win Rate</span>
+              <TrendingUp className="w-4 h-4 text-slate-400" />
+              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Win Rate</span>
             </div>
             <div className="text-2xl font-bold font-mono text-slate-900">
               {winRate}<span className="text-sm text-slate-400">%</span>
@@ -51,8 +51,8 @@ export default function StatsBar({ onShare }: StatsBarProps) {
           {/* PnL */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Zap className="w-4 h-4 text-slate-300" />
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">PnL</span>
+              <Zap className="w-4 h-4 text-slate-400" />
+              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">PnL</span>
             </div>
             <div className={`text-2xl font-bold font-mono ${totalPnL >= 0 ? "text-[#16a34a]" : "text-[#dc2626]"}`}>
               {totalPnL >= 0 ? "+" : ""}{totalPnL.toFixed(1)}
@@ -62,13 +62,13 @@ export default function StatsBar({ onShare }: StatsBarProps) {
           {/* Score */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Award className="w-4 h-4 text-slate-300" />
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Score</span>
+              <Award className="w-4 h-4 text-slate-400" />
+              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Score</span>
             </div>
             <div className="text-2xl font-bold font-mono text-gradient">
               {score}
             </div>
-            <div className="text-[9px] text-slate-400">{scoreLabel}</div>
+            <div className="text-[9px] text-slate-500">{scoreLabel}</div>
           </div>
         </div>
 
