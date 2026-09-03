@@ -47,23 +47,27 @@ function MarketSkeleton({ delay = 0 }: { delay?: number }) {
       className="glass rounded-[20px] p-5 overflow-hidden relative opacity-0 animate-fade-up"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-[10px] bg-white/5 animate-pulse" />
-          <div>
-            <div className="h-3.5 w-16 bg-white/5 rounded-md mb-1.5 animate-pulse" />
-            <div className="h-2.5 w-12 bg-white/5 rounded-md animate-pulse" />
+      {/* Shimmer overlay */}
+      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.8s_infinite] bg-gradient-to-r from-transparent via-slate-100/80 to-transparent z-[1]" />
+      <div className="relative z-0">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-[10px] bg-slate-100 animate-skeleton-pulse" />
+            <div>
+              <div className="h-3.5 w-16 bg-slate-100 rounded-md mb-1.5 animate-skeleton-pulse" />
+              <div className="h-2.5 w-12 bg-slate-100 rounded-md animate-skeleton-pulse" />
+            </div>
           </div>
+          <div className="h-6 w-20 bg-slate-100 rounded-full animate-skeleton-pulse" />
         </div>
-        <div className="h-6 w-20 bg-white/5 rounded-full animate-pulse" />
-      </div>
-      <div className="mb-4">
-        <div className="h-2.5 rounded-full bg-white/5 animate-pulse" />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="h-11 rounded-[12px] bg-white/5 animate-pulse" />
-        <div className="h-11 rounded-[12px] bg-white/5 animate-pulse" />
+        <div className="mb-4">
+          <div className="h-2.5 rounded-full bg-slate-100 animate-skeleton-pulse" />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="h-11 rounded-[12px] bg-slate-100 animate-skeleton-pulse" />
+          <div className="h-11 rounded-[12px] bg-slate-100 animate-skeleton-pulse" />
+        </div>
+        <div className="mt-3 h-1 rounded-full bg-slate-100 animate-skeleton-pulse" />
       </div>
     </div>
   );
