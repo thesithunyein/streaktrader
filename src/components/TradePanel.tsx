@@ -97,14 +97,18 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
       onClose();
     } catch (e: any) {
       const msg = e?.message || "Trade failed";
-      if (msg.includes("empty") || msg.includes("no liquidity")) {
+      if (msg.includes("0xd48c4403") || msg.includes("Custom error")) {
+        setTradeError("Market not accepting trades right now. Try another market or wait for the next window.");
+      } else if (msg.includes("empty") || msg.includes("no liquidity")) {
         setTradeError("Order book empty. Try a different market or wait for liquidity.");
       } else if (msg.includes("balance") || msg.includes("insufficient")) {
-        setTradeError("Insufficient balance. Get more STT from the faucet.");
+        setTradeError("Insufficient balance. Get STT from the faucet.");
       } else if (msg.includes("chain") || msg.includes("network")) {
         setTradeError("Wrong network. Switch MetaMask to Shannon Testnet.");
+      } else if (msg.includes("user rejected")) {
+        setTradeError("Transaction cancelled.");
       } else {
-        setTradeError(msg);
+        setTradeError(msg.slice(0, 120));
       }
     } finally {
       setPlacing(false);
@@ -127,7 +131,10 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
               chainId: "0xc488",
               chainName: "Somnia Shannon Testnet",
               nativeCurrency: { name: "STT", symbol: "STT", decimals: 18 },
-              rpcUrls: ["https://api.infra.testnet.somnia.network"],
+              rpcUrls: [
+                "https://dream-rpc.somnia.network",
+                "https://api.infra.testnet.somnia.network",
+              ],
               blockExplorerUrls: ["https://shannon-explorer.somnia.network"],
             },
           ],
@@ -138,10 +145,11 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
     setTimeout(async () => {
       try {
         const chainId = await window.ethereum.request({ method: "eth_chainId" });
-        setIsWrongNetwork(parseInt(chainId, 16) !== 50312);
-        setTradeError(null);
+        const wrong = parseInt(chainId, 16) !== 50312;
+        setIsWrongNetwork(wrong);
+        if (!wrong) setTradeError(null);
       } catch {}
-    }, 1000);
+    }, 1500);
   };
 
   const toggleShield = () => {
