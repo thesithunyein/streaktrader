@@ -623,10 +623,10 @@ export default function SettlementView() {
 
             {/* On-chain status */}
             {onChainStatus && (
-              <div className="mb-3 p-2 rounded-lg bg-down/5 border border-down/10">
+              <div className="mb-3 p-2 rounded-lg bg-accent/5 border border-accent/15">
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-down animate-pulse" />
-                  <span className="text-[10px] font-medium text-down">{onChainStatus}</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                  <span className="text-[10px] font-medium text-accent">{onChainStatus}</span>
                 </div>
               </div>
             )}
