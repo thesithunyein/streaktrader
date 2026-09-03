@@ -12,12 +12,22 @@ interface TradePanelProps {
   onChallenge?: () => void;
 }
 
+const SHANNON_CHAIN_ID = "0xc488"; // 50312 in hex
+const SHANNON_PARAMS = {
+  chainId: SHANNON_CHAIN_ID,
+  chainName: "Somnia Shannon Testnet",
+  nativeCurrency: { name: "STT", symbol: "STT", decimals: 18 },
+  rpcUrls: ["https://50312.rpc.thirdweb.com", "https://dream-rpc.somnia.network"],
+  blockExplorerUrls: ["https://shannon-explorer.somnia.network"],
+};
+
 export default function TradePanel({ market, onClose, onChallenge }: TradePanelProps) {
   const [side, setSide] = useState<"UP" | "DOWN">("UP");
   const [stake, setStake] = useState(10);
   const [placing, setPlacing] = useState(false);
   const [placingStep, setPlacingStep] = useState("");
   const [tradeError, setTradeError] = useState<string | null>(null);
+  const [isSwitching, setIsSwitching] = useState(false);
   const { placeTrade, streak, getMultiplier, shields, activeShield, activateShield, deactivateShield } = useStreakStore();
   const { address, placeOrder } = useTrade();
   const multiplier = getMultiplier();
@@ -26,24 +36,37 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
 
   const [isWrongNetwork, setIsWrongNetwork] = useState(false);
 
-  // Check network on mount, when address changes, and on chain change
+  // Check network and auto-switch on mount
   useEffect(() => {
-    const checkNetwork = async () => {
+    const checkAndAutoSwitch = async () => {
       if (typeof window === "undefined" || !window.ethereum) return;
       try {
         const chainId = await window.ethereum.request({ method: "eth_chainId" });
         const wrong = parseInt(chainId, 16) !== 50312;
         setIsWrongNetwork(wrong);
-        if (!wrong) setTradeError(null);
+        if (!wrong) {
+          setTradeError(null);
+          return;
+        }
+        // Auto-switch silently on mount
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: SHANNON_CHAIN_ID }],
+          });
+          setIsWrongNetwork(false);
+          setTradeError(null);
+        } catch {
+          // User rejected — that's fine, they can click Switch manually
+        }
       } catch {}
     };
-    checkNetwork();
-    // Also check every 2 seconds to catch any changes
-    const interval = setInterval(checkNetwork, 2000);
+    checkAndAutoSwitch();
+    const interval = setInterval(checkAndAutoSwitch, 3000);
     if (window.ethereum) {
-      window.ethereum.on("chainChanged", checkNetwork);
+      window.ethereum.on("chainChanged", checkAndAutoSwitch);
       return () => {
-        window.ethereum?.removeListener("chainChanged", checkNetwork);
+        window.ethereum?.removeListener("chainChanged", checkAndAutoSwitch);
         clearInterval(interval);
       };
     }
@@ -62,7 +85,7 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
         const chainId = await window.ethereum.request({ method: "eth_chainId" });
         if (parseInt(chainId, 16) !== 50312) {
           setIsWrongNetwork(true);
-          setTradeError("Wrong network. Click Switch to change.");
+          setTradeError("Wrong network. Click Switch to change to Shannon Testnet.");
           return;
         }
       } catch {}
@@ -74,32 +97,15 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
     setPlacingStep("Fetching order book...");
 
     try {
-      // UP = buy YES token, DOWN = buy NO token
-      // Strip #YES/#NO suffix — SDK expects base market symbol
       const baseSymbol = market.symbol.replace(/#(YES|NO)$/i, "");
-      const orderSymbol = side === "UP" ? baseSymbol : baseSymbol;
+      const orderSymbol = baseSymbol;
 
-      // Small delay so user sees the step message
       await new Promise(r => setTimeout(r, 500));
       setPlacingStep("Confirm in MetaMask...");
 
-      // placeOrder now handles order book fetching + crossing the touch automatically
-      await placeOrder(
-        orderSymbol,
-        "buy",
-        stake,
-        undefined, // let useExchange fetch book and set price
-        "IOC" // immediate or cancel — SDK recommended
-      );
+      await placeOrder(orderSymbol, "buy", stake, undefined, "IOC");
 
-      // If order succeeds, create the local streak trade
-      placeTrade({
-        marketId: market.symbol,
-        symbol: market.symbol,
-        side,
-        stake,
-      });
-
+      placeTrade({ marketId: market.symbol, symbol: market.symbol, side, stake });
       onClose();
     } catch (e: any) {
       const msg = e?.message || "Trade failed";
@@ -110,7 +116,7 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
       } else if (msg.includes("balance") || msg.includes("insufficient")) {
         setTradeError("Insufficient balance. Get STT from the faucet.");
       } else if (msg.includes("chain") || msg.includes("network")) {
-        setTradeError("Wrong network. Switch MetaMask to Shannon Testnet.");
+        setTradeError("Wrong network. Click Switch below to auto-switch.");
       } else if (msg.includes("user rejected")) {
         setTradeError("Transaction cancelled.");
       } else {
@@ -123,40 +129,55 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
   };
 
   const switchNetwork = async () => {
-    if (typeof window === "undefined" || !window.ethereum) return;
+    if (typeof window === "undefined" || !window.ethereum) {
+      setTradeError("No wallet detected. Install MetaMask.");
+      return;
+    }
+
+    setIsSwitching(true);
+    setTradeError(null);
+
     try {
+      // Try switch first (fastest path)
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0xc488" }], // 50312 in hex
+        params: [{ chainId: SHANNON_CHAIN_ID }],
       });
-    } catch {
+      setIsWrongNetwork(false);
+      setTradeError(null);
+    } catch (switchErr: any) {
+      if (switchErr?.code === 4001) {
+        setTradeError("Switch cancelled. Please switch to Shannon Testnet (50312) in MetaMask manually.");
+        setIsSwitching(false);
+        return;
+      }
+      // Chain not in MetaMask — try to add it
       try {
         await window.ethereum.request({
           method: "wallet_addEthereumChain",
-          params: [
-            {
-              chainId: "0xc488",
-              chainName: "Somnia Shannon Testnet",
-              nativeCurrency: { name: "STT", symbol: "STT", decimals: 18 },
-              rpcUrls: [
-                "https://dream-rpc.somnia.network",
-                "https://api.infra.testnet.somnia.network",
-              ],
-              blockExplorerUrls: ["https://shannon-explorer.somnia.network"],
-            },
-          ],
+          params: [SHANNON_PARAMS],
         });
-      } catch {}
+        setIsWrongNetwork(false);
+        setTradeError(null);
+      } catch (addErr: any) {
+        if (addErr?.code === 4001) {
+          setTradeError("Network cancelled. Add Shannon Testnet manually in MetaMask settings.");
+        } else {
+          setTradeError(`Failed: ${addErr?.message?.slice(0, 80) || "Unknown error"}. Switch manually to Chain ID 50312.`);
+        }
+      }
+    } finally {
+      setIsSwitching(false);
+      // Final check
+      setTimeout(async () => {
+        try {
+          const chainId = await window.ethereum!.request({ method: "eth_chainId" });
+          const wrong = parseInt(chainId, 16) !== 50312;
+          setIsWrongNetwork(wrong);
+          if (!wrong) setTradeError(null);
+        } catch {}
+      }, 1000);
     }
-    // Re-check network after switch attempt
-    setTimeout(async () => {
-      try {
-        const chainId = await window.ethereum.request({ method: "eth_chainId" });
-        const wrong = parseInt(chainId, 16) !== 50312;
-        setIsWrongNetwork(wrong);
-        if (!wrong) setTradeError(null);
-      } catch {}
-    }, 1500);
   };
 
   const toggleShield = () => {
@@ -221,33 +242,20 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
         {/* Shield Toggle */}
         {shields > 0 && streak > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-5">
-            <button
-              onClick={toggleShield}
+            <button onClick={toggleShield}
               className={`w-full p-3 rounded-xl flex items-center gap-3 transition-all ${
-                activeShield
-                  ? "bg-accent/10 border-2 border-accent/30"
-                  : "bg-slate-50 border border-slate-200 hover:border-accent/20"
-              }`}
-            >
+                activeShield ? "bg-accent/10 border-2 border-accent/30" : "bg-slate-50 border border-slate-200 hover:border-accent/20"
+              }`}>
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${activeShield ? "bg-accent/20" : "bg-slate-100"}`}>
-                {activeShield ? (
-                  <ShieldCheck className="w-5 h-5 text-accent" />
-                ) : (
-                  <Shield className="w-5 h-5 text-slate-500" />
-                )}
+                {activeShield ? <ShieldCheck className="w-5 h-5 text-accent" /> : <Shield className="w-5 h-5 text-slate-500" />}
               </div>
               <div className="flex-1 text-left">
                 <div className={`text-sm font-semibold ${activeShield ? "text-accent" : "text-slate-900"}`}>
                   {activeShield ? "Shield Active" : "Activate Shield"}
                 </div>
                 <div className="text-xs text-slate-500">
-                  {activeShield
-                    ? "This trade is protected from streak loss"
-                    : `${shields} shield${shields > 1 ? "s" : ""} remaining — protects your streak`}
+                  {activeShield ? "This trade is protected from streak loss" : `${shields} shield${shields > 1 ? "s" : ""} remaining`}
                 </div>
-              </div>
-              <div className={`text-xs font-bold px-2 py-1 rounded-lg ${activeShield ? "bg-accent/20 text-accent" : "bg-slate-100 text-slate-500"}`}>
-                {shields}x
               </div>
             </button>
           </motion.div>
@@ -295,12 +303,18 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
           )}
         </div>
 
+        {/* Network error + Switch button */}
         {(tradeError || isWrongNetwork) && (
-          <div className="mb-4 p-3 rounded-xl bg-down/10 border border-down/20">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-down">{tradeError || "Wrong network"}</span>
-              <button onClick={switchNetwork} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-down/20 hover:bg-down/30 text-down text-xs font-semibold">
-                <RefreshCw className="w-3 h-3" /> Switch
+          <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm text-amber-700 flex-1">{tradeError || "Wrong network. Click Switch to change."}</span>
+              <button onClick={switchNetwork} disabled={isSwitching}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-bold transition-colors shrink-0 disabled:opacity-50">
+                {isSwitching ? (
+                  <><Loader2 className="w-3 h-3 animate-spin" /> Switching...</>
+                ) : (
+                  <><RefreshCw className="w-3 h-3" /> Switch</>
+                )}
               </button>
             </div>
           </div>
@@ -309,12 +323,14 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
         <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
           onClick={handlePlaceTrade}
           disabled={placing || !address}
-          className={`w-full py-4 rounded-2xl text-base font-bold text-white transition-all flex items-center justify-center gap-2 ${!address ? "opacity-50 cursor-not-allowed bg-slate-300" : side === "UP" ? "btn-up" : "btn-down"}`}>
+          className={`w-full py-4 rounded-2xl text-base font-bold text-white transition-all flex items-center justify-center gap-2 ${!address ? "opacity-50 cursor-not-allowed bg-slate-300" : isWrongNetwork ? "bg-amber-500 hover:bg-amber-600" : side === "UP" ? "btn-up" : "btn-down"}`}>
           {placing ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
               {placingStep || "Confirm in MetaMask..."}
             </>
+          ) : isWrongNetwork ? (
+            "Switch Network to Trade"
           ) : !address ? (
             "Connect Wallet to Trade"
           ) : (
@@ -322,7 +338,6 @@ export default function TradePanel({ market, onClose, onChallenge }: TradePanelP
           )}
         </motion.button>
 
-        {/* Challenge Friend button */}
         {onChallenge && (
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             onClick={onChallenge}

@@ -140,7 +140,7 @@ export function useWallet() {
                   symbol: "STT",
                   decimals: 18,
                 },
-                rpcUrls: ["https://rpc.infra.testnet.somnia.network"],
+                rpcUrls: ["https://50312.rpc.thirdweb.com", "https://rpc.infra.testnet.somnia.network"],
                 blockExplorerUrls: ["https://shannon-explorer.somnia.network"],
               },
             ],
